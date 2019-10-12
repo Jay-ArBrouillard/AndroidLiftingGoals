@@ -27,9 +27,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
         //Get Intent info. from LoginActivity
-//        Intent intent = getIntent();
+//Intent intent = getIntent();
 //        username = intent.getStringExtra("username");
-
 
         //Now pass username from Activity to a fragment
 //        Bundle bundle = new Bundle();
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 //        startingFragment.setArguments(bundle);
         
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, startingFragment).commit();
-
 
     }
 

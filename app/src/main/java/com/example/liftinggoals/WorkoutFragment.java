@@ -20,14 +20,14 @@ public class WorkoutFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_workout, container, false);
+        View view = inflater.inflate(R.layout.fragment_multiple_workout_routine, container, false);
 
         ArrayList<String> daysOfTheWeek = new ArrayList<>();
         daysOfTheWeek.add("Monday");
         daysOfTheWeek.add("Wednesday");
         daysOfTheWeek.add("Friday");
 
-        listView = (ListView) view.findViewById(R.id.workout_listView);
+        listView = (ListView) view.findViewById(R.id.multiple_workout_list_view);
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, daysOfTheWeek);
         listView.setAdapter(arrayAdapter);
