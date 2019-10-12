@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ExerciseDetailsFragment">
+
+    <Button
+        android:id="@+id/fragment_exercise_details_back_button"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:text="Back"/>
+
+    <TextView
+        android:id="@+id/exercise_details_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bench Press"
+        android:textSize="50dp"
+        android:layout_below="@id/fragment_exercise_details_back_button"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/exercise_details_line_chart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@+id/exercise_details_name"/>
+
+    <LinearLayout
+        android:id="@+id/exercise_details_numbers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/exercise_details_line_chart"
+        android:weightSum="4">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2500 lb"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="100 lb"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="5"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="50"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/exercise_details_ids"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/exercise_details_numbers"
+        android:weightSum="4">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Volume Record"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="1 RM"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Set Record"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rep Record"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/exercise_details_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/exercise_details_ids"/>
+
+</RelativeLayout>
