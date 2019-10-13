@@ -14,6 +14,12 @@ public class WorkoutModel {
         this.workoutName = workoutName;
     }
 
+    public WorkoutModel(String workoutName, int estimatedDuration, List<ExerciseModel> exercises) {
+        this.workoutName = workoutName;
+        this.estimatedDuration = estimatedDuration;
+        this.exercises = exercises;
+    }
+
     public String getWorkoutName() {
         return workoutName;
     }

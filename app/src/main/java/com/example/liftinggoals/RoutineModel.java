@@ -10,9 +10,15 @@ public class RoutineModel {
     private Date lastPerformed;
     private List<WorkoutModel> workouts;
 
-    public RoutineModel(String mText1, String mText2) {
-        this.routineName = mText1;
-        this.description = mText2;
+    public RoutineModel(String routineName, String description) {
+        this.routineName = routineName;
+        this.description = description;
+    }
+
+    public RoutineModel(String routineName, String description, List<WorkoutModel> workouts) {
+        this.routineName = routineName;
+        this.description = description;
+        this.workouts = workouts;
     }
 
     public String getRoutineName() {

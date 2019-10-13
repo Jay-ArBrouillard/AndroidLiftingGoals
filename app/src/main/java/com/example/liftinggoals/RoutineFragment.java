@@ -49,6 +49,14 @@ public class RoutineFragment extends Fragment {
         routineModels.add(new RoutineModel("Lifting Routine", "Test Description"));
         routineModels.add(new RoutineModel("Biking Routine", "Test Description"));
         routineModels.add(new RoutineModel("Log Splitting Routine", "Test Description"));
+
+        final ArrayList<WorkoutModel> workoutModels = new ArrayList<>();
+        final ArrayList<ExerciseModel> exerciseModels = new ArrayList<>();
+        exerciseModels.add(new ExerciseModel("Bench Press"));
+        workoutModels.add(new WorkoutModel("Chest Day"));
+        routineModels.add(new RoutineModel("Chest Routine", "Simple Chest Workouts", workoutModels));
+
+
         routineModels.add(new RoutineModel("Starting Strength", "Easy Beginner program"));
         routineModels.add(new RoutineModel("5x5", "Simple Beginner to Intermediate strength program"));
         routineModels.add(new RoutineModel("Wendlers", "Advanced strength program"));
@@ -63,6 +71,7 @@ public class RoutineFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 routineModels.get(position); //Unused
+
 
                 Fragment selectedFragment = new WorkoutFragment();
 
