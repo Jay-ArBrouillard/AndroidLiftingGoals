@@ -12,27 +12,38 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class WorkoutFragment extends Fragment {
-    ListView listView;
+    private ArrayList<WorkoutModel> workoutsList;
+    private ArrayList<String> workoutItems;
+    private RecyclerView recyclerView;
+    private RoutineAdapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_multiple_workout_routine, container, false);
 
-        ArrayList<String> daysOfTheWeek = new ArrayList<>();
-        daysOfTheWeek.add("Monday");
-        daysOfTheWeek.add("Wednesday");
-        daysOfTheWeek.add("Friday");
+        //Get info from Bundle
+        if (getArguments() != null) {
+            workoutsList = getArguments().getParcelableArrayList("routine_item");
+            workoutItems = new ArrayList<>();
+            for (WorkoutModel workoutModel : workoutsList) {
+                workoutItems.add(workoutModel.getWorkoutName());
+            }
+        }
 
-        listView = (ListView) view.findViewById(R.id.multiple_workout_list_view);
+        recyclerView = view.findViewById(R.id.multiple_workout_list_view);
+        initializeRecyclerView();
+/*
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, workoutItems);
+        recyclerView.setAdapter(arrayAdapter);
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, daysOfTheWeek);
-        listView.setAdapter(arrayAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
@@ -41,7 +52,39 @@ public class WorkoutFragment extends Fragment {
                 }
             }
         });
-
+*/
         return view;
+    }
+
+    private void initializeRecyclerView() {
+        recyclerView.setHasFixedSize(true);
+        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
+
+        layoutManager = new LinearLayoutManager(getActivity());
+        /*
+        adapter = new RoutineAdapter(workoutItems);
+
+        adapter.setOnItemClickListener(new RoutineAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());
+                Fragment selectedFragment = new WorkoutFragment();
+                selectedFragment.setArguments(bundle);
+
+                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+            }
+
+            @Override
+            public void onItemEdit(int position) {
+                //unimplemented
+            }
+
+        });
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+        */
+
     }
 }

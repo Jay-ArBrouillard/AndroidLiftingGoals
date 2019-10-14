@@ -1,6 +1,9 @@
 package com.example.liftinggoals;
 
-public class ExerciseModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ExerciseModel implements Parcelable {
     private String exerciseName;
     private int minSets;
     private int maxSets;
@@ -35,6 +38,30 @@ public class ExerciseModel {
         this.tempo = temp;
         this.trainingMax = trainingMax;
     }
+
+    protected ExerciseModel(Parcel in) {
+        exerciseName = in.readString();
+        minSets = in.readInt();
+        maxSets = in.readInt();
+        minReps = in.readInt();
+        maxReps = in.readInt();
+        restDuration = in.readInt();
+        RPE = in.readInt();
+        tempo = in.readInt();
+        trainingMax = in.readInt();
+    }
+
+    public static final Creator<ExerciseModel> CREATOR = new Creator<ExerciseModel>() {
+        @Override
+        public ExerciseModel createFromParcel(Parcel in) {
+            return new ExerciseModel(in);
+        }
+
+        @Override
+        public ExerciseModel[] newArray(int size) {
+            return new ExerciseModel[size];
+        }
+    };
 
     public String getExerciseName() {
         return exerciseName;
@@ -106,5 +133,23 @@ public class ExerciseModel {
 
     public void setTrainingMax(int trainingMax) {
         this.trainingMax = trainingMax;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(exerciseName);
+        dest.writeInt(minSets);
+        dest.writeInt(maxSets);
+        dest.writeInt(minReps);
+        dest.writeInt(maxReps);
+        dest.writeInt(restDuration);
+        dest.writeInt(RPE);
+        dest.writeInt(tempo);
+        dest.writeInt(trainingMax);
     }
 }

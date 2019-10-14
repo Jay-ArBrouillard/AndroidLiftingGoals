@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class RoutineFragment extends Fragment {
+    private ArrayList<RoutineModel> routineModels;
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -43,23 +44,16 @@ public class RoutineFragment extends Fragment {
     }
 
     private void initializeRecyclerView() {
-        final ArrayList<RoutineModel> routineModels = new ArrayList<>();
-        routineModels.add(new RoutineModel("Stretching Routine", "Test Description"));
-        routineModels.add(new RoutineModel("Cardio Routine", "Test Description"));
-        routineModels.add(new RoutineModel("Lifting Routine", "Test Description"));
-        routineModels.add(new RoutineModel("Biking Routine", "Test Description"));
-        routineModels.add(new RoutineModel("Log Splitting Routine", "Test Description"));
+        routineModels = new ArrayList<>();
 
-        final ArrayList<WorkoutModel> workoutModels = new ArrayList<>();
-        final ArrayList<ExerciseModel> exerciseModels = new ArrayList<>();
+        ArrayList<WorkoutModel> workoutModels = new ArrayList<>();  //Contains Workout Variants in Routine
+        ArrayList<ExerciseModel> exerciseModels = new ArrayList<>();    //Contain exercises in a Workout
         exerciseModels.add(new ExerciseModel("Bench Press"));
         workoutModels.add(new WorkoutModel("Chest Day"));
-        routineModels.add(new RoutineModel("Chest Routine", "Simple Chest Workouts", workoutModels));
+        workoutModels.add(new WorkoutModel("Back Day"));
+        workoutModels.add(new WorkoutModel("Leg Day"));
 
-
-        routineModels.add(new RoutineModel("Starting Strength", "Easy Beginner program"));
-        routineModels.add(new RoutineModel("5x5", "Simple Beginner to Intermediate strength program"));
-        routineModels.add(new RoutineModel("Wendlers", "Advanced strength program"));
+        routineModels.add(new RoutineModel(R.drawable.ic_dumbbell_blue_48dp, "Chest Routine", "Simple Chest Routine", workoutModels));
 
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
@@ -70,10 +64,10 @@ public class RoutineFragment extends Fragment {
         adapter.setOnItemClickListener(new RoutineAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                routineModels.get(position); //Unused
-
-
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());
                 Fragment selectedFragment = new WorkoutFragment();
+                selectedFragment.setArguments(bundle);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
             }
@@ -117,8 +111,6 @@ public class RoutineFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int pos = viewHolder.getAdapterPosition();
-                //Toast toast = Toast.makeText(getActivity(),adapter.getItem(pos).getText1() + " Deleted", Toast.LENGTH_SHORT);
-                //toast.show();
                 adapter.delete(viewHolder, pos);
             }
         }).attachToRecyclerView(recyclerView);

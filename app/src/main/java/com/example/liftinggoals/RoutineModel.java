@@ -1,21 +1,23 @@
 package com.example.liftinggoals;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class RoutineModel {
-    private int imageResource; //Not used
+    private int imageResource;
     private String routineName;
     private String description;
     private Date lastPerformed;
-    private List<WorkoutModel> workouts;
+    private ArrayList<WorkoutModel> workouts;
 
-    public RoutineModel(String routineName, String description) {
+    public RoutineModel(int imageResource, String routineName, String description) {
+        this.imageResource = imageResource;
         this.routineName = routineName;
         this.description = description;
     }
 
-    public RoutineModel(String routineName, String description, List<WorkoutModel> workouts) {
+    public RoutineModel(int imageResource, String routineName, String description, ArrayList<WorkoutModel> workouts) {
+        this.imageResource = imageResource;
         this.routineName = routineName;
         this.description = description;
         this.workouts = workouts;
@@ -45,11 +47,11 @@ public class RoutineModel {
         this.lastPerformed = lastPerformed;
     }
 
-    public List<WorkoutModel> getWorkouts() {
+    public ArrayList<WorkoutModel> getWorkouts() {
         return workouts;
     }
 
-    public void setWorkouts(List<WorkoutModel> workouts) {
+    public void setWorkouts(ArrayList<WorkoutModel> workouts) {
         this.workouts = workouts;
     }
 }
