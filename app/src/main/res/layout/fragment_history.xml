@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:background="@android:color/black">
+
+    <TextView
+        android:id="@+id/history_fragment_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:text="History"
+        android:textColor="@android:color/white"
+        android:textSize="40dp" />
+
 
     <CalendarView
         android:id="@+id/history_calendar_view"
         android:layout_width="match_parent"
-        android:layout_height="400dp">
-    </CalendarView>
+        android:layout_height="400dp"
+        android:layout_below="@+id/history_fragment_title"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/background_calendar" />
 
-    <ListView
-        android:id="@+id/history_list_view"
+
+    <TextView
+        android:id="@+id/history_fragment_workout_details"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/history_calendar_view"
+        android:paddingLeft="10dp"
+        android:text="Workout Details"
+        android:textColor="@android:color/white"
+        android:textSize="20dp"
+        android:textAlignment="center" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/history_fragment_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/history_calendar_view"></ListView>
+        android:layout_below="@+id/history_fragment_workout_details"/>
 
 </RelativeLayout>

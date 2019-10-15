@@ -7,19 +7,15 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 public class WorkoutModel implements Parcelable {
+    private int imageResource;
     private String workoutName;
     private int estimatedDuration;
     private ArrayList<ExerciseModel> exercises;
     private Color color;
 
     public WorkoutModel(String workoutName) {
-        this.workoutName = workoutName;
-    }
 
-    public WorkoutModel(String workoutName, int estimatedDuration, ArrayList<ExerciseModel> exercises) {
         this.workoutName = workoutName;
-        this.estimatedDuration = estimatedDuration;
-        this.exercises = exercises;
     }
 
     protected WorkoutModel(Parcel in) {

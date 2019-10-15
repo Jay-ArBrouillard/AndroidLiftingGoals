@@ -10,14 +10,7 @@ public class RoutineModel {
     private Date lastPerformed;
     private ArrayList<WorkoutModel> workouts;
 
-    public RoutineModel(int imageResource, String routineName, String description) {
-        this.imageResource = imageResource;
-        this.routineName = routineName;
-        this.description = description;
-    }
-
-    public RoutineModel(int imageResource, String routineName, String description, ArrayList<WorkoutModel> workouts) {
-        this.imageResource = imageResource;
+    public RoutineModel(String routineName, String description, ArrayList<WorkoutModel> workouts) {
         this.routineName = routineName;
         this.description = description;
         this.workouts = workouts;

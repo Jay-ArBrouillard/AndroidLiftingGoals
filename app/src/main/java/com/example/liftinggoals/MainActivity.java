@@ -23,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+
+
         //Check if coming from Google maps activity
         Intent intent = getIntent();
         String strMenuId = intent.getStringExtra("menu_id");
@@ -51,24 +55,10 @@ public class MainActivity extends AppCompatActivity {
             if (selectedFragment != null)
             {
                 getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
-
             }
+        } else {
+            getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineFragment()).commit();
         }
-
-        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
-        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
-
-        //Get Intent info. from LoginActivity
-//Intent intent = getIntent();
-//        username = intent.getStringExtra("username");
-
-        //Now pass username from Activity to a fragment
-//        Bundle bundle = new Bundle();
-//        bundle.putString("username", username);
-        RoutineFragment startingFragment = new RoutineFragment();
-//        startingFragment.setArguments(bundle);
-        
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, startingFragment).commit();
 
     }
 
@@ -94,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_maps:
                     Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
                     startActivity(mapsIntent);
+                    finish();
                     break;
                 case R.id.nav_settings:
                     selectedFragment = new SettingFragment();

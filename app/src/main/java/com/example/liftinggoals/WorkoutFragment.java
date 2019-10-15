@@ -38,7 +38,7 @@ public class WorkoutFragment extends Fragment {
         //Get info from Bundle
         workoutsList = getArguments().getParcelableArrayList("routine_item");
         //Set title of WorkoutFragment to the passed RoutineName from RoutineFragment
-        TextView title = (TextView) view.findViewById(R.id.fragment_multiple_workout_title);
+        TextView title = view.findViewById(R.id.fragment_multiple_workout_title);
         title.setText(getArguments().getString("routine_name"));
 
         recyclerView = view.findViewById(R.id.multiple_workout_recycler_view);
@@ -65,7 +65,7 @@ public class WorkoutFragment extends Fragment {
 
             @Override
             public void onItemEdit(int position) {
-                //unimplemented
+                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineEditFragment()).commit();
             }
 
         });

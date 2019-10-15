@@ -48,6 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
             Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
+            Bundle bundle = new Bundle();
             mainActivity.putExtra("menu_id", Integer.toString(menuItem.getItemId()));
             startActivity(mainActivity);
 

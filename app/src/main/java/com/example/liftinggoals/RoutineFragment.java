@@ -47,15 +47,25 @@ public class RoutineFragment extends Fragment {
         routineModels = new ArrayList<>();
 
         //Passing data to WorkoutFragment
-        ArrayList<WorkoutModel> workoutModels = new ArrayList<>();  //Contains Workout Variants in Routine
-        ArrayList<ExerciseModel> exerciseModels = new ArrayList<>();    //Contain exercises in a Workout
-        exerciseModels.add(new ExerciseModel("Bench Press"));
-        exerciseModels.add(new ExerciseModel("High Row"));
-        exerciseModels.add(new ExerciseModel("Leg Press"));
-        workoutModels.add(new WorkoutModel("Chest Day"));
-        workoutModels.add(new WorkoutModel("Back Day"));
-        workoutModels.add(new WorkoutModel("Leg Day"));
-        routineModels.add(new RoutineModel(R.drawable.ic_dumbbell_blue_48dp, "Chest Routine", "Simple Chest Routine", workoutModels));
+        ArrayList<WorkoutModel> liftingModel = new ArrayList<>();  //Contains Workout Variants in Routine
+        ArrayList<ExerciseModel> liftingExercises = new ArrayList<>();    //Contain exercises in a Workout
+        liftingExercises.add(new ExerciseModel("Bench Press"));
+        liftingExercises.add(new ExerciseModel("High Row"));
+        liftingExercises.add(new ExerciseModel("Leg Press"));
+        liftingModel.add(new WorkoutModel("Chest Day"));
+        liftingModel.add(new WorkoutModel("Back Day"));
+        liftingModel.add(new WorkoutModel("Leg Day"));
+        routineModels.add(new RoutineModel("Full Body Routine", "Jack-of-all Trades Routine", liftingModel));
+
+        ArrayList<WorkoutModel> runningModel = new ArrayList<>();
+        ArrayList<ExerciseModel> runningWorkouts = new ArrayList<>();    //Contain exercises in a Workout
+        runningWorkouts.add(new ExerciseModel("Marathon"));
+        runningWorkouts.add(new ExerciseModel("Sprints"));
+        runningWorkouts.add(new ExerciseModel("Stretching"));
+        runningModel.add(new WorkoutModel("Jog around the park"));
+        runningModel.add(new WorkoutModel("Track Sprints"));
+        runningModel.add(new WorkoutModel("Intervals"));
+        routineModels.add(new RoutineModel("General Running Routine", "Intermediate Running Routine", runningModel));
         //End data
 
         recyclerView.setHasFixedSize(true);
@@ -78,7 +88,7 @@ public class RoutineFragment extends Fragment {
 
             @Override
             public void onItemEdit(int position) {
-                //unimplemented
+                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutinesEditFolderFragment()).commit();
             }
 
         });

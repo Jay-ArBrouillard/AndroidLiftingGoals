@@ -54,7 +54,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     @NonNull
     @Override
     public RoutineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.routine_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.workout_item, parent, false);
         RoutineViewHolder rvh = new RoutineViewHolder(view, listener);
         return rvh;
     }
@@ -113,14 +113,14 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
 
     //Inner class
     public static class RoutineViewHolder extends RecyclerView.ViewHolder {
-        public ImageView dumbbellIcon;
+        public ImageView folderIcon;
         public ImageView editIcon;
         public TextView routineName;
         public TextView lastPerformed;
 
         public RoutineViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
-            dumbbellIcon = itemView.findViewById(R.id.dumbbell_icon);
+            folderIcon = itemView.findViewById(R.id.dumbbell_icon);
             editIcon = itemView.findViewById(R.id.edit_icon);
             routineName = itemView.findViewById(R.id.title_text_view);
             lastPerformed = itemView.findViewById(R.id.description_text_view);

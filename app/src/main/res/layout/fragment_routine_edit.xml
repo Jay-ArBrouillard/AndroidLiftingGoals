@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RoutineEditFragment">
+    tools:context=".RoutineEditFragment"
+    android:background="@android:color/black">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,6 +14,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="right"
             android:background="?android:attr/selectableItemBackground"
             android:text="Edit"
             android:textColor="@android:color/white"
@@ -23,26 +25,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-            android:paddingLeft="10dp"
+            android:paddingLeft="20dp"
             android:text="Edit Routine"
             android:textColor="@android:color/white"
-            android:textSize="50sp" />
+            android:textSize="50dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
+            android:paddingLeft="20dp"
             android:text="Routine Name"
             android:textColor="@android:color/darker_gray"
-            android:textSize="15dp" />
+            android:textSize="20dp" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginBottom="40dp">
 
             <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:paddingLeft="10dp"
@@ -54,6 +58,8 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginBottom="40dp">
 
             <LinearLayout
@@ -71,10 +77,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="right"
                     android:gravity="right"
+                    android:paddingRight="10dp"
                     android:text="0min"
-                    android:textSize="20dp"
-                    android:layout_gravity="right" />
+                    android:textSize="20dp" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -82,10 +89,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:paddingLeft="10dp"
             android:text="Exercises"
             android:textColor="@android:color/darker_gray"
-            android:textSize="15dp" />
+            android:textSize="20dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/edit_routine_recycler_view"
@@ -98,7 +107,9 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <TextView
                 android:layout_width="wrap_content"

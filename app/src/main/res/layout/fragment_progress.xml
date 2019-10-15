@@ -31,16 +31,29 @@
                 android:background="@color/cardview_light_background"
                 android:textSize="30dp" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="Volume Groups"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="15dp" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/routine_fragment_create_a_workout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/routine_fragment_search"
-                android:layout_marginTop="4dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginBottom="50dp"
                 android:background="@android:color/black"
                 app:cardCornerRadius="4dp"
-                app:cardElevation="10dp">
+                app:cardElevation="10dp"
+                app:contentPaddingBottom="10dp"
+                app:contentPaddingTop="10dp">
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -50,15 +63,8 @@
                     android:textColor="@android:color/black"
                     android:textSize="20dp" />
 
-            </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="Volume Groups"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15dp" />
+            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/progress_fragment_volume_groups_recycler_view"
@@ -70,7 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="Volume Groups"
+                android:text="Exercises"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="15dp" />
 
