@@ -59,12 +59,8 @@ public class WorkoutFragment extends Fragment {
         adapter.setOnItemClickListener(new WorkoutAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                //Bundle bundle = new Bundle();
-                //bundle.putParcelableArrayList("workout_item", routineModels.get(position).getWorkouts());
-                Fragment selectedFragment = new ExerciseDetailsFragment();
-                //selectedFragment.setArguments(bundle);
-
-                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+                Intent startExerciseActivity = new Intent(getActivity(), ExerciseActivity.class);
+                startActivity(startExerciseActivity);
             }
 
             @Override

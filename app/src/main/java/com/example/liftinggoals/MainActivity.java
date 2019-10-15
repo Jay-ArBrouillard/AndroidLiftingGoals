@@ -23,6 +23,38 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Check if coming from Google maps activity
+        Intent intent = getIntent();
+        String strMenuId = intent.getStringExtra("menu_id");
+
+        if (strMenuId != null) {
+            Fragment selectedFragment = null;
+            switch (Integer.parseInt(strMenuId)) {
+                case R.id.nav_routine:
+                    selectedFragment = new RoutineFragment();
+                    break;
+                case R.id.nav_progress:
+                    selectedFragment = new ProgressFragment();
+                    break;
+                case R.id.nav_history:
+                    selectedFragment = new HistoryFragment();
+                    break;
+                case R.id.nav_maps:
+                    Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
+                    startActivity(mapsIntent);
+                    break;
+                case R.id.nav_settings:
+                    selectedFragment = new SettingFragment();
+                    break;
+
+            }
+            if (selectedFragment != null)
+            {
+                getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+
+            }
+        }
+
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
@@ -59,13 +91,20 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_history:
                     selectedFragment = new HistoryFragment();
                     break;
+                case R.id.nav_maps:
+                    Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
+                    startActivity(mapsIntent);
+                    break;
                 case R.id.nav_settings:
                     selectedFragment = new SettingFragment();
                     break;
 
             }
+            if (selectedFragment != null)
+            {
+                getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
 
-            getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+            }
 
             return true;    //Means we want to select the clicked item
         }

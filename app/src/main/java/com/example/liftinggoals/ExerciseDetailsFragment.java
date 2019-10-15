@@ -24,9 +24,6 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.util.ArrayList;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class ExerciseDetailsFragment extends Fragment {
     LineChart lineChart;
     ListView listView;

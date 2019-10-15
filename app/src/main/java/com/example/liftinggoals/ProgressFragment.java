@@ -23,32 +23,7 @@ public class ProgressFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_progress, container, false);
 
-        ArrayList<String> exercises = new ArrayList<>();
-        exercises.add("Squat");
-        exercises.add("Bench Press");
-        exercises.add("Barbell Row");
-        exercises.add("Deadlift");
-        exercises.add("Shoulder Press");
-        exercises.add("Hang Clean");
-
-        listView = (ListView) view.findViewById(R.id.progress_list_view);
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, exercises);
-        listView.setAdapter(arrayAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Fragment selectedFragment = null;
-
-                if (position == 1) {
-                    selectedFragment = new ExerciseDetailsFragment();
-                }
-
-
-                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
-            }
-        });
+        //ToDo create Volume groups and exercises recycler views
 
         return view;
     }

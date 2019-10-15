@@ -30,7 +30,7 @@ public class ExerciseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
 
-        button = (Button) findViewById(R.id.activity_exercise_done_button);
+        button = findViewById(R.id.activity_exercise_done_button);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
