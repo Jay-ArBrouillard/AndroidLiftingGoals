@@ -35,7 +35,7 @@
             android:layout_toRightOf="@+id/dumbbell_icon"/>
 
         <ImageView
-            android:id="@+id/image_edit"
+            android:id="@+id/edit_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_edit_black_24dp"

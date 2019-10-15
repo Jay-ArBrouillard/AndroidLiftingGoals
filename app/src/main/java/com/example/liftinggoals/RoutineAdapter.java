@@ -1,6 +1,5 @@
 package com.example.liftinggoals;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,8 +63,8 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     public void onBindViewHolder(@NonNull RoutineViewHolder holder, int position) {
         RoutineModel currentItem = routineList.get(position);
 
-        holder.mTextView1.setText(currentItem.getRoutineName());
-        holder.mTextView2.setText(currentItem.getRoutineDescription());
+        holder.routineName.setText(currentItem.getRoutineName());
+        holder.lastPerformed.setText(currentItem.getRoutineDescription());
     }
 
     @Override
@@ -114,15 +113,18 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
 
     //Inner class
     public static class RoutineViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView1;
-        public TextView mTextView2;
-        public ImageView editImage;
+        public ImageView dumbbellIcon;
+        public ImageView editIcon;
+        public TextView routineName;
+        public TextView lastPerformed;
 
         public RoutineViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
-            mTextView1 = itemView.findViewById(R.id.title_text_view);
-            mTextView2 = itemView.findViewById(R.id.description_text_view);
-            editImage = itemView.findViewById(R.id.image_edit);
+            dumbbellIcon = itemView.findViewById(R.id.dumbbell_icon);
+            editIcon = itemView.findViewById(R.id.edit_icon);
+            routineName = itemView.findViewById(R.id.title_text_view);
+            lastPerformed = itemView.findViewById(R.id.description_text_view);
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -136,7 +138,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
                 }
             });
 
-            editImage.setOnClickListener(new View.OnClickListener() {
+            editIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (listener != null) {

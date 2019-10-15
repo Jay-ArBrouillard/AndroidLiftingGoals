@@ -46,14 +46,17 @@ public class RoutineFragment extends Fragment {
     private void initializeRecyclerView() {
         routineModels = new ArrayList<>();
 
+        //Passing data to WorkoutFragment
         ArrayList<WorkoutModel> workoutModels = new ArrayList<>();  //Contains Workout Variants in Routine
         ArrayList<ExerciseModel> exerciseModels = new ArrayList<>();    //Contain exercises in a Workout
         exerciseModels.add(new ExerciseModel("Bench Press"));
+        exerciseModels.add(new ExerciseModel("High Row"));
+        exerciseModels.add(new ExerciseModel("Leg Press"));
         workoutModels.add(new WorkoutModel("Chest Day"));
         workoutModels.add(new WorkoutModel("Back Day"));
         workoutModels.add(new WorkoutModel("Leg Day"));
-
         routineModels.add(new RoutineModel(R.drawable.ic_dumbbell_blue_48dp, "Chest Routine", "Simple Chest Routine", workoutModels));
+        //End data
 
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
@@ -65,7 +68,8 @@ public class RoutineFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());
+                bundle.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());   //Passing List<WorkoutModel> to WorkoutFragment
+                bundle.putString("routine_name", routineModels.get(position).getRoutineName());
                 Fragment selectedFragment = new WorkoutFragment();
                 selectedFragment.setArguments(bundle);
 
@@ -96,6 +100,14 @@ public class RoutineFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 adapter.getFilter().filter(newText);
                 return false;
+            }
+        });
+
+        //Make the entire text box clickable aswell
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search.onActionViewExpanded();
             }
         });
     }

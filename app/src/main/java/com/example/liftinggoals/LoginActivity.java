@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
                 startMainActivity.putExtra("username", "Jay-Ar");
                 startActivity(startMainActivity);
+                finish();   //Prevent user from pressing back button and going to login page
             } else {
                 toastMsg = Toast.makeText(getApplicationContext(),
                         "Incorrect Username and/or password",

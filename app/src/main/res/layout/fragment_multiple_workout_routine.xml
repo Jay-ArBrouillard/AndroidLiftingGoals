@@ -1,12 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/black">
+
+    <LinearLayout
+        android:id="@+id/fragment_multiple_workout_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="right">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit"
+            android:textSize="20dp"
+            android:textColor="@android:color/white"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <ImageView
+            android:id="@+id/fragment_multiple_workout_add_routine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:onClick="AddRoutineButton"
+            android:paddingRight="10dp"
+            android:src="@drawable/ic_add_white_48dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/fragment_multiple_workout_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="WorkoutName"
+        android:textSize="50dp"
+        android:textColor="@android:color/white"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/fragment_multiple_workout_top_bar"/>
+
+    <LinearLayout
+        android:id="@+id/fragment_multiple_workout_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/black"
+        android:layout_below="@+id/fragment_multiple_workout_title">
+
+        <SearchView
+            android:id="@+id/fragment_multiple_workout_action_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@color/cardview_light_background"
+            android:textSize="30dp" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/multiple_workout_list_view"
+        android:id="@+id/multiple_workout_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/black"
         android:padding="10dp"
-        android:background="@android:color/black"/>
+        android:layout_below="@+id/fragment_multiple_workout_search"/>
 </RelativeLayout>
