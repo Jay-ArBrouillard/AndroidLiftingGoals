@@ -34,6 +34,7 @@ public class RoutineEditFragment extends Fragment {
     private void initializeRecyclerView()
     {
         //Todo
+
     }
 
 }
