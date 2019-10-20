@@ -1,4 +1,4 @@
-package com.example.liftinggoals;
+package liftinggoals.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +13,13 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import liftinggoals.classes.ExerciseModel;
+import com.example.liftinggoals.R;
+import liftinggoals.adapters.RoutineAdapter;
+import liftinggoals.classes.RoutineModel;
+import liftinggoals.misc.VerticalSpaceItemDecoration;
+import liftinggoals.classes.WorkoutModel;
+
 import java.util.ArrayList;
 
 public class RoutineFragment extends Fragment {
@@ -23,7 +30,6 @@ public class RoutineFragment extends Fragment {
     private SearchView search;
     private String username;
 
-    private DatabaseHelper myDb;
     public RoutineFragment() {
         //Empty constructor
     }
@@ -37,7 +43,6 @@ public class RoutineFragment extends Fragment {
         }
 
         recyclerView = view.findViewById(R.id.routine_fragment_recycler_view);
-        myDb = new DatabaseHelper(getActivity().getApplicationContext());
 
         initializeRecyclerView();
         initializeActionSearch(view);
@@ -45,6 +50,7 @@ public class RoutineFragment extends Fragment {
 
         return view;
     }
+
 
     private void initializeRecyclerView() {
         routineModels = new ArrayList<>();

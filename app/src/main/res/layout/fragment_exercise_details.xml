@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ExerciseDetailsFragment">
+    tools:context="liftinggoals.fragments.ExerciseDetailsFragment">
 
     <Button
         android:id="@+id/fragment_exercise_details_back_button"

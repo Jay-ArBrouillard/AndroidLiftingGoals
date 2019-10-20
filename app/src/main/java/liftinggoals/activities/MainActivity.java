@@ -1,4 +1,4 @@
-package com.example.liftinggoals;
+package liftinggoals.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,15 +6,16 @@ import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
+import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
+import liftinggoals.fragments.HistoryFragment;
+import liftinggoals.fragments.ProgressFragment;
+import liftinggoals.fragments.RoutineFragment;
+import liftinggoals.fragments.SettingFragment;
 
 public class MainActivity extends AppCompatActivity {
     private String username;

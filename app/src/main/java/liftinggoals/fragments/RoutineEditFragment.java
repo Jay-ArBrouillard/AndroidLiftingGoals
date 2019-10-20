@@ -1,4 +1,4 @@
-package com.example.liftinggoals;
+package liftinggoals.fragments;
 
 
 import android.os.Bundle;
@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import com.example.liftinggoals.R;
 
 public class RoutineEditFragment extends Fragment {
     private RecyclerView recyclerView;

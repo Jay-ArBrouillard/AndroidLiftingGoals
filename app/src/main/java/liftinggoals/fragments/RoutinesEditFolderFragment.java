@@ -1,7 +1,5 @@
-package com.example.liftinggoals;
+package liftinggoals.fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import com.example.liftinggoals.R;
 
 
 public class RoutinesEditFolderFragment extends Fragment {

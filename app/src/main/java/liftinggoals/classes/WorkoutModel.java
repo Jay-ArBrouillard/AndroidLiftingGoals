@@ -1,4 +1,4 @@
-package com.example.liftinggoals;
+package liftinggoals.classes;
 
 import android.graphics.Color;
 import android.os.Parcel;

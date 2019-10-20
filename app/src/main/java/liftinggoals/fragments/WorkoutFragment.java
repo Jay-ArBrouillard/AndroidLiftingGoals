@@ -1,13 +1,10 @@
-package com.example.liftinggoals;
+package liftinggoals.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -18,7 +15,12 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import liftinggoals.activities.ExerciseActivity;
+import liftinggoals.classes.ExerciseModel;
+import com.example.liftinggoals.R;
+import liftinggoals.misc.VerticalSpaceItemDecoration;
+import liftinggoals.adapters.WorkoutAdapter;
+import liftinggoals.classes.WorkoutModel;
 
 import java.util.ArrayList;
 

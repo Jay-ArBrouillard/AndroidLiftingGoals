@@ -33,17 +33,17 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="liftinggoals.activities.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
-        <activity android:name=".ExerciseActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name="liftinggoals.activities.ExerciseActivity" />
+        <activity android:name="liftinggoals.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="liftinggoals.activities.MainActivity" />
     </application>
 
 </manifest>

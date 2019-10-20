@@ -1,49 +1,53 @@
-package com.example.liftinggoals;
+package liftinggoals.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.liftinggoals.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutViewHolder> {
-    private ArrayList<WorkoutModel> workoutList;
-    private ArrayList<WorkoutModel> workoutListFull; //Need a copy for the search function
-    private WorkoutAdapter.OnItemClickListener listener;
-    private int removedPosition = 0;
-    private WorkoutModel removedItem;
+import liftinggoals.classes.RoutineModel;
 
-    public WorkoutAdapter(ArrayList<WorkoutModel> workoutList) {
-        this.workoutList = workoutList;
-        workoutListFull = new ArrayList<>(workoutList);
+public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineViewHolder> implements Filterable {
+    private ArrayList<RoutineModel> routineList;
+    private ArrayList<RoutineModel> routineListFull; //Need a copy for the search function
+    private OnItemClickListener listener;
+    private int removedPosition = 0;
+    private RoutineModel removedItem;
+
+    public RoutineAdapter (ArrayList<RoutineModel> routineList) {
+        this.routineList = routineList;
+        routineListFull = new ArrayList<>(routineList);
     }
 
-    public WorkoutModel getItem(int position) {
-        return workoutList.get(position);
+    public RoutineModel getItem(int position) {
+        return routineList.get(position);
     }
 
     public void delete(RecyclerView.ViewHolder viewHolder, final int position) {
         removedPosition = position;
-        removedItem = this.getItem(position);
+        removedItem = getItem(position);
 
-        workoutList.remove(position);
-        workoutListFull = new ArrayList<>(workoutList);
+        routineList.remove(position);
+        routineListFull = new ArrayList<>(routineList);
         notifyItemRemoved(position);
 
-        Snackbar.make(viewHolder.itemView, removedItem.getWorkoutName() + " deleted", Snackbar.LENGTH_LONG).setAction("UNDO", new View.OnClickListener() {
+        Snackbar.make(viewHolder.itemView, removedItem.getRoutineName() + " deleted", Snackbar.LENGTH_LONG).setAction("UNDO", new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                workoutList.add(removedPosition, removedItem);
-                workoutListFull = new ArrayList<>(workoutList);
+                routineList.add(removedPosition, removedItem);
+                routineListFull = new ArrayList<>(routineList);
                 notifyItemInserted(removedPosition);
             }
         }).show();
@@ -52,41 +56,42 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
 
     @NonNull
     @Override
-    public WorkoutViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.routine_item, parent, false);
-        WorkoutViewHolder wvh = new WorkoutViewHolder(view, listener);
-        return wvh;
+    public RoutineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.workout_item, parent, false);
+        RoutineViewHolder rvh = new RoutineViewHolder(view, listener);
+        return rvh;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull WorkoutViewHolder holder, int position) {
-        WorkoutModel currentItem = workoutList.get(position);
+    public void onBindViewHolder(@NonNull RoutineViewHolder holder, int position) {
+        RoutineModel currentItem = routineList.get(position);
 
-        holder.workoutName.setText(currentItem.getWorkoutName());
-        holder.lastPerformed.setText("Last performed: " + currentItem.getEstimatedDuration());   //Fix Later
+        holder.routineName.setText(currentItem.getRoutineName());
+        holder.lastPerformed.setText(currentItem.getRoutineDescription());
     }
 
     @Override
     public int getItemCount() {
-        return workoutList.size();
+        return routineList.size();
     }
 
+    @Override
     public Filter getFilter() {
-        return workoutFilter;
+        return routineFilter;
     }
 
-    private Filter workoutFilter = new Filter() {
+    private Filter routineFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            List<WorkoutModel> filteredList = new ArrayList<>();
+            List<RoutineModel> filteredList = new ArrayList<>();
 
             if (constraint == null || constraint.length() == 0) {   //search field is null
-                filteredList.addAll(workoutListFull);
+                filteredList.addAll(routineListFull);
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim();
 
-                for (WorkoutModel item : workoutListFull) {
-                    if (item.getWorkoutName().toLowerCase().contains(filterPattern)) {
+                for (RoutineModel item : routineListFull) {
+                    if (item.getRoutineName().toLowerCase().contains(filterPattern)) {
                         filteredList.add(item);
                     }
                 }
@@ -102,26 +107,27 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             @SuppressWarnings("unchecked")
-            ArrayList<WorkoutModel> tempList = (ArrayList<WorkoutModel>) results.values;
-            workoutList.clear();
-            workoutList.addAll(tempList);
+            ArrayList<RoutineModel> tempList = (ArrayList<RoutineModel>) results.values;
+            routineList.clear();
+            routineList.addAll(tempList);
             notifyDataSetChanged();
         }
     };
 
-
-    public static class WorkoutViewHolder extends RecyclerView.ViewHolder {
-        public ImageView dumbbellIcon;
+    //Inner class
+    public static class RoutineViewHolder extends RecyclerView.ViewHolder {
+        public ImageView folderIcon;
         public ImageView editIcon;
-        public TextView workoutName;
+        public TextView routineName;
         public TextView lastPerformed;
 
-        public WorkoutViewHolder(@NonNull View itemView, final WorkoutAdapter.OnItemClickListener listener) {
+        public RoutineViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
-            dumbbellIcon = itemView.findViewById(R.id.dumbbell_icon);
+            folderIcon = itemView.findViewById(R.id.dumbbell_icon);
             editIcon = itemView.findViewById(R.id.edit_icon);
-            workoutName = itemView.findViewById(R.id.title_text_view);
+            routineName = itemView.findViewById(R.id.title_text_view);
             lastPerformed = itemView.findViewById(R.id.description_text_view);
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -146,9 +152,10 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
                     }
                 }
             });
-        }
-    }
 
+        }
+
+    }
 
     public interface OnItemClickListener {
         void onItemClick(int position);

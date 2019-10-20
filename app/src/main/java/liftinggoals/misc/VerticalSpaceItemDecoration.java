@@ -1,4 +1,4 @@
-package com.example.liftinggoals;
+package liftinggoals.misc;
 
 import android.graphics.Rect;
 import android.view.View;

@@ -1,10 +1,10 @@
-package com.example.liftinggoals;
+package liftinggoals.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -12,7 +12,11 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.liftinggoals.R;
+
 import java.util.regex.Pattern;
+
+import liftinggoals.data.DatabaseHelper;
 
 public class LoginActivity extends AppCompatActivity {
     private Button button;
@@ -20,11 +24,17 @@ public class LoginActivity extends AppCompatActivity {
     private EditText password;
     private CheckBox registering;
     private Toast toastMsg;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //Setup database
+        databaseHelper = new DatabaseHelper(this.getApplicationContext());
+        databaseHelper.openDB();
+        //databaseHelper.insert("Erik", "Krohn1", null, null);
 
         button = findViewById(R.id.login_button);
         username = findViewById(R.id.username_edit_text);
@@ -43,6 +53,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    public void onDestroy()
+    {
+        super.onDestroy();
+        databaseHelper.closeDB();
+    }
+
     public void loginOrRegister (View view) {
         if (registering.isChecked()) {  //user is registering
             boolean validUser = validateUser();
@@ -57,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             String userNameInput = username.getEditableText().toString();
             String passwordInput = password.getEditableText().toString();
 
-            if (userNameInput.equals("") && passwordInput.equals("")) {
+            if (databaseHelper.getUser(userNameInput, passwordInput) != null) {
                 Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
                 startMainActivity.putExtra("username", "Jay-Ar");
                 startActivity(startMainActivity);
@@ -68,6 +84,12 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG);
 
                 toastMsg.show();
+
+                Cursor c = databaseHelper.getAllUsers();
+
+                while(c.moveToNext()){
+                    System.out.println("Username in db: " + c.getString(c.getColumnIndexOrThrow(DatabaseHelper.UserEntry.COLUMN_USERNAME)));
+                }
 
             }
 

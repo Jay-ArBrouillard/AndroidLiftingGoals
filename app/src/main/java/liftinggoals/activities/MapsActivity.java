@@ -1,13 +1,13 @@
-package com.example.liftinggoals;
+package liftinggoals.activities;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.example.liftinggoals.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,7 +32,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation_maps);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
