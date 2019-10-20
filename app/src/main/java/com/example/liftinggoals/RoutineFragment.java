@@ -22,6 +22,8 @@ public class RoutineFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private SearchView search;
     private String username;
+
+    private DatabaseHelper myDb;
     public RoutineFragment() {
         //Empty constructor
     }
@@ -35,6 +37,7 @@ public class RoutineFragment extends Fragment {
         }
 
         recyclerView = view.findViewById(R.id.routine_fragment_recycler_view);
+        myDb = new DatabaseHelper(getActivity().getApplicationContext());
 
         initializeRecyclerView();
         initializeActionSearch(view);
