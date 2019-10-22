@@ -12,9 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.liftinggoals.R;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import liftinggoals.fragments.HistoryFragment;
+import liftinggoals.fragments.MapsFragment;
 import liftinggoals.fragments.ProgressFragment;
 import liftinggoals.fragments.RoutineFragment;
 import liftinggoals.fragments.SettingFragment;
@@ -29,38 +31,9 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
-        //Check if coming from Google maps activity
-        Intent intent = getIntent();
-        String strMenuId = intent.getStringExtra("menu_id");
 
-        if (strMenuId != null) {
-            Fragment selectedFragment = null;
-            switch (Integer.parseInt(strMenuId)) {
-                case R.id.nav_routine:
-                    selectedFragment = new RoutineFragment();
-                    break;
-                case R.id.nav_progress:
-                    selectedFragment = new ProgressFragment();
-                    break;
-                case R.id.nav_history:
-                    selectedFragment = new HistoryFragment();
-                    break;
-                case R.id.nav_maps:
-                    Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
-                    startActivity(mapsIntent);
-                    break;
-                case R.id.nav_settings:
-                    selectedFragment = new SettingFragment();
-                    break;
+        getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineFragment()).commit();
 
-            }
-            if (selectedFragment != null)
-            {
-                getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
-            }
-        } else {
-            getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineFragment()).commit();
-        }
 
     }
 
@@ -84,9 +57,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = new HistoryFragment();
                     break;
                 case R.id.nav_maps:
-                    Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
-                    startActivity(mapsIntent);
-                    finish();
+                    selectedFragment = new MapsFragment();
                     break;
                 case R.id.nav_settings:
                     selectedFragment = new SettingFragment();
