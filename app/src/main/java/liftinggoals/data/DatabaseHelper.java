@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import java.util.List;
+
 import liftinggoals.classes.User;
 
 public class DatabaseHelper extends SQLiteOpenHelper
@@ -102,6 +104,28 @@ public class DatabaseHelper extends SQLiteOpenHelper
         String where = UserEntry._ID + " = " + id;
 
         return myDB.delete(UserEntry.TABLE_NAME, where, null);
+    }
+
+    public String getUsername(String username)
+    {
+        String query = "SELECT username FROM " + UserEntry.TABLE_NAME + " WHERE " + UserEntry.COLUMN_USERNAME  + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {username});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            String name = null;
+
+            while(c.moveToNext()){
+                name = c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_USERNAME));
+            }
+
+            return name;
+        }
     }
 
     public User getUser(String username, String password)

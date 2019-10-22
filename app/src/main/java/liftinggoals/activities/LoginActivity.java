@@ -1,9 +1,11 @@
 package liftinggoals.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +36,6 @@ public class LoginActivity extends AppCompatActivity {
         //Setup database
         databaseHelper = new DatabaseHelper(this.getApplicationContext());
         databaseHelper.openDB();
-        //databaseHelper.insert("Erik", "Krohn1", null, null);
 
         button = findViewById(R.id.login_button);
         username = findViewById(R.id.username_edit_text);
@@ -53,50 +54,93 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void onDestroy()
-    {
-        super.onDestroy();
-        databaseHelper.closeDB();
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("username", username.getEditableText().toString());
+        outState.putString("password", password.getEditableText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        username.setText(savedInstanceState.getString("username"));
+        password.setText(savedInstanceState.getString("password"));
     }
 
     public void loginOrRegister (View view) {
+
+        String userNameInput = username.getEditableText().toString();
+        String passwordInput = password.getEditableText().toString();
+
         if (registering.isChecked()) {  //user is registering
-            boolean validUser = validateUser();
-            boolean validPassword = validatePass();
-            if (validUser && validPassword) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+            boolean validUsername = validateUserReq();
+            boolean validPassword = validatePassReq();
+            if (databaseHelper.getUsername(userNameInput) != null)
+            {
+                Toast.makeText(getApplicationContext(),userNameInput + " is already registered", Toast.LENGTH_SHORT).show();
+            }
+            else if (validUsername && validPassword)
+            {
+                databaseHelper.insert(userNameInput, passwordInput, null, null);
+
+                //Ensure new user was successfully added to database
+                if (databaseHelper.getUser(userNameInput, passwordInput) != null)
+                {
+                    Toast.makeText(getApplicationContext(),"Successfully added new user to Database!", Toast.LENGTH_SHORT).show();
+
+                    //Lab 5
+                    SharedPreferences sp = getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("username", userNameInput);
+                    editor.commit();
+                    //Lab 5 end
+
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"Error adding user to database", Toast.LENGTH_SHORT).show();
+                }
             }
 
-        } else { //user is logging in
-            String userNameInput = username.getEditableText().toString();
-            String passwordInput = password.getEditableText().toString();
+        }
+        else { //user is logging in
 
-            if (databaseHelper.getUser(userNameInput, passwordInput) != null) {
-                Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
-                startMainActivity.putExtra("username", "Jay-Ar");
-                startActivity(startMainActivity);
-                finish();   //Prevent user from pressing back button and going to login page
-            } else {
-                toastMsg = Toast.makeText(getApplicationContext(),
-                        "Incorrect Username and/or password",
-                        Toast.LENGTH_LONG);
+            if (databaseHelper.getUsername(userNameInput) == null)
+            {
+                Toast.makeText(getApplicationContext(),"Username doesn't exist", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                if (databaseHelper.getUser(userNameInput, passwordInput) != null) {
+                    Toast.makeText(getApplicationContext(),"Successful login", Toast.LENGTH_SHORT).show();
 
-                toastMsg.show();
+                    //Lab 5
+                    SharedPreferences sp = getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("username", userNameInput);
+                    editor.commit();
+                    //Lab 5 end
 
-                Cursor c = databaseHelper.getAllUsers();
-
-                while(c.moveToNext()){
-                    System.out.println("Username in db: " + c.getString(c.getColumnIndexOrThrow(DatabaseHelper.UserEntry.COLUMN_USERNAME)));
+                    Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(startMainActivity);
+                    finish();   //Prevent user from pressing back button and going to login page
                 }
-
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "Username or password is incorrect", Toast.LENGTH_LONG).show();
+                }
             }
 
         }
     }
 
-    private boolean validatePass() {
+    private boolean validatePassReq() {
         String passwordInput = password.getEditableText().toString().trim();
         boolean valid = false;
         Pattern upperCasePattern = Pattern.compile("[A-Z]");
@@ -106,32 +150,16 @@ public class LoginActivity extends AppCompatActivity {
         if (passwordInput.isEmpty()) {
             password.setError("Field can't be empty");
         } else if (passwordInput.length() < 6) {
-            toastMsg = Toast.makeText(getApplicationContext(),
-                    "Password must be at least 6 characters long",
-                    Toast.LENGTH_SHORT);
-
-            toastMsg.show();
+            Toast.makeText(getApplicationContext(),"Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
             password.setError("Password must be at least 6 characters long");
         } else if (!digitCasePattern.matcher(passwordInput).find()) {
-            toastMsg = Toast.makeText(getApplicationContext(),
-                    "Password must contain a number",
-                    Toast.LENGTH_SHORT);
-
-            toastMsg.show();
+            Toast.makeText(getApplicationContext(),"Password must contain a number", Toast.LENGTH_SHORT).show();
             password.setError("Password must contain a number");
         } else if (!lowerCasePattern.matcher(passwordInput).find()) {
-            toastMsg = Toast.makeText(getApplicationContext(),
-                    "Password must contain a lower case letter",
-                    Toast.LENGTH_SHORT);
-
-            toastMsg.show();
+            Toast.makeText(getApplicationContext(),"Password must contain a lower case letter", Toast.LENGTH_SHORT).show();
             password.setError("Password must contain a lower case letter");
         } else if (!upperCasePattern.matcher(passwordInput).find()) {
-            toastMsg = Toast.makeText(getApplicationContext(),
-                    "Password must contain an upper case letter",
-                    Toast.LENGTH_SHORT);
-
-            toastMsg.show();
+            Toast.makeText(getApplicationContext(),"Password must contain an upper case letter", Toast.LENGTH_SHORT).show();
             password.setError("Password must contain an upper case letter");
         } else {
             password.setError(null);
@@ -141,24 +169,27 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
-    private boolean validateUser() {
+    private boolean validateUserReq() {
         String userNameInput = username.getEditableText().toString().trim();
-        boolean valid = false;
 
         if (userNameInput.isEmpty()) {
             username.setError("Field can't be empty");
-        } else if (userNameInput.length() < 4) {
-            toastMsg = Toast.makeText(getApplicationContext(),
-                    "UserName must be at least 4 characters long",
-                    Toast.LENGTH_SHORT);
-
-            toastMsg.show();
-            username.setError("UserName must be at least 4 characters long");
-        } else {
-            username.setError(null);
-            valid = true;
+            return false;
         }
 
-        return valid;
+        if (userNameInput.length() < 4) {
+            Toast.makeText(getApplicationContext(),"UserName must be at least 4 characters long", Toast.LENGTH_SHORT).show();
+            username.setError("UserName must be at least 4 characters long");
+            return false;
+        }
+
+        username.setError(null);
+        return true;
+    }
+
+    public void onDestroy()
+    {
+        super.onDestroy();
+        databaseHelper.closeDB();
     }
 }

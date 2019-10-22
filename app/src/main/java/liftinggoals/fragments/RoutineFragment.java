@@ -1,5 +1,7 @@
 package liftinggoals.fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +40,6 @@ public class RoutineFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_routines, container, false);
 
-        if (getArguments() != null) {
-            username = getArguments().getString("username");
-        }
-
         recyclerView = view.findViewById(R.id.routine_fragment_recycler_view);
 
         initializeRecyclerView();
@@ -54,6 +52,7 @@ public class RoutineFragment extends Fragment {
 
     private void initializeRecyclerView() {
         routineModels = new ArrayList<>();
+
 
         //Passing data to WorkoutFragment
         ArrayList<WorkoutModel> liftingModel = new ArrayList<>();  //Contains Workout Variants in Routine
@@ -75,6 +74,14 @@ public class RoutineFragment extends Fragment {
         runningModel.add(new WorkoutModel("Track Sprints"));
         runningModel.add(new WorkoutModel("Intervals"));
         routineModels.add(new RoutineModel("General Running Routine", "Intermediate Running Routine", runningModel));
+
+        //Lab 5
+        SharedPreferences sp = getActivity().getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
+        String username = sp.getString("username", "null username");
+        ArrayList<WorkoutModel> test = new ArrayList<>();
+        routineModels.add(new RoutineModel("Hi, " + username, "This card is here to display usage of SharedPreferences", test));
+        //end lab5
+
         //End data
 
         recyclerView.setHasFixedSize(true);
