@@ -14,8 +14,21 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.liftinggoals.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import liftinggoals.data.DatabaseHelper;
@@ -27,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private CheckBox registering;
     private Toast toastMsg;
     private DatabaseHelper databaseHelper;
+    private final String URL_REGISTER = "http://3.221.56.60/register.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +86,53 @@ public class LoginActivity extends AppCompatActivity {
 
     public void loginOrRegister (View view) {
 
-        String userNameInput = username.getEditableText().toString();
-        String passwordInput = password.getEditableText().toString();
+        final String userNameInput = username.getEditableText().toString();
+        final String passwordInput = password.getEditableText().toString();
 
+        //Added code login using remote database
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        String success = jsonObject.getString("success");
+
+                        if (success.equals("1"))
+                        {
+                            Toast.makeText(getApplicationContext(), "Registration Success!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    catch (JSONException je)
+                    {
+                        je.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Registration Fail: " + je.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            },
+                new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), "Registration Fail: " + error.toString(), Toast.LENGTH_LONG).show();
+                }
+            })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", userNameInput);
+                params.put("password", passwordInput);
+                return super.getParams();
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(stringRequest);
+
+
+         //End Added code
+
+        /*
+        //Login using local databases
         if (registering.isChecked()) {  //user is registering
             boolean validUsername = validateUserReq();
             boolean validPassword = validatePassReq();
@@ -137,7 +195,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
-        }
+        }*/
     }
 
     private boolean validatePassReq() {
