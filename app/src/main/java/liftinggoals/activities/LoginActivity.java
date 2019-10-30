@@ -15,15 +15,18 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.liftinggoals.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,48 +88,59 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void loginOrRegister (View view) {
-
         final String userNameInput = username.getEditableText().toString();
         final String passwordInput = password.getEditableText().toString();
 
         //Added code login using remote database
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        String success = jsonObject.getString("success");
+        RequestQueue queue = Volley.newRequestQueue(this);
 
-                        if (success.equals("1"))
+        String url = String.format("http://3.221.56.60/register.php?username=%s&password=%s", userNameInput, passwordInput);
+        StringRequest stringRequest = new StringRequest (Request.Method.GET, url, new
+                Response.Listener<String>() {
+                    public void onResponse(String response) {
+                        if (response.equals("1"))
                         {
-                            Toast.makeText(getApplicationContext(), "Registration Success!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Successfully registered: " + userNameInput, Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Error registering: " + userNameInput, Toast.LENGTH_LONG).show();
                         }
                     }
-                    catch (JSONException je)
-                    {
-                        je.printStackTrace();
-                        Toast.makeText(getApplicationContext(), "Registration Fail: " + je.toString(), Toast.LENGTH_LONG).show();
-                    }
-                }
-            },
-                new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(), "Registration Fail: " + error.toString(), Toast.LENGTH_LONG).show();
-                }
-            })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", userNameInput);
-                params.put("password", passwordInput);
-                return super.getParams();
+                }, new Response.ErrorListener() {
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "onErrorResponse: " + error.toString(), Toast.LENGTH_LONG).show();
             }
-        };
+        });
+        queue.add(stringRequest);
 
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(stringRequest);
+
+        /* JsonArrayRequest
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.POST, url, null, new
+                        Response.Listener<JSONArray>() {
+                    public void onResponse(JSONArray response) {
+
+                        try {
+                            for(int i = 0; i < response.length(); i++){
+                                JSONObject jso = response.getJSONObject(i);
+                                int id = jso.getInt("user_id");
+                                String username = jso.getString("username");
+
+                                Toast.makeText(getApplicationContext(), "Successfully registered: " + username + "(" + id + ")", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "onErrorResponse: " + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+        });
+        queue.add(jsObjRequest);
+        */
 
 
          //End Added code
