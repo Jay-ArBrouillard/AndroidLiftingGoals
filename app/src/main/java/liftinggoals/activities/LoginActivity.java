@@ -3,6 +3,7 @@ package liftinggoals.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,24 +15,20 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.liftinggoals.R;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import liftinggoals.data.DatabaseHelper;
@@ -41,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private CheckBox registering;
-    private Toast toastMsg;
+    private boolean valid;
     private DatabaseHelper databaseHelper;
     private final String URL_REGISTER = "http://3.221.56.60/register.php";
 
@@ -92,124 +89,52 @@ public class LoginActivity extends AppCompatActivity {
         final String passwordInput = password.getEditableText().toString();
 
         //Added code login using remote database
-        RequestQueue queue = Volley.newRequestQueue(this);
 
-        String url = String.format("http://3.221.56.60/register.php?username=%s&password=%s", userNameInput, passwordInput);
-        StringRequest stringRequest = new StringRequest (Request.Method.GET, url, new
-                Response.Listener<String>() {
-                    public void onResponse(String response) {
-                        if (response.equals("1"))
-                        {
-                            Toast.makeText(getApplicationContext(), "Successfully registered: " + userNameInput, Toast.LENGTH_LONG).show();
-                        }
-                        else {
-                            Toast.makeText(getApplicationContext(), "Error registering: " + userNameInput, Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "onErrorResponse: " + error.toString(), Toast.LENGTH_LONG).show();
-            }
-        });
-        queue.add(stringRequest);
-
-
-        /* JsonArrayRequest
-        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.POST, url, null, new
-                        Response.Listener<JSONArray>() {
-                    public void onResponse(JSONArray response) {
-
-                        try {
-                            for(int i = 0; i < response.length(); i++){
-                                JSONObject jso = response.getJSONObject(i);
-                                int id = jso.getInt("user_id");
-                                String username = jso.getString("username");
-
-                                Toast.makeText(getApplicationContext(), "Successfully registered: " + username + "(" + id + ")", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "onErrorResponse: " + error.toString(), Toast.LENGTH_SHORT).show();
-                    }
-        });
-        queue.add(jsObjRequest);
-        */
 
 
          //End Added code
 
-        /*
         //Login using local databases
         if (registering.isChecked()) {  //user is registering
             boolean validUsername = validateUserReq();
             boolean validPassword = validatePassReq();
-            if (databaseHelper.getUsername(userNameInput) != null)
+            if (validUsername && validPassword && insertUser())
             {
-                Toast.makeText(getApplicationContext(),userNameInput + " is already registered", Toast.LENGTH_SHORT).show();
-            }
-            else if (validUsername && validPassword)
-            {
-                databaseHelper.insert(userNameInput, passwordInput, null, null);
+                Toast.makeText(getApplicationContext(),"Successfully added new user to Database!", Toast.LENGTH_SHORT).show();
 
-                //Ensure new user was successfully added to database
-                if (databaseHelper.getUser(userNameInput, passwordInput) != null)
-                {
-                    Toast.makeText(getApplicationContext(),"Successfully added new user to Database!", Toast.LENGTH_SHORT).show();
+                //Lab 5
+                SharedPreferences sp = getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("username", userNameInput);
+                editor.commit();
+                //Lab 5 end
 
-                    //Lab 5
-                    SharedPreferences sp = getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("username", userNameInput);
-                    editor.commit();
-                    //Lab 5 end
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
 
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(),"Error adding user to database", Toast.LENGTH_SHORT).show();
-                }
             }
 
         }
         else { //user is logging in
 
+            //Lab 5
+            SharedPreferences sp = getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("username", userNameInput);
+            editor.commit();
+            //Lab 5 end
+
+            getUsers();
+            //DON'T FORGET to check if username exists
+            /*
             if (databaseHelper.getUsername(userNameInput) == null)
             {
                 Toast.makeText(getApplicationContext(),"Username doesn't exist", Toast.LENGTH_SHORT).show();
             }
-            else
-            {
-                if (databaseHelper.getUser(userNameInput, passwordInput) != null) {
-                    Toast.makeText(getApplicationContext(),"Successful login", Toast.LENGTH_SHORT).show();
+*/
 
-                    //Lab 5
-                    SharedPreferences sp = getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("username", userNameInput);
-                    editor.commit();
-                    //Lab 5 end
-
-                    Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(startMainActivity);
-                    finish();   //Prevent user from pressing back button and going to login page
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "Username or password is incorrect", Toast.LENGTH_LONG).show();
-                }
-            }
-
-        }*/
+        }
     }
 
     private boolean validatePassReq() {
@@ -257,6 +182,72 @@ public class LoginActivity extends AppCompatActivity {
 
         username.setError(null);
         return true;
+    }
+
+    private void getUsers()
+    {
+        final String userNameInput = username.getEditableText().toString();
+        final String passwordInput = password.getEditableText().toString();
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = String.format("http://3.221.56.60/login.php?username=%s&password=%s", userNameInput, passwordInput);
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
+                Response.Listener<JSONArray>() {
+                    public void onResponse(JSONArray response) {
+                        System.out.println(response.length());
+                        if (response.length() == 1)
+                        {
+                            Toast.makeText(getApplicationContext(), "Successfully login: " + userNameInput, Toast.LENGTH_LONG).show();
+                            Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(startMainActivity);
+                            finish();   //Prevent user from pressing back button and going to login page
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Error login: " + userNameInput, Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "onErrorResponse: " + error.toString(), Toast.LENGTH_SHORT).show();
+                valid = false;
+            }
+        });
+
+        queue.add(jsObjRequest);
+
+    }
+
+    private boolean insertUser()
+    {
+        final String userNameInput = username.getEditableText().toString();
+        final String passwordInput = password.getEditableText().toString();
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        String url = String.format("http://3.221.56.60/register.php?username=%s&password=%s", userNameInput, passwordInput);
+        StringRequest stringRequest = new StringRequest (Request.Method.GET, url, new
+                Response.Listener<String>() {
+                    public void onResponse(String response) {
+                        if (response.equals("1"))
+                        {
+                            Toast.makeText(getApplicationContext(), "Successfully registered: " + userNameInput, Toast.LENGTH_LONG).show();
+                            valid = true;
+                        }
+                        else
+                        {
+                            Toast.makeText(getApplicationContext(), "Error registering: " + userNameInput, Toast.LENGTH_LONG).show();
+                            valid = false;
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "onErrorResponse: " + error.toString(), Toast.LENGTH_LONG).show();
+                valid = false;
+            }
+        });
+        queue.add(stringRequest);
+
+        return valid;
     }
 
     public void onDestroy()

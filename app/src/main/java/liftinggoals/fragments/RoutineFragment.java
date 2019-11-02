@@ -75,12 +75,6 @@ public class RoutineFragment extends Fragment {
         runningModel.add(new WorkoutModel("Intervals"));
         routineModels.add(new RoutineModel("General Running Routine", "Intermediate Running Routine", runningModel));
 
-        //Lab 5
-        SharedPreferences sp = getActivity().getSharedPreferences("com.example.Brouillard.lab5", Context.MODE_PRIVATE);
-        String username = sp.getString("username", "null username");
-        ArrayList<WorkoutModel> test = new ArrayList<>();
-        routineModels.add(new RoutineModel("Hi, " + username, "This card is here to display usage of SharedPreferences", test));
-        //end lab5
 
         //End data
 
