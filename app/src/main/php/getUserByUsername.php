@@ -9,32 +9,24 @@ if ($conn->connect_error) {
 }
 
 $username = $_GET['username'];
-$password = $_GET['password'];
 
 $stmt = $conn->prepare("SELECT * FROM Users WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
 
 $result = $stmt->get_result();
-if (mysqli_num_rows($result) == 1)  //username exists
+if (mysqli_num_rows($result) > 0)
 {
-    $row = $result->fetch_object();
-    if ($row->password == $password)  //Password matches
-    {
-      $arr[] = $row;
+    while($row = $result->fetch_object()) {
+        $arr[] = $row;
+      }
       echo json_encode($arr);
-    }
-    else //Password doesn't match
-    {
-      $empty[] = array('ErrorStatus'=>'PasswordIncorrect');
-      echo json_encode($empty);
-    }
 }
-else //Username doesn't exist
-{
-    $empty[] = array('ErrorStatus'=>'UserNonExisting');
+else {
+    $empty = array();
     echo json_encode($empty);
 }
+
 
 $stmt->close();
 $conn->close();
