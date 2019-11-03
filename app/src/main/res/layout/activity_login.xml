@@ -62,7 +62,7 @@
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:padding="8dp"
-                android:textColorHint="@android:color/darker_gray"
+                android:textColorHint="#FFF"
                 android:textColor="@android:color/white"
                 android:textSize="20dp"/>
 

@@ -1,12 +1,14 @@
 package liftinggoals.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +17,22 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import liftinggoals.activities.LoginActivity;
+import liftinggoals.activities.MainActivity;
 import liftinggoals.classes.ExerciseModel;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.liftinggoals.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import liftinggoals.adapters.RoutineAdapter;
 import liftinggoals.classes.RoutineModel;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
@@ -55,6 +71,9 @@ public class RoutineFragment extends Fragment {
 
 
         //Passing data to WorkoutFragment
+        /*
+
+
         ArrayList<WorkoutModel> liftingModel = new ArrayList<>();  //Contains Workout Variants in Routine
         ArrayList<ExerciseModel> liftingExercises = new ArrayList<>();    //Contain exercises in a Workout
         liftingExercises.add(new ExerciseModel("Bench Press"));
@@ -74,9 +93,43 @@ public class RoutineFragment extends Fragment {
         runningModel.add(new WorkoutModel("Track Sprints"));
         runningModel.add(new WorkoutModel("Intervals"));
         routineModels.add(new RoutineModel("General Running Routine", "Intermediate Running Routine", runningModel));
+*/
 
 
         //End data
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://3.221.56.60/initializeRoutines.php";
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
+                Response.Listener<JSONArray>() {
+                    public void onResponse(JSONArray response) {
+                        try
+                        {
+                            for (int i = 0; i < response.length(); i++)
+                            {
+                                JSONObject jso = response.getJSONObject(i);
+                                System.out.println(jso);//
+
+
+//                                ArrayList<ExerciseModel> liftingExercises = new ArrayList<>();    //Contain exercises in a Workout
+//                                liftingExercises.add(new ExerciseModel("Bench Press"));
+//                                liftingExercises.add(new ExerciseModel("High Row"));
+//                                liftingExercises.add(new ExerciseModel("Leg Press"));
+
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        queue.add(jsObjRequest);
+
 
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
