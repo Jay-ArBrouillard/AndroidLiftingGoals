@@ -23,6 +23,11 @@ if (mysqli_num_rows($result) == 1)  //username exists
     {
       $arr[] = $row;
       echo json_encode($arr);
+      //Update last_login time
+      date_default_timezone_set('US/Central');
+      $current_date = date("Y-m-d h:i:s");
+      $stmt = $conn->prepare("UPDATE Users SET last_login = '$current_date' WHERE username = '$username'");
+      $stmt->execute();
     }
     else //Password doesn't match
     {

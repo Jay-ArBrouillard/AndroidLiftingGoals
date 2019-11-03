@@ -31,10 +31,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
-
         getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineFragment()).commit();
-
-
     }
 
     public void AddRoutineButton(View view) {

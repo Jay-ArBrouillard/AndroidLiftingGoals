@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -50,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         registerButton = findViewById(R.id.register_button);
         username = findViewById(R.id.username_edit_text);
         password = findViewById(R.id.password_edit_text);
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
     public void loginEvent (View view) {
         boolean validUsername = validateUserReq();
