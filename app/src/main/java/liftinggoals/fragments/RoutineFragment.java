@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,9 +41,11 @@ import liftinggoals.misc.VerticalSpaceItemDecoration;
 import liftinggoals.classes.WorkoutModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class RoutineFragment extends Fragment {
-    private ArrayList<RoutineModel> routineModels;
+    public ArrayList<RoutineModel> routineModels;
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -49,7 +53,12 @@ public class RoutineFragment extends Fragment {
     private String username;
 
     public RoutineFragment() {
-        //Empty constructor
+        routineModels = new ArrayList<>();
+
+    }
+
+    public RoutineFragment(ArrayList<RoutineModel> list) {
+        routineModels = list;
     }
     @Nullable
     @Override
@@ -58,7 +67,7 @@ public class RoutineFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.routine_fragment_recycler_view);
 
-        initializeRecyclerView();
+        initializeRecyclerView(savedInstanceState);
         initializeActionSearch(view);
         initializeSwipe();
 
@@ -66,71 +75,16 @@ public class RoutineFragment extends Fragment {
     }
 
 
-    private void initializeRecyclerView() {
-        routineModels = new ArrayList<>();
-
-
-        //Passing data to WorkoutFragment
-        /*
-
-
-        ArrayList<WorkoutModel> liftingModel = new ArrayList<>();  //Contains Workout Variants in Routine
-        ArrayList<ExerciseModel> liftingExercises = new ArrayList<>();    //Contain exercises in a Workout
-        liftingExercises.add(new ExerciseModel("Bench Press"));
-        liftingExercises.add(new ExerciseModel("High Row"));
-        liftingExercises.add(new ExerciseModel("Leg Press"));
-        liftingModel.add(new WorkoutModel("Chest Day"));
-        liftingModel.add(new WorkoutModel("Back Day"));
-        liftingModel.add(new WorkoutModel("Leg Day"));
-        routineModels.add(new RoutineModel("Full Body Routine", "Jack-of-all Trades Routine", liftingModel));
-
-        ArrayList<WorkoutModel> runningModel = new ArrayList<>();
-        ArrayList<ExerciseModel> runningWorkouts = new ArrayList<>();    //Contain exercises in a Workout
-        runningWorkouts.add(new ExerciseModel("Marathon"));
-        runningWorkouts.add(new ExerciseModel("Sprints"));
-        runningWorkouts.add(new ExerciseModel("Stretching"));
-        runningModel.add(new WorkoutModel("Jog around the park"));
-        runningModel.add(new WorkoutModel("Track Sprints"));
-        runningModel.add(new WorkoutModel("Intervals"));
-        routineModels.add(new RoutineModel("General Running Routine", "Intermediate Running Routine", runningModel));
-*/
-
-
-        //End data
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://3.221.56.60/initializeRoutines.php";
-        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
-                Response.Listener<JSONArray>() {
-                    public void onResponse(JSONArray response) {
-                        try
-                        {
-                            for (int i = 0; i < response.length(); i++)
-                            {
-                                JSONObject jso = response.getJSONObject(i);
-                                System.out.println(jso);//
-
-
-//                                ArrayList<ExerciseModel> liftingExercises = new ArrayList<>();    //Contain exercises in a Workout
-//                                liftingExercises.add(new ExerciseModel("Bench Press"));
-//                                liftingExercises.add(new ExerciseModel("High Row"));
-//                                liftingExercises.add(new ExerciseModel("Leg Press"));
-
-                            }
-                        }
-                        catch (JSONException e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-
-        queue.add(jsObjRequest);
-
-
+    private void initializeRecyclerView(Bundle savedInstanceState) {
+        if(savedInstanceState != null)
+        {
+            System.out.println("jere");
+            routineModels = savedInstanceState.getParcelableArrayList("routineModels");
+        }
+        else
+        {
+            fetchData();
+        }
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
@@ -146,18 +100,91 @@ public class RoutineFragment extends Fragment {
                 Fragment selectedFragment = new WorkoutFragment();
                 selectedFragment.setArguments(bundle);
 
-                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+                //getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, selectedFragment).addToBackStack(null).commit();
             }
 
             @Override
             public void onItemEdit(int position) {
-                getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutinesEditFolderFragment()).commit();
+                //getActivity().getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutinesEditFolderFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new RoutinesEditFolderFragment()).addToBackStack(null).commit();
             }
 
         });
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+    }
+
+    private void fetchData()
+    {
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://3.221.56.60/initializeRoutines.php";
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
+                Response.Listener<JSONArray>() {
+                    public void onResponse(JSONArray response) {
+                        try
+                        {
+                            ArrayList<WorkoutModel> liftingModel = new ArrayList<>();
+                            String routineName = null;
+                            String routineDescription = null;
+                            for (int i = 0; i < response.length(); i++)
+                            {
+                                JSONObject jso = response.getJSONObject(i);
+                                routineName = jso.getString("routine_name");
+                                routineDescription = jso.getString("description");
+
+                                if (jso.has("user_id"))
+                                {
+                                    i++;
+                                    do {    //Iterate on every routine item
+                                        i++;
+                                        jso = response.getJSONObject(i);
+                                        if (jso.has("workout_name"))
+                                        {
+                                            String workoutName = jso.getString("workout_name");
+                                            liftingModel.add(new WorkoutModel(workoutName));
+                                        }
+
+                                        if (jso.has("description"))
+                                        {
+                                            String workoutDescription = jso.getString("description");
+                                        }
+
+                                        do {
+                                            jso = response.getJSONObject(i);
+                                            if (jso.has("minimum_sets"))
+                                            {
+                                                //nothing right now
+                                            }
+                                            else if (jso.has("exercise_name"))
+                                            {
+                                                String exerciseName = jso.getString("exercise_name");
+                                            }
+
+                                            i++;
+                                        }
+                                        while (jso.has("exercise_id"));
+
+                                    }
+                                    while (jso.has("workout_id"));
+                                }
+                            }
+
+                            routineModels.add(new RoutineModel(routineName, routineDescription, liftingModel));
+                        }
+                        catch (JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        queue.add(jsObjRequest);
     }
 
     private void initializeActionSearch(View view) {
@@ -201,4 +228,17 @@ public class RoutineFragment extends Fragment {
         }).attachToRecyclerView(recyclerView);
     }
 
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        System.out.println("called");
+        outState.putParcelableArrayList("routineModels", routineModels);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            routineModels = savedInstanceState.getParcelableArrayList("routineModels");
+        }
+    }
 }

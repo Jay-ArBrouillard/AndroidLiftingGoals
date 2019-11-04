@@ -3,6 +3,7 @@ package liftinggoals.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,9 @@ import com.example.liftinggoals.R;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+
+import liftinggoals.classes.RoutineModel;
 import liftinggoals.fragments.HistoryFragment;
 import liftinggoals.fragments.MapsFragment;
 import liftinggoals.fragments.ProgressFragment;
@@ -23,6 +27,7 @@ import liftinggoals.fragments.SettingFragment;
 
 public class MainActivity extends AppCompatActivity {
     private String username;
+    private RoutineFragment startingFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
-        getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new RoutineFragment()).addToBackStack(null).commit();
     }
 
     public void AddRoutineButton(View view) {
@@ -63,11 +68,27 @@ public class MainActivity extends AppCompatActivity {
             }
             if (selectedFragment != null)
             {
-                getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
-
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().add(R.id.fragment_container, selectedFragment).addToBackStack(null).commit();
+//                fragmentManager.beginTransaction().replace((R.id.fragment_container), selectedFragment).commit();
+//                fragmentManager.beginTransaction().addToBackStack(null);
             }
 
             return true;    //Means we want to select the clicked item
         }
     };
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "startingFragment", startingFragment);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        startingFragment = (RoutineFragment)getSupportFragmentManager().getFragment(savedInstanceState, "startingFragment");
+    }
 }
