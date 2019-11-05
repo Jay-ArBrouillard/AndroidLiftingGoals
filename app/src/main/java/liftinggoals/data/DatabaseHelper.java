@@ -9,7 +9,7 @@ import liftinggoals.classes.RoutineModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 11;
 
     public SQLiteDatabase myDB;
 
@@ -22,12 +22,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(RoutineTable.SQL_CREATE_ROUTINE_TABLE);
+        db.execSQL(RoutineWorkoutsTable.SQL_CREATE_ROUTINE_WORKOUTS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
         db.execSQL(RoutineTable.SQL_DROP_ROUTINE_TABLE);
+        db.execSQL(RoutineWorkoutsTable.SQL_DROP_ROUTINE_WORKOUTS_TABLE);
         onCreate(db);
     }
 
@@ -72,4 +74,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         return RoutineTable.getAllRoutines(myDB);
     }
+
+
 }

@@ -32,12 +32,10 @@ public class WorkoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
 
-        //Get info from Bundle
-
-        workoutsList = savedInstanceState.getParcelableArrayList("routine_item");
-        //Set title of WorkoutFragment to the passed RoutineName from RoutineFragment
+        //Get info from Intent->Bundle
+        workoutsList = getIntent().getExtras().getParcelableArrayList("routine_item");
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
-        title.setText(savedInstanceState.getString("routine_name"));
+        title.setText(getIntent().getExtras().getString("routine_name"));
 
         recyclerView = findViewById(R.id.multiple_workout_recycler_view);
         initializeRecyclerView();

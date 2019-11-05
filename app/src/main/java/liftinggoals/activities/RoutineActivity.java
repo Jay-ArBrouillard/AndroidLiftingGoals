@@ -112,15 +112,19 @@ public class RoutineActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new RoutineAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());   //Passing List<WorkoutModel> to WorkoutFragment
-                bundle.putString("routine_name", routineModels.get(position).getRoutineName());
-                Fragment selectedFragment = new WorkoutFragment();
-                selectedFragment.setArguments(bundle);
-
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, selectedFragment).addToBackStack(null).commit();
+//                Fragment selectedFragment = new WorkoutFragment();
+//                selectedFragment.setArguments(bundle);
+//
+//                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, selectedFragment).addToBackStack(null).commit();
 
                 Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
+                selectWorkFromRoutine.putParcelableArrayListExtra("routine_item", routineModels.get(position).getWorkouts());
+                selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
+                /*
+                Bundle extras = new Bundle();
+                extras.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());                    //Passing List<WorkoutModel> to WorkoutFragment
+                extras.putString("routine_name", routineModels.get(position).getRoutineName());
+                selectWorkFromRoutine.putExtras(extras);*/
                 startActivity(selectWorkFromRoutine);
             }
 
@@ -160,7 +164,6 @@ public class RoutineActivity extends AppCompatActivity {
                                 routineDesc = routineObj.getString("description");
                                 int totalWorkouts = routineObj.getInt("number_workouts");
 
-                                int iterations = 0;
                                 for (int j = 0 ; j < totalWorkouts; j++)
                                 {
                                     i++;
@@ -168,19 +171,28 @@ public class RoutineActivity extends AppCompatActivity {
                                     listOfWorkouts.add(new WorkoutModel(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration")));
                                     int totalExercises = nextObj.getInt("number_exercises");
                                     listOfExercises.clear();
+                                    ExerciseModel exerciseModel = new ExerciseModel();
                                     for (int k = 0; k < totalExercises*2; k++)
                                     {
                                         i++;
                                         JSONObject exerciseObj = response.getJSONObject(i);
-                                        //Sets Reps
-                                        if (exerciseObj.has("minimum_sets"))
+                                        if (k % 2 == 0)
                                         {
-                                            //todo
+                                            String strMinSets = exerciseObj.getString("minimum_sets");
+                                            String strMinReps = exerciseObj.getString("minimum_reps");
+                                            String strMaxSets = exerciseObj.getString("maximum_sets");
+                                            String strMaxReps = exerciseObj.getString("maximum_reps");
+                                            exerciseModel.setMinSets(strMinSets);
+                                            exerciseModel.setMinReps(strMinReps);
+                                            exerciseModel.setMaxSets(strMaxSets);
+                                            exerciseModel.setMaxReps(strMaxReps);
                                         }
-
-                                        //Exercise Name
-                                        if (exerciseObj.has("exercise_name"))
-                                        listOfExercises.add(new ExerciseModel(exerciseObj.getString("exercise_name")));
+                                        else
+                                        {
+                                            exerciseModel.setExerciseName(exerciseObj.getString("exercise_name"));
+                                            listOfExercises.add(exerciseModel);
+                                            exerciseModel = new ExerciseModel(); //Clear exercise model
+                                        }
                                     }
 
                                     listOfWorkouts.get(listOfWorkouts.size()-1).setExercises(listOfExercises);
@@ -191,7 +203,7 @@ public class RoutineActivity extends AppCompatActivity {
                             routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
 
                             //Testing Return value
-                            for (RoutineModel r : routineModels)
+                            /*for (RoutineModel r : routineModels)
                             {
                                 System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
                                 for (WorkoutModel w : r.getWorkouts())
@@ -200,10 +212,14 @@ public class RoutineActivity extends AppCompatActivity {
                                     for (ExerciseModel e : w.getExercises())
                                     {
                                         System.out.println(e.getExerciseName());
+                                        System.out.println(e.getMaxReps());
                                     }
                                 }
-                            }
+                            }*/
                             //EndTesting
+
+                            //Insert routines into local database if they don't already exist
+
 
                         }
                         catch (JSONException e)

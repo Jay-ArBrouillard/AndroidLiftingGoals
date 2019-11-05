@@ -5,48 +5,34 @@ import android.os.Parcelable;
 
 public class ExerciseModel implements Parcelable {
     private String exerciseName;
-    private int minSets;
-    private int maxSets;
-    private int minReps;
-    private int maxReps;
-    private int restDuration;
-    private int RPE;
-    private int tempo;
-    private int trainingMax;
+    private String minSets;
+    private String maxSets;
+    private String minReps;
+    private String maxReps;
+    private String restDuration;
+    private String RPE;
+    private String tempo;
+    private String trainingMax;
+
+    public ExerciseModel() {
+
+    }
 
     public ExerciseModel(String exerciseName) {
         this.exerciseName = exerciseName;
     }
 
-    public ExerciseModel(int minSets, int minReps, int maxSets, int maxReps) {
-        this.minSets = minSets;
-        this.minReps = minReps;
-        this.maxSets = maxSets;
-        this.maxReps = maxReps;
-    }
-
-    public ExerciseModel(String exerciseName, int minSets, int maxSets, int minReps, int maxReps, int restDuration, int RPE, int temp, int trainingMax) {
-        this.exerciseName = exerciseName;
-        this.minSets = minSets;
-        this.maxSets = maxSets;
-        this.minReps = minReps;
-        this.maxReps = maxReps;
-        this.restDuration = restDuration;
-        this.RPE = RPE;
-        this.tempo = temp;
-        this.trainingMax = trainingMax;
-    }
 
     protected ExerciseModel(Parcel in) {
         exerciseName = in.readString();
-        minSets = in.readInt();
-        maxSets = in.readInt();
-        minReps = in.readInt();
-        maxReps = in.readInt();
-        restDuration = in.readInt();
-        RPE = in.readInt();
-        tempo = in.readInt();
-        trainingMax = in.readInt();
+        minSets = in.readString();
+        maxSets = in.readString();
+        minReps = in.readString();
+        maxReps = in.readString();
+        restDuration = in.readString();
+        RPE = in.readString();
+        tempo = in.readString();
+        trainingMax = in.readString();
     }
 
     public static final Creator<ExerciseModel> CREATOR = new Creator<ExerciseModel>() {
@@ -69,67 +55,67 @@ public class ExerciseModel implements Parcelable {
         this.exerciseName = exerciseName;
     }
 
-    public int getMinSets() {
+    public String getMinSets() {
         return minSets;
     }
 
-    public void setMinSets(int minSets) {
+    public void setMinSets(String minSets) {
         this.minSets = minSets;
     }
 
-    public int getMaxSets() {
+    public String getMaxSets() {
         return maxSets;
     }
 
-    public void setMaxSets(int maxSets) {
+    public void setMaxSets(String maxSets) {
         this.maxSets = maxSets;
     }
 
-    public int getMinReps() {
+    public String getMinReps() {
         return minReps;
     }
 
-    public void setMinReps(int minReps) {
+    public void setMinReps(String minReps) {
         this.minReps = minReps;
     }
 
-    public int getMaxReps() {
+    public String getMaxReps() {
         return maxReps;
     }
 
-    public void setMaxReps(int maxReps) {
+    public void setMaxReps(String maxReps) {
         this.maxReps = maxReps;
     }
 
-    public int getRestDuration() {
+    public String getRestDuration() {
         return restDuration;
     }
 
-    public void setRestDuration(int restDuration) {
+    public void setRestDuration(String restDuration) {
         this.restDuration = restDuration;
     }
 
-    public int getRPE() {
+    public String getRPE() {
         return RPE;
     }
 
-    public void setRPE(int RPE) {
+    public void setRPE(String RPE) {
         this.RPE = RPE;
     }
 
-    public int getTempo() {
+    public String getTempo() {
         return tempo;
     }
 
-    public void setTempo(int tempo) {
+    public void setTempo(String tempo) {
         this.tempo = tempo;
     }
 
-    public int getTrainingMax() {
+    public String getTrainingMax() {
         return trainingMax;
     }
 
-    public void setTrainingMax(int trainingMax) {
+    public void setTrainingMax(String trainingMax) {
         this.trainingMax = trainingMax;
     }
 
@@ -141,13 +127,13 @@ public class ExerciseModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(exerciseName);
-        dest.writeInt(minSets);
-        dest.writeInt(maxSets);
-        dest.writeInt(minReps);
-        dest.writeInt(maxReps);
-        dest.writeInt(restDuration);
-        dest.writeInt(RPE);
-        dest.writeInt(tempo);
-        dest.writeInt(trainingMax);
+        dest.writeString(minSets);
+        dest.writeString(maxSets);
+        dest.writeString(minReps);
+        dest.writeString(maxReps);
+        dest.writeString(restDuration);
+        dest.writeString(RPE);
+        dest.writeString(tempo);
+        dest.writeString(trainingMax);
     }
 }
