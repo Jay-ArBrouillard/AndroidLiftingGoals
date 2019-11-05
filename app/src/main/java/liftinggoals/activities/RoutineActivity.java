@@ -104,20 +104,12 @@ public class RoutineActivity extends AppCompatActivity {
 
         adapter.setOnItemClickListener(new RoutineAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
-//                Fragment selectedFragment = new WorkoutFragment();
-//                selectedFragment.setArguments(bundle);
-//
-//                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, selectedFragment).addToBackStack(null).commit();
-
+            public void onItemClick(int position)
+            {
                 Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
                 selectWorkFromRoutine.putParcelableArrayListExtra("routine_item", routineModels.get(position).getWorkouts());
                 selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
-                /*
-                Bundle extras = new Bundle();
-                extras.putParcelableArrayList("routine_item", routineModels.get(position).getWorkouts());                    //Passing List<WorkoutModel> to WorkoutFragment
-                extras.putString("routine_name", routineModels.get(position).getRoutineName());
-                selectWorkFromRoutine.putExtras(extras);*/
+
                 startActivity(selectWorkFromRoutine);
             }
 

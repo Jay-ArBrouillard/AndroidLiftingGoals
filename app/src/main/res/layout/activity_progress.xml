@@ -18,7 +18,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/progress_fragment_title"
+                android:id="@+id/activity_progress_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
@@ -28,7 +28,7 @@
                 android:textSize="50sp" />
 
             <SearchView
-                android:id="@+id/progress_fragment_action_search"
+                android:id="@+id/activity_progress_action_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -71,9 +71,9 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/progress_fragment_volume_groups_recycler_view"
+                android:id="@+id/progress_activity_volume_groups_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:padding="10dp" />
 
             <TextView
@@ -81,8 +81,9 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
                 android:text="Exercises"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15dp" />
+                android:textColor="@android:color/white"
+                android:textSize="15dp"
+                android:layout_gravity="top"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/progress_fragment_exercises_recycler_view"
