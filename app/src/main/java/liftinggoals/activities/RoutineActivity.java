@@ -27,11 +27,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import liftinggoals.adapters.RoutineAdapter;
+import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.WorkoutModel;
+import liftinggoals.data.DatabaseHelper;
 import liftinggoals.fragments.HistoryFragment;
 import liftinggoals.fragments.MapsFragment;
 import liftinggoals.fragments.ProgressFragment;
@@ -42,7 +46,8 @@ import liftinggoals.fragments.WorkoutFragment;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class RoutineActivity extends AppCompatActivity {
-    public ArrayList<RoutineModel> routineModels;
+    public ArrayList<RoutineModel> routineModels = new ArrayList<>();
+
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -51,10 +56,6 @@ public class RoutineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routine);
-        if (savedInstanceState == null)
-        {
-            routineModels = new ArrayList<>();
-        }
 
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
 
@@ -62,8 +63,9 @@ public class RoutineActivity extends AppCompatActivity {
         initializeActionSearch();
         initializeSwipe();
 
-        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigation = findViewById(R.id.activity_routine_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -143,53 +145,66 @@ public class RoutineActivity extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         try
                         {
-                            ArrayList<WorkoutModel> liftingModel = new ArrayList<>();
+                            System.out.println("response length: " + response.length());
+                            ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>(); //Ex: Workout A and Workout B
+                            //
+                            ArrayList<ExerciseModel> listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
+                            //
                             String routineName = null;
-                            String routineDescription = null;
-                            for (int i = 0; i < response.length(); i++)
+                            String routineDesc = null;
+                            int i = 0;
+                            while (i < response.length())
                             {
-                                JSONObject jso = response.getJSONObject(i);
-                                routineName = jso.getString("routine_name");
-                                routineDescription = jso.getString("description");
+                                JSONObject routineObj = response.getJSONObject(i);
+                                routineName = routineObj.getString("routine_name");
+                                routineDesc = routineObj.getString("description");
+                                int totalWorkouts = routineObj.getInt("number_workouts");
 
-                                if (jso.has("user_id"))
+                                int iterations = 0;
+                                for (int j = 0 ; j < totalWorkouts; j++)
                                 {
                                     i++;
-                                    do {    //Iterate on every routine item
+                                    JSONObject nextObj = response.getJSONObject(i);
+                                    listOfWorkouts.add(new WorkoutModel(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration")));
+                                    int totalExercises = nextObj.getInt("number_exercises");
+                                    listOfExercises.clear();
+                                    for (int k = 0; k < totalExercises*2; k++)
+                                    {
                                         i++;
-                                        jso = response.getJSONObject(i);
-                                        if (jso.has("workout_name"))
+                                        JSONObject exerciseObj = response.getJSONObject(i);
+                                        //Sets Reps
+                                        if (exerciseObj.has("minimum_sets"))
                                         {
-                                            String workoutName = jso.getString("workout_name");
-                                            liftingModel.add(new WorkoutModel(workoutName));
+                                            //todo
                                         }
 
-                                        if (jso.has("description"))
-                                        {
-                                            String workoutDescription = jso.getString("description");
-                                        }
-
-                                        do {
-                                            jso = response.getJSONObject(i);
-                                            if (jso.has("minimum_sets"))
-                                            {
-                                                //nothing right now
-                                            }
-                                            else if (jso.has("exercise_name"))
-                                            {
-                                                String exerciseName = jso.getString("exercise_name");
-                                            }
-
-                                            i++;
-                                        }
-                                        while (jso.has("exercise_id"));
-
+                                        //Exercise Name
+                                        if (exerciseObj.has("exercise_name"))
+                                        listOfExercises.add(new ExerciseModel(exerciseObj.getString("exercise_name")));
                                     }
-                                    while (jso.has("workout_id"));
+
+                                    listOfWorkouts.get(listOfWorkouts.size()-1).setExercises(listOfExercises);
+                                }
+                                i++;
+                            }   //End outer for loop
+
+                            routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
+
+                            //Testing Return value
+                            for (RoutineModel r : routineModels)
+                            {
+                                System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
+                                for (WorkoutModel w : r.getWorkouts())
+                                {
+                                    System.out.println(w.getWorkoutName() + ": " + w.getEstimatedDuration());
+                                    for (ExerciseModel e : w.getExercises())
+                                    {
+                                        System.out.println(e.getExerciseName());
+                                    }
                                 }
                             }
+                            //EndTesting
 
-                            routineModels.add(new RoutineModel(routineName, routineDescription, liftingModel));
                         }
                         catch (JSONException e)
                         {

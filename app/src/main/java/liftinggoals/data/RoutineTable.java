@@ -1,26 +1,20 @@
 package liftinggoals.data;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.User;
 
 public class RoutineTable{
 
     public static final String SQL_CREATE_ROUTINE_TABLE = "CREATE TABLE " +
             RoutineEntry.TABLE_NAME + " (" +
             RoutineEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            RoutineEntry.COLUMN_ROUTINE_ID + " TEXT NOT NULL, " +
             RoutineEntry.COLUMN_ROUTINE_NAME + " TEXT NOT NULL, " +
-            RoutineEntry.COLUMN_DESCRIPTION + " TEXT " +
+            RoutineEntry.COLUMN_DESCRIPTION + " TEXT" +
             ");";
     public static final String SQL_DROP_ROUTINE_TABLE = "DROP TABLE IF EXISTS " + RoutineEntry.TABLE_NAME;
 
@@ -28,7 +22,6 @@ public class RoutineTable{
     public static abstract class RoutineEntry implements BaseColumns
     {
         public static final String TABLE_NAME = "Routines";
-        public static final String COLUMN_ROUTINE_ID = "routine_id";
         public static final String COLUMN_ROUTINE_NAME = "routine_name";
         public static final String COLUMN_DESCRIPTION = "description";
     }

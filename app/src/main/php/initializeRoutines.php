@@ -29,7 +29,7 @@ if (mysqli_num_rows($routinesResult) > 0)   //1 row
         $routineWorkoutsResult = $stmt->get_result();
         while ($row2 = mysqli_fetch_object($routineWorkoutsResult))    // fetch all rows
         {
-            array_push($arr, $row2);
+            //array_push($arr, $row2);
             $workout_id = $row2->workout_id;
             $stmt = $conn->prepare("SELECT * FROM Workouts WHERE workout_id = ?");
             $stmt->bind_param("s", $workout_id);

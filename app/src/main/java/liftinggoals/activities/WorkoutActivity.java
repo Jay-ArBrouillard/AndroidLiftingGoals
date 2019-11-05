@@ -11,12 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.liftinggoals.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import java.util.ArrayList;
-
 import liftinggoals.adapters.WorkoutAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.WorkoutModel;

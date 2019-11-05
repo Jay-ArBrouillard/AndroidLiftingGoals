@@ -18,13 +18,11 @@ public class ExerciseModel implements Parcelable {
         this.exerciseName = exerciseName;
     }
 
-    public ExerciseModel(String exerciseName, int minSets, int minReps, int maxReps, int RPE, int trainingMax) {
-        this.exerciseName = exerciseName;
+    public ExerciseModel(int minSets, int minReps, int maxSets, int maxReps) {
         this.minSets = minSets;
         this.minReps = minReps;
+        this.maxSets = maxSets;
         this.maxReps = maxReps;
-        this.RPE = RPE;
-        this.trainingMax = trainingMax;
     }
 
     public ExerciseModel(String exerciseName, int minSets, int maxSets, int minReps, int maxReps, int restDuration, int RPE, int temp, int trainingMax) {

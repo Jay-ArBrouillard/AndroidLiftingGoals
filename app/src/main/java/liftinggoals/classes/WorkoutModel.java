@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class WorkoutModel implements Parcelable {
     private int imageResource;
     private String workoutName;
-    private int estimatedDuration;
+    private String description;
+    private double estimatedDuration;
     private ArrayList<ExerciseModel> exercises;
     private Color color;
 
@@ -18,8 +19,22 @@ public class WorkoutModel implements Parcelable {
         this.workoutName = workoutName;
     }
 
+    public WorkoutModel(String workoutName, String description) {
+
+        this.workoutName = workoutName;
+        this.description = description;
+    }
+
+    public WorkoutModel(String workoutName, String description, double estimatedDuration) {
+
+        this.workoutName = workoutName;
+        this.description = description;
+        this.estimatedDuration = estimatedDuration;
+    }
+
     protected WorkoutModel(Parcel in) {
         workoutName = in.readString();
+        description = in.readString();
         estimatedDuration = in.readInt();
         exercises = in.createTypedArrayList(ExerciseModel.CREATOR);
     }
@@ -44,11 +59,11 @@ public class WorkoutModel implements Parcelable {
         this.workoutName = workoutName;
     }
 
-    public int getEstimatedDuration() {
+    public double getEstimatedDuration() {
         return estimatedDuration;
     }
 
-    public void setEstimatedDuration(int estimatedDuration) {
+    public void setEstimatedDuration(double estimatedDuration) {
         this.estimatedDuration = estimatedDuration;
     }
 
@@ -76,7 +91,8 @@ public class WorkoutModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(workoutName);
-        dest.writeInt(estimatedDuration);
+        dest.writeString(description);
+        dest.writeDouble(estimatedDuration);
         dest.writeTypedList(exercises);
     }
 }
