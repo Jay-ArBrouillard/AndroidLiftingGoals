@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.List;
 import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.RoutineWorkoutModel;
+import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.classes.WorkoutModel;
 
 public class DatabaseHelper extends SQLiteOpenHelper
 {
@@ -24,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         db.execSQL(RoutineTable.SQL_CREATE_ROUTINE_TABLE);
         db.execSQL(RoutineWorkoutsTable.SQL_CREATE_ROUTINE_WORKOUTS_TABLE);
+        db.execSQL(WorkoutsTable.SQL_CREATE_WORKOUT_TABLE);
     }
 
     @Override
@@ -31,6 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         db.execSQL(RoutineTable.SQL_DROP_ROUTINE_TABLE);
         db.execSQL(RoutineWorkoutsTable.SQL_DROP_ROUTINE_WORKOUTS_TABLE);
+        db.execSQL(WorkoutsTable.SQL_DROP_WORKOUT_TABLE);
         onCreate(db);
     }
 
@@ -53,17 +57,17 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////ROUTINE METHODS/////////////////////////////////////////////////////
 
-    public long insert(String name, String description)
+    public long insertRoutine(String name, String description)
     {
         return RoutineTable.insert(myDB, name, description);
     }
 
-    public long update(String name, String description)
+    public long updateRoutine(String name, String description)
     {
         return RoutineTable.update(myDB, name, description);
     }
 
-    public long delete(String name)
+    public long deleteRoutine(String name)
     {
         return RoutineTable.delete(myDB, name);
     }
@@ -82,17 +86,17 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////ROUTINE WORKOUTS METHODS ///////////////////////////////////////////
 
-    public long insert(int routineId, int workoutId)
+    public long insertRoutineWorkout(int routineId, int workoutId)
     {
         return RoutineWorkoutsTable.insert(myDB, routineId, workoutId);
     }
 
-    public long update(int routineId, int workoutId)
+    public long updateRoutineWorkout(int routineId, int workoutId)
     {
         return RoutineWorkoutsTable.update(myDB, routineId, workoutId);
     }
 
-    public long delete(int routineId, int workoutId)
+    public long deleteRoutineWorkout(int routineId, int workoutId)
     {
         return RoutineWorkoutsTable.delete(myDB, routineId, workoutId);
     }
@@ -100,6 +104,68 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public RoutineWorkoutModel getRoutineWorkout(int routineId, int workoutId)
     {
         return RoutineWorkoutsTable.getRoutineWorkout(myDB, routineId, workoutId);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////WORKOUT METHODS ////////////////////////////////////////////////////
+
+
+    public long insertWorkout(String name, String description, double duration, int exercises)
+    {
+        return WorkoutsTable.insert(myDB, name, description, duration, exercises);
+    }
+
+    public long updateWorkout(String name, String description, double duration, int exercises)
+    {
+        return WorkoutsTable.update(myDB, name, description, duration, exercises);
+    }
+
+    public long deleteWorkout(int workoutId)
+    {
+        return WorkoutsTable.delete(myDB, workoutId);
+    }
+
+    public WorkoutModel getWorkout(int workoutId)
+    {
+        return WorkoutsTable.getWorkout(myDB, workoutId);
+    }
+
+    public List<WorkoutModel> getAllWorkouts()
+    {
+        return WorkoutsTable.getAllWorkouts(myDB);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////WORKOUT EXERCISE METHODS ///////////////////////////////////////////
+
+
+    public long insertWorkoutExercise(int workoutId, int exerciseId, int minimumSets,
+                                      int minimumReps, int maximumSets, int maximumReps)
+    {
+        return WorkoutExercisesTable.insert(myDB, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
+    }
+
+    public long updateWorkoutExcercise(int workoutId, int exerciseId, int minimumSets,
+                              int minimumReps, int maximumSets, int maximumReps)
+    {
+        return WorkoutExercisesTable.update(myDB, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
+    }
+
+    public long deleteWorkoutExercise(int workoutExerciseId)
+    {
+        return WorkoutExercisesTable.delete(myDB, workoutExerciseId);
+    }
+
+    public WorkoutExerciseModel getWorkoutExercise(int workoutExerciseId)
+    {
+        return WorkoutExercisesTable.getWorkoutExercise(myDB, workoutExerciseId);
+    }
+
+    public List<WorkoutExerciseModel> getAllWorkoutExercises()
+    {
+        return WorkoutExercisesTable.getAllWorkoutExercises(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

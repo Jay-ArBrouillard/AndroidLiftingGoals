@@ -34,6 +34,7 @@ import java.util.List;
 import liftinggoals.adapters.RoutineAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
+import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.fragments.HistoryFragment;
@@ -152,7 +153,7 @@ public class RoutineActivity extends AppCompatActivity {
                             System.out.println("response length: " + response.length());
                             ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>(); //Ex: Workout A and Workout B
                             //
-                            ArrayList<ExerciseModel> listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
+                            ArrayList<WorkoutExerciseModel> listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
                             //
                             String routineName = null;
                             String routineDesc = null;
@@ -171,7 +172,7 @@ public class RoutineActivity extends AppCompatActivity {
                                     listOfWorkouts.add(new WorkoutModel(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration")));
                                     int totalExercises = nextObj.getInt("number_exercises");
                                     listOfExercises.clear();
-                                    ExerciseModel exerciseModel = new ExerciseModel();
+                                    WorkoutExerciseModel exerciseModel = new WorkoutExerciseModel();
                                     for (int k = 0; k < totalExercises*2; k++)
                                     {
                                         i++;
@@ -182,16 +183,16 @@ public class RoutineActivity extends AppCompatActivity {
                                             String strMinReps = exerciseObj.getString("minimum_reps");
                                             String strMaxSets = exerciseObj.getString("maximum_sets");
                                             String strMaxReps = exerciseObj.getString("maximum_reps");
-                                            exerciseModel.setMinSets(strMinSets);
-                                            exerciseModel.setMinReps(strMinReps);
-                                            exerciseModel.setMaxSets(strMaxSets);
-                                            exerciseModel.setMaxReps(strMaxReps);
+                                            exerciseModel.setMinimumReps(Integer.parseInt(strMinSets));
+                                            exerciseModel.setMinimumReps(Integer.parseInt(strMinReps));
+                                            exerciseModel.setMaximumSets(Integer.parseInt(strMaxSets));
+                                            exerciseModel.setMaximumReps(Integer.parseInt(strMaxReps));
                                         }
                                         else
                                         {
-                                            exerciseModel.setExerciseName(exerciseObj.getString("exercise_name"));
+                                            exerciseModel.getExercise().setExerciseName(exerciseObj.getString("exercise_name"));
                                             listOfExercises.add(exerciseModel);
-                                            exerciseModel = new ExerciseModel(); //Clear exercise model
+                                            exerciseModel = new WorkoutExerciseModel(); //Clear exercise model
                                         }
                                     }
 
@@ -203,19 +204,19 @@ public class RoutineActivity extends AppCompatActivity {
                             routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
 
                             //Testing Return value
-                            /*for (RoutineModel r : routineModels)
+                            for (RoutineModel r : routineModels)
                             {
                                 System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
                                 for (WorkoutModel w : r.getWorkouts())
                                 {
                                     System.out.println(w.getWorkoutName() + ": " + w.getEstimatedDuration());
-                                    for (ExerciseModel e : w.getExercises())
+                                    for (WorkoutExerciseModel e : w.getExercises())
                                     {
-                                        System.out.println(e.getExerciseName());
-                                        System.out.println(e.getMaxReps());
+                                        System.out.println(e.getMaximumReps());
+                                        System.out.println(e.getExercise().getMaxReps());
                                     }
                                 }
-                            }*/
+                            }
                             //EndTesting
 
                             //Insert routines into local database if they don't already exist

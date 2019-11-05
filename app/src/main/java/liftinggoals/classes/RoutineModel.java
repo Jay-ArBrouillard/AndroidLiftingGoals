@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class RoutineModel implements Parcelable {
     private int imageResource;
+    private int routineId;
     private String routineName;
     private String description;
     private Date lastPerformed;
@@ -24,6 +25,7 @@ public class RoutineModel implements Parcelable {
 
     protected RoutineModel(Parcel in) {
         imageResource = in.readInt();
+        routineId = in.readInt();
         routineName = in.readString();
         description = in.readString();
         workouts = in.createTypedArrayList(WorkoutModel.CREATOR);
@@ -88,6 +90,7 @@ public class RoutineModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(routineId);
         dest.writeString(routineName);
         dest.writeString(description);
         //dest.write(lastPerformed);

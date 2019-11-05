@@ -7,22 +7,22 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 public class WorkoutModel implements Parcelable {
-    private int imageResource;
+    private int workoutId;
     private String workoutName;
     private String description;
     private double estimatedDuration;
-    private ArrayList<ExerciseModel> exercises;
+    private int numberExercises;
+    private ArrayList<WorkoutExerciseModel> exercises;
     private Color color;
+
+    public WorkoutModel()
+    {
+
+    }
 
     public WorkoutModel(String workoutName) {
 
         this.workoutName = workoutName;
-    }
-
-    public WorkoutModel(String workoutName, String description) {
-
-        this.workoutName = workoutName;
-        this.description = description;
     }
 
     public WorkoutModel(String workoutName, String description, double estimatedDuration) {
@@ -32,11 +32,27 @@ public class WorkoutModel implements Parcelable {
         this.estimatedDuration = estimatedDuration;
     }
 
+
     protected WorkoutModel(Parcel in) {
+        workoutId = in.readInt();
         workoutName = in.readString();
         description = in.readString();
-        estimatedDuration = in.readInt();
-        exercises = in.createTypedArrayList(ExerciseModel.CREATOR);
+        estimatedDuration = in.readDouble();
+        numberExercises = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(workoutId);
+        dest.writeString(workoutName);
+        dest.writeString(description);
+        dest.writeDouble(estimatedDuration);
+        dest.writeInt(numberExercises);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<WorkoutModel> CREATOR = new Creator<WorkoutModel>() {
@@ -59,6 +75,14 @@ public class WorkoutModel implements Parcelable {
         this.workoutName = workoutName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public double getEstimatedDuration() {
         return estimatedDuration;
     }
@@ -67,11 +91,11 @@ public class WorkoutModel implements Parcelable {
         this.estimatedDuration = estimatedDuration;
     }
 
-    public ArrayList<ExerciseModel> getExercises() {
+    public ArrayList<WorkoutExerciseModel> getExercises() {
         return exercises;
     }
 
-    public void setExercises(ArrayList<ExerciseModel> exercises) {
+    public void setExercises(ArrayList<WorkoutExerciseModel> exercises) {
         this.exercises = exercises;
     }
 
@@ -83,16 +107,13 @@ public class WorkoutModel implements Parcelable {
         this.color = color;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getNumberExercises() {
+        return numberExercises;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(workoutName);
-        dest.writeString(description);
-        dest.writeDouble(estimatedDuration);
-        dest.writeTypedList(exercises);
+    public void setNumberExercises(int numberExercises) {
+        this.numberExercises = numberExercises;
     }
+
+
 }
