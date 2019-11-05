@@ -22,20 +22,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="liftinggoals.activities.WorkoutActivity"></activity>
-        <activity android:name="liftinggoals.activities.RoutineActivity"></activity>
+        <activity android:name="liftinggoals.activities.WorkoutEditActivity"></activity>
+        <activity android:name="liftinggoals.activities.SettingsActivity" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name="liftinggoals.activities.MapsActivity"
+            android:label="@string/title_activity_maps" />
+        <activity android:name="liftinggoals.activities.HistoryActivity" />
+        <activity android:name="liftinggoals.activities.ProgressActivity" />
+        <activity android:name="liftinggoals.activities.RoutinesEditActivity" />
+        <activity android:name="liftinggoals.activities.WorkoutActivity" />
+        <activity android:name="liftinggoals.activities.RoutineActivity" />
         <activity android:name="liftinggoals.activities.ExerciseActivity" />
         <activity android:name="liftinggoals.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="liftinggoals.activities.MainActivity" />
     </application>
 
 </manifest>

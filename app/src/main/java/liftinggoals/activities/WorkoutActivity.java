@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import liftinggoals.adapters.WorkoutAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.WorkoutModel;
-import liftinggoals.fragments.RoutineEditFragment;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class WorkoutActivity extends AppCompatActivity {
@@ -60,8 +59,9 @@ public class WorkoutActivity extends AppCompatActivity {
 
             @Override
             public void onItemEdit(int position) {
-                //Remove
-                getSupportFragmentManager().beginTransaction().replace((R.id.fragment_container), new RoutineEditFragment()).commit();
+                Intent editWorkoutActivity = new Intent(WorkoutActivity.this, WorkoutEditActivity.class);
+                startActivity(editWorkoutActivity);
+
             }
 
         });

@@ -8,8 +8,6 @@ import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,32 +25,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 import liftinggoals.adapters.RoutineAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
+import liftinggoals.classes.RoutineWorkoutModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.fragments.HistoryFragment;
-import liftinggoals.fragments.MapsFragment;
-import liftinggoals.fragments.ProgressFragment;
-import liftinggoals.fragments.RoutineFragment;
-import liftinggoals.fragments.RoutinesEditFolderFragment;
-import liftinggoals.fragments.SettingFragment;
-import liftinggoals.fragments.WorkoutFragment;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class RoutineActivity extends AppCompatActivity {
     public ArrayList<RoutineModel> routineModels = new ArrayList<>();
-
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private SearchView search;
+    private DatabaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +50,13 @@ public class RoutineActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
 
+        db = new DatabaseHelper(getApplicationContext());
+        db.openDB();
         initializeRecyclerView();
         initializeActionSearch();
         initializeSwipe();
 
-        BottomNavigationView bottomNavigation = findViewById(R.id.activity_routine_bottom_navigation);
+        BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
     }
@@ -72,30 +64,29 @@ public class RoutineActivity extends AppCompatActivity {
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-            Fragment selectedFragment = null;
+            Intent selectedActivity = null;
 
             switch (menuItem.getItemId()) {
                 case R.id.nav_routine:
-                    selectedFragment = new RoutineFragment();
+                    //already on this page so don't do anything
                     break;
                 case R.id.nav_progress:
-                    selectedFragment = new ProgressFragment();
+                    selectedActivity = new Intent(RoutineActivity.this, ProgressActivity.class);
                     break;
                 case R.id.nav_history:
-                    selectedFragment = new HistoryFragment();
+                    selectedActivity = new Intent(RoutineActivity.this, HistoryActivity.class);
                     break;
                 case R.id.nav_maps:
-                    selectedFragment = new MapsFragment();
+                    selectedActivity = new Intent(RoutineActivity.this, MapsActivity.class);
                     break;
                 case R.id.nav_settings:
-                    selectedFragment = new SettingFragment();
+                    selectedActivity = new Intent(RoutineActivity.this, SettingsActivity.class);
                     break;
 
             }
-            if (selectedFragment != null)
+            if (selectedActivity != null)
             {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction().add(R.id.fragment_container, selectedFragment).addToBackStack(null).commit();
+                startActivity(selectedActivity);
             }
 
             return true;    //Means we want to select the clicked item
@@ -103,7 +94,8 @@ public class RoutineActivity extends AppCompatActivity {
     };
 
     private void initializeRecyclerView() {
-        fetchData();
+        fetchRemoteData();
+
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
@@ -131,8 +123,9 @@ public class RoutineActivity extends AppCompatActivity {
 
             @Override
             public void onItemEdit(int position) {
-                //to change
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new RoutinesEditFolderFragment()).addToBackStack(null).commit();
+                Intent editRoutineActivity = new Intent(RoutineActivity.this, RoutinesEditActivity.class);
+                editRoutineActivity.putExtra("routine_name", routineModels.get(position).getRoutineName());
+                startActivity(editRoutineActivity);
             }
 
         });
@@ -141,8 +134,10 @@ public class RoutineActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void fetchData()
+    private void fetchRemoteData()
     {
+        final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
+        db.openDB();
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = "http://3.221.56.60/initializeRoutines.php";
         JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
@@ -152,9 +147,7 @@ public class RoutineActivity extends AppCompatActivity {
                         {
                             System.out.println("response length: " + response.length());
                             ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>(); //Ex: Workout A and Workout B
-                            //
                             ArrayList<WorkoutExerciseModel> listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
-                            //
                             String routineName = null;
                             String routineDesc = null;
                             int i = 0;
@@ -165,14 +158,29 @@ public class RoutineActivity extends AppCompatActivity {
                                 routineDesc = routineObj.getString("description");
                                 int totalWorkouts = routineObj.getInt("number_workouts");
 
+                                if (db.getRoutine(routineName) == null)
+                                db.insertRoutine(routineName, routineDesc, totalWorkouts);
+
                                 for (int j = 0 ; j < totalWorkouts; j++)
                                 {
+                                    i++;
+                                    JSONObject routineWorkoutObj = response.getJSONObject(i);
+
+                                    int routineId = routineWorkoutObj.getInt("routine_id");
+                                    int workoutId = routineWorkoutObj.getInt("workout_id");
+                                    if (routineWorkoutObj.has("routine_workout_id") && db.getRoutineWorkout(routineId,workoutId) == null)
+                                        db.insertRoutineWorkout(routineId, workoutId);
+
                                     i++;
                                     JSONObject nextObj = response.getJSONObject(i);
                                     listOfWorkouts.add(new WorkoutModel(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration")));
                                     int totalExercises = nextObj.getInt("number_exercises");
+
+                                    if (db.getWorkout(nextObj.getInt("workout_id")) == null)
+                                        db.insertWorkout(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration"), totalExercises);
+
                                     listOfExercises.clear();
-                                    WorkoutExerciseModel exerciseModel = new WorkoutExerciseModel();
+                                    WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
                                     for (int k = 0; k < totalExercises*2; k++)
                                     {
                                         i++;
@@ -183,16 +191,35 @@ public class RoutineActivity extends AppCompatActivity {
                                             String strMinReps = exerciseObj.getString("minimum_reps");
                                             String strMaxSets = exerciseObj.getString("maximum_sets");
                                             String strMaxReps = exerciseObj.getString("maximum_reps");
-                                            exerciseModel.setMinimumReps(Integer.parseInt(strMinSets));
-                                            exerciseModel.setMinimumReps(Integer.parseInt(strMinReps));
-                                            exerciseModel.setMaximumSets(Integer.parseInt(strMaxSets));
-                                            exerciseModel.setMaximumReps(Integer.parseInt(strMaxReps));
+                                            //Quick null fix
+                                            if (strMinSets == "null")
+                                                strMinSets = "-1";
+                                            if (strMinReps == "null")
+                                                strMinReps = "-1";
+                                            if (strMaxSets == "null")
+                                                strMaxSets = "-1";
+                                            if (strMaxReps == "null")
+                                                strMaxReps = "-1";
+                                            //Fix later
+                                            workoutExerciseModel.setMinimumReps(Integer.parseInt(strMinSets));
+                                            workoutExerciseModel.setMinimumReps(Integer.parseInt(strMinReps));
+                                            workoutExerciseModel.setMaximumSets(Integer.parseInt(strMaxSets));
+                                            workoutExerciseModel.setMaximumReps(Integer.parseInt(strMaxReps));
+
+                                            if (db.getWorkoutExercise(exerciseObj.getInt("workout_exercise_id")) == null)
+                                            {
+                                                db.insertWorkoutExercise(exerciseObj.getInt("workout_id"), exerciseObj.getInt("exercise_id"),
+                                                        Integer.parseInt(strMinSets), Integer.parseInt(strMinReps), Integer.parseInt(strMaxSets), Integer.parseInt(strMaxReps));
+                                            }
                                         }
                                         else
                                         {
-                                            exerciseModel.getExercise().setExerciseName(exerciseObj.getString("exercise_name"));
-                                            listOfExercises.add(exerciseModel);
-                                            exerciseModel = new WorkoutExerciseModel(); //Clear exercise model
+                                            String exerciseName = exerciseObj.getString("exercise_name");
+                                            //Create ExerciseModel for Workout
+                                            ExerciseModel exerciseModel = new ExerciseModel(exerciseName);
+                                            workoutExerciseModel.setExercise(exerciseModel);
+                                            listOfExercises.add(workoutExerciseModel);
+                                            workoutExerciseModel = new WorkoutExerciseModel(); //Clear exercise model
                                         }
                                     }
 
@@ -203,23 +230,29 @@ public class RoutineActivity extends AppCompatActivity {
 
                             routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
 
-                            //Testing Return value
-                            for (RoutineModel r : routineModels)
+                            //Check local database
+                            for (RoutineModel r : db.getAllRoutines())
                             {
                                 System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
-                                for (WorkoutModel w : r.getWorkouts())
-                                {
-                                    System.out.println(w.getWorkoutName() + ": " + w.getEstimatedDuration());
-                                    for (WorkoutExerciseModel e : w.getExercises())
-                                    {
-                                        System.out.println(e.getMaximumReps());
-                                        System.out.println(e.getExercise().getMaxReps());
-                                    }
-                                }
                             }
-                            //EndTesting
 
-                            //Insert routines into local database if they don't already exist
+                            for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
+                            {
+                                System.out.println(rWM.getRoutineId() + ": " + rWM.getWorkoutId());
+                            }
+
+
+                            for (WorkoutModel w : db.getAllWorkouts())
+                            {
+                                System.out.println(w.getWorkoutName() + ": " + w.getDescription() + ": " + w.getEstimatedDuration() + ": " + w.getNumberExercises());
+                            }
+
+                            for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
+                            {
+                                System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
+                            }
+
+
 
 
                         }
@@ -294,4 +327,9 @@ public class RoutineActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.closeDB();
+    }
 }

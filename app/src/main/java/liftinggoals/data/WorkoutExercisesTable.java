@@ -45,13 +45,9 @@ public class WorkoutExercisesTable {
         ContentValues values = new ContentValues();
         values.put(WorkoutExercisesEntry.COLUMN_WORKOUT_ID, workoutId);
         values.put(WorkoutExercisesEntry.COLUMN_EXERCISE_ID, exerciseId);
-        if (minimumSets != -1)
         values.put(WorkoutExercisesEntry.COLUMN_MINIMUM_SETS, minimumSets);
-        if (minimumReps != -1)
         values.put(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS, minimumReps);
-        if (maximumSets != -1)
         values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS, maximumSets);
-        if (maximumReps != -1)
         values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS, maximumReps);
 
         return myDB.insert(WorkoutExercisesEntry.TABLE_NAME, null, values);

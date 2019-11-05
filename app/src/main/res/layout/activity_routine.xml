@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/black"
-        android:layout_above="@id/activity_routine_bottom_navigation">
+        android:layout_above="@id/activity_routines_bottom_navigation">
 
         <LinearLayout
             android:id="@+id/routine_fragment_top_bar"
@@ -123,7 +123,7 @@
     </RelativeLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/activity_routine_bottom_navigation"
+        android:id="@+id/activity_routines_bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

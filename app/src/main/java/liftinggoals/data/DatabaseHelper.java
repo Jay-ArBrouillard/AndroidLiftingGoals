@@ -12,7 +12,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 11;
+    public static final int DATABASE_VERSION = 14;
 
     public SQLiteDatabase myDB;
 
@@ -27,6 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(RoutineTable.SQL_CREATE_ROUTINE_TABLE);
         db.execSQL(RoutineWorkoutsTable.SQL_CREATE_ROUTINE_WORKOUTS_TABLE);
         db.execSQL(WorkoutsTable.SQL_CREATE_WORKOUT_TABLE);
+        db.execSQL(WorkoutExercisesTable.SQL_CREATE_WORKOUT_EXERCISES_TABLE);
     }
 
     @Override
@@ -35,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(RoutineTable.SQL_DROP_ROUTINE_TABLE);
         db.execSQL(RoutineWorkoutsTable.SQL_DROP_ROUTINE_WORKOUTS_TABLE);
         db.execSQL(WorkoutsTable.SQL_DROP_WORKOUT_TABLE);
+        db.execSQL(WorkoutExercisesTable.SQL_DROP_WORKOUT_EXERCISES_TABLE);
         onCreate(db);
     }
 
@@ -57,9 +59,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////ROUTINE METHODS/////////////////////////////////////////////////////
 
-    public long insertRoutine(String name, String description)
+    public long insertRoutine(String name, String description, int numberWorkouts)
     {
-        return RoutineTable.insert(myDB, name, description);
+        return RoutineTable.insert(myDB, name, description, numberWorkouts);
+    }
+
+    public long updateRoutineName(String name)
+    {
+        return RoutineTable.update(myDB, name);
     }
 
     public long updateRoutine(String name, String description)
@@ -104,6 +111,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public RoutineWorkoutModel getRoutineWorkout(int routineId, int workoutId)
     {
         return RoutineWorkoutsTable.getRoutineWorkout(myDB, routineId, workoutId);
+    }
+
+    public List<RoutineWorkoutModel> getAllRoutineWorkouts()
+    {
+        return RoutineWorkoutsTable.getAllRoutineWorkouts(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

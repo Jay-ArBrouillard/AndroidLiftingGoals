@@ -27,13 +27,22 @@ public class RoutineTable{
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_NUMBER_WORKOUTS = "number_workouts";
     }
-    public static long insert(SQLiteDatabase myDB, String name, String description)
+    public static long insert(SQLiteDatabase myDB, String name, String description, int workouts)
     {
         ContentValues values = new ContentValues();
         values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
         values.put(RoutineEntry.COLUMN_DESCRIPTION, description);
+        values.put(RoutineEntry.COLUMN_NUMBER_WORKOUTS, workouts);
 
         return myDB.insert(RoutineEntry.TABLE_NAME, null, values);
+    }
+
+    public static long update(SQLiteDatabase myDB, String name)
+    {
+        ContentValues values = new ContentValues();
+        values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
+
+        return myDB.update(RoutineEntry.TABLE_NAME, values, null, null);
     }
 
     public static long update(SQLiteDatabase myDB, String name, String description)

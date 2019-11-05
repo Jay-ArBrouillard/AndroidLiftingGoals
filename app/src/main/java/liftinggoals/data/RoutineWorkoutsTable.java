@@ -75,4 +75,30 @@ public class RoutineWorkoutsTable {
         }
     }
 
+    public static List<RoutineWorkoutModel> getAllRoutineWorkouts(SQLiteDatabase myDB)
+    {
+        String query = "SELECT * FROM " + RoutineWorkoutEntry.TABLE_NAME;
+
+        Cursor c = myDB.rawQuery(query, null);
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<RoutineWorkoutModel> workouts = new ArrayList<>();
+
+            while(c.moveToNext()){
+                RoutineWorkoutModel routineWorkoutModel = new RoutineWorkoutModel();
+                routineWorkoutModel.setRoutineWorkoutId(c.getInt(c.getColumnIndexOrThrow(RoutineWorkoutEntry._ID)));
+                routineWorkoutModel.setRoutineId(c.getInt(c.getColumnIndexOrThrow(RoutineWorkoutEntry.COLUMN_ROUTINE_ID)));
+                routineWorkoutModel.setWorkoutId(c.getInt(c.getColumnIndexOrThrow(RoutineWorkoutEntry.COLUMN_WORKOUT_ID)));
+                workouts.add(routineWorkoutModel);
+            }
+
+            return workouts;
+        }
+    }
+
 }
