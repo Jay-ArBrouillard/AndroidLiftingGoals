@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import java.util.List;
+
+import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.RoutineWorkoutModel;
 import liftinggoals.classes.WorkoutExerciseModel;
@@ -12,7 +14,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 14;
+    public static final int DATABASE_VERSION = 15;
 
     public SQLiteDatabase myDB;
 
@@ -28,6 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(RoutineWorkoutsTable.SQL_CREATE_ROUTINE_WORKOUTS_TABLE);
         db.execSQL(WorkoutsTable.SQL_CREATE_WORKOUT_TABLE);
         db.execSQL(WorkoutExercisesTable.SQL_CREATE_WORKOUT_EXERCISES_TABLE);
+        db.execSQL(ExercisesTable.SQL_CREATE_EXERCISE_TABLE);
     }
 
     @Override
@@ -178,6 +181,36 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public List<WorkoutExerciseModel> getAllWorkoutExercises()
     {
         return WorkoutExercisesTable.getAllWorkoutExercises(myDB);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////EXERCISE METHODS ///////////////////////////////////////////////////
+
+
+    public long insertExercise(String exerciseName)
+    {
+        return ExercisesTable.insert(myDB, exerciseName);
+    }
+
+    public long updateExerciseName(String exerciseName)
+    {
+        return ExercisesTable.update(myDB, exerciseName);
+    }
+
+    public long deleteExercise(String exerciseName)
+    {
+        return ExercisesTable.delete(myDB, exerciseName);
+    }
+
+    public ExerciseModel getExercise(String exerciseName)
+    {
+        return ExercisesTable.getExercise(myDB, exerciseName);
+    }
+
+    public List<ExerciseModel> getAllExercises()
+    {
+        return ExercisesTable.getAllExercises(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

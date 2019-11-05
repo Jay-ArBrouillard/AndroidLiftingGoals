@@ -18,7 +18,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="right">
+            android:weightSum="5">
+
+            <Button
+                android:id="@+id/fetch_remote_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="Fetch"
+                android:textColor="@android:color/white"
+                android:textSize="20dp"
+                android:layout_weight="2" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -26,15 +36,16 @@
                 android:text="Edit"
                 android:textSize="20dp"
                 android:textColor="@android:color/white"
-                android:background="?android:attr/selectableItemBackground"/>
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_weight="2"/>
 
             <ImageView
                 android:id="@+id/add_routine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:paddingRight="10dp"
-                android:src="@drawable/ic_add_white_48dp" />
+                android:src="@drawable/ic_add_white_48dp"
+                android:layout_weight="1"/>
 
         </LinearLayout>
 

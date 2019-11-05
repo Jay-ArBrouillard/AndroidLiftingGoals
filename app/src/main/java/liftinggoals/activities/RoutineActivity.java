@@ -215,6 +215,10 @@ public class RoutineActivity extends AppCompatActivity {
                                         else
                                         {
                                             String exerciseName = exerciseObj.getString("exercise_name");
+                                            if (db.getExercise(exerciseName) == null)
+                                            {
+                                                db.insertExercise(exerciseName);
+                                            }
                                             //Create ExerciseModel for Workout
                                             ExerciseModel exerciseModel = new ExerciseModel(exerciseName);
                                             workoutExerciseModel.setExercise(exerciseModel);
@@ -250,6 +254,11 @@ public class RoutineActivity extends AppCompatActivity {
                             for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
                             {
                                 System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
+                            }
+
+                            for (ExerciseModel e : db.getAllExercises())
+                            {
+                                System.out.println(e.getExerciseName());
                             }
 
 
