@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import java.util.List;
 import liftinggoals.classes.RoutineModel;
+import liftinggoals.classes.RoutineWorkoutModel;
 
 public class DatabaseHelper extends SQLiteOpenHelper
 {
@@ -50,6 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
     }
 
+    ////////////////////////////ROUTINE METHODS/////////////////////////////////////////////////////
+
     public long insert(String name, String description)
     {
         return RoutineTable.insert(myDB, name, description);
@@ -75,5 +78,30 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.getAllRoutines(myDB);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////ROUTINE WORKOUTS METHODS ///////////////////////////////////////////
+
+    public long insert(int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.insert(myDB, routineId, workoutId);
+    }
+
+    public long update(int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.update(myDB, routineId, workoutId);
+    }
+
+    public long delete(int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.delete(myDB, routineId, workoutId);
+    }
+
+    public RoutineWorkoutModel getRoutineWorkout(int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.getRoutineWorkout(myDB, routineId, workoutId);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
