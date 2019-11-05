@@ -26,7 +26,6 @@ import liftinggoals.fragments.RoutineFragment;
 import liftinggoals.fragments.SettingFragment;
 
 public class MainActivity extends AppCompatActivity {
-    private String username;
     private RoutineFragment startingFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.User;
 
 public class RoutineTable{
@@ -37,29 +41,27 @@ public class RoutineTable{
         return myDB.insert(RoutineEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int id, String name, String description)
+    public static long update(SQLiteDatabase myDB, String name, String description)
     {
         ContentValues values = new ContentValues();
         values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
         values.put(RoutineEntry.COLUMN_DESCRIPTION, description);
 
-        String where = RoutineEntry._ID + " = " + id;
-
-        return myDB.update(RoutineEntry.TABLE_NAME, values, where, null);
+        return myDB.update(RoutineEntry.TABLE_NAME, values, null, null);
     }
 
-    public static long delete(SQLiteDatabase myDB, int id)
+    public static long delete(SQLiteDatabase myDB, String name)
     {
-        String where = RoutineEntry._ID + " = " + id;
+        String where = RoutineEntry.COLUMN_ROUTINE_NAME + " = " + name;
 
         return myDB.delete(RoutineEntry.TABLE_NAME, where, null);
     }
-/*
-    public static String getUsername(String username)
-    {
-        String query = "SELECT username FROM " + RoutineEntry.TABLE_NAME + " WHERE " + RoutineEntry.COLUMN_USERNAME  + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[] {username});
+    public static RoutineModel getRoutine(SQLiteDatabase myDB, String routineName)
+    {
+        String query = "SELECT * FROM " + RoutineEntry.TABLE_NAME + " WHERE " + RoutineEntry.COLUMN_ROUTINE_NAME  + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {routineName});
 
         if (c.getCount() == 0)
         {
@@ -67,21 +69,22 @@ public class RoutineTable{
         }
         else
         {
-            String name = null;
+            RoutineModel routineModel = new RoutineModel();
 
             while(c.moveToNext()){
-                name = c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_USERNAME));
+                routineModel.setRoutineName(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_ROUTINE_NAME)));
+                routineModel.setRoutineDescription(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_DESCRIPTION)));
             }
 
-            return name;
+            return routineModel;
         }
     }
 
-    public User getRoutine(String username, String password)
+    public static List<RoutineModel> getAllRoutines(SQLiteDatabase myDB)
     {
-        String query = "SELECT username,password FROM " + RoutineEntry.TABLE_NAME + " WHERE " + RoutineEntry.COLUMN_USERNAME  + " = ? AND " + RoutineEntry.COLUMN_PASSWORD + " = ?";
+        String query = "SELECT * FROM " + RoutineEntry.TABLE_NAME;
 
-        Cursor c = myDB.rawQuery(query, new String[] {username, password});
+        Cursor c = myDB.rawQuery(query, null);
 
         if (c.getCount() == 0)
         {
@@ -89,30 +92,18 @@ public class RoutineTable{
         }
         else
         {
-            User user = new User();
+            ArrayList<RoutineModel> routines = new ArrayList<>();
 
             while(c.moveToNext()){
-                user.setUsername(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_USERNAME)));
-                user.setLast_name(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_PASSWORD)));
+                RoutineModel routineModel = new RoutineModel();
+                routineModel.setRoutineName(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_ROUTINE_NAME)));
+                routineModel.setRoutineDescription(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_DESCRIPTION)));
+                routines.add(routineModel);
             }
 
-            return user;
+            return routines;
         }
     }
-
-    public Cursor getAllUsers()
-    {
-        //String query = "SELECT * FROM " + RoutineEntry.TABLE_NAME;
-        // return myDB.rawQuery(query, null);
-        return myDB.query(RoutineEntry.TABLE_NAME, null, null, null, null, null, null);
-    }
-
-    public long clear()
-    {
-        return myDB.delete(RoutineEntry.TABLE_NAME, null, null);
-    }
-
-*/
 
 
 }

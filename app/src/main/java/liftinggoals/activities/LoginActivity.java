@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                             {
                                 loadToast.success();
                                 Toast.makeText(getApplicationContext(), "Successful login: " + userNameInput, Toast.LENGTH_LONG).show();
-                                Intent startMainActivity = new Intent(LoginActivity.this, MainActivity.class);
+                                Intent startMainActivity = new Intent(LoginActivity.this, RoutineActivity.class);
                                 startActivity(startMainActivity);
                                 finish();   //Prevent user from pressing back button and going to login page
                             }

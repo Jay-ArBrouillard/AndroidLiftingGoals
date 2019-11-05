@@ -1,14 +1,10 @@
 package liftinggoals.data;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
-
-
-import liftinggoals.classes.User;
+import java.util.List;
+import liftinggoals.classes.RoutineModel;
 
 public class DatabaseHelper extends SQLiteOpenHelper
 {
@@ -16,7 +12,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final int DATABASE_VERSION = 8;
 
     public SQLiteDatabase myDB;
-
 
     public DatabaseHelper(Context context)
     {
@@ -58,4 +53,23 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.insert(myDB, name, description);
     }
 
+    public long update(String name, String description)
+    {
+        return RoutineTable.update(myDB, name, description);
+    }
+
+    public long delete(String name)
+    {
+        return RoutineTable.delete(myDB, name);
+    }
+
+    public RoutineModel getRoutine(String name)
+    {
+        return RoutineTable.getRoutine(myDB, name);
+    }
+
+    public List<RoutineModel> getRoutine()
+    {
+        return RoutineTable.getAllRoutines(myDB);
+    }
 }
