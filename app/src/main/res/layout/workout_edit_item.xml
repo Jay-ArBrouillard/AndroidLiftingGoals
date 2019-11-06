@@ -5,60 +5,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="4dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="4">
 
-        <TextView
-            android:id="@+id/sets"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
-            android:text="A"
-            android:layout_above="@+id/exercise_name"/>
+            android:layout_marginLeft="10dp
+"
+            android:layout_weight="2">
 
-        <TextView
-            android:id="@+id/exercise_name"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/workout_edit_item_letter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A."
+                android:layout_above="@+id/workout_edit_item_exercise_name"/>
+
+            <TextView
+                android:id="@+id/workout_edit_item_sets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:text="2-3 Sets"
+                android:layout_toRightOf="@+id/workout_edit_item_letter"/>
+
+            <TextView
+                android:id="@+id/workout_edit_item_exercise_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:text="Bulgarian Split Squat"
+                android:layout_below="@+id/workout_edit_item_sets"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text="Squat"/>
+            android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/reps_string"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/workout_edit_item_reps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reps"
+                />
+
+            <TextView
+                android:id="@+id/workout_edit_item_reps_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="5-10"
+                android:layout_below="@+id/workout_edit_item_reps"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
-            android:text="Reps"
-            android:layout_above="@+id/reps"
-            android:layout_toRightOf="@+id/exercise_name"/>
+            android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/intensity_string"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15dp"
-            android:text="Int"
-            android:layout_above="@+id/intensity"
-            android:layout_toRightOf="@+id/exercise_name"/>
+            <TextView
+                android:id="@+id/workout_edit_item_intensity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Int" />
 
-        <TextView
-            android:id="@+id/reps"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text="10"
-            android:layout_toRightOf="@+id/exercise_name"/>
+            <TextView
+                android:id="@+id/workout_edit_item_reps_intensity_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="80%"
+                android:layout_below="@+id/workout_edit_item_intensity"/>
 
-        <TextView
-            android:id="@+id/intensity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text="50%"
-            android:layout_toRightOf="@+id/exercise_name"/>
+        </RelativeLayout>
 
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </androidx.cardview.widget.CardView>
