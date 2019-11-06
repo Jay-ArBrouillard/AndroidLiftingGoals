@@ -21,12 +21,11 @@
 
             <ImageView
                 android:layout_width="240dp"
-                android:layout_height="160dp"
+                android:layout_height="220dp"
                 android:layout_gravity="center_horizontal"
                 android:padding="16dp"
-                android:layout_marginTop="48dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_barbell_black_512dp"/>
+                android:layout_marginTop="28dp"
+                android:src="@drawable/ic_barbell_and_rack_no_bg_512dp"/>
 
             <EditText
                 android:id="@+id/username_edit_text"

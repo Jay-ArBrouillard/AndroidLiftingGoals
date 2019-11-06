@@ -94,8 +94,7 @@ public class RoutineActivity extends AppCompatActivity {
     };
 
     private void initializeRecyclerView() {
-        fetchRemoteData();
-
+        fetchRemoteData(); //later we will periodically check remote data
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
