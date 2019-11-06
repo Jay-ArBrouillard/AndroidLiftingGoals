@@ -101,7 +101,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/edit_routine_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
             android:layout_marginBottom="40dp"
             android:paddingLeft="10dp">
 

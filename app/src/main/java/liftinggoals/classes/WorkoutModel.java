@@ -39,20 +39,7 @@ public class WorkoutModel implements Parcelable {
         description = in.readString();
         estimatedDuration = in.readDouble();
         numberExercises = in.readInt();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(workoutId);
-        dest.writeString(workoutName);
-        dest.writeString(description);
-        dest.writeDouble(estimatedDuration);
-        dest.writeInt(numberExercises);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        exercises = in.createTypedArrayList(WorkoutExerciseModel.CREATOR);
     }
 
     public static final Creator<WorkoutModel> CREATOR = new Creator<WorkoutModel>() {
@@ -116,4 +103,18 @@ public class WorkoutModel implements Parcelable {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(workoutId);
+        dest.writeString(workoutName);
+        dest.writeString(description);
+        dest.writeDouble(estimatedDuration);
+        dest.writeInt(numberExercises);
+        dest.writeTypedList(exercises);
+    }
 }

@@ -43,7 +43,7 @@
         <activity android:name="liftinggoals.activities.ProgressActivity" />
         <activity android:name="liftinggoals.activities.RoutinesEditActivity" />
         <activity android:name="liftinggoals.activities.WorkoutActivity" />
-        <activity android:name="liftinggoals.activities.RoutineActivity" />
+        <activity android:name="liftinggoals.activities.RoutineActivity" android:launchMode="singleTask"/>
         <activity android:name="liftinggoals.activities.ExerciseActivity" />
         <activity android:name="liftinggoals.activities.LoginActivity">
             <intent-filter>

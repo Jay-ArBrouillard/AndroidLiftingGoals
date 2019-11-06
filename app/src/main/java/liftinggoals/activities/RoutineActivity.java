@@ -68,7 +68,7 @@ public class RoutineActivity extends AppCompatActivity {
 
             switch (menuItem.getItemId()) {
                 case R.id.nav_routine:
-                    //already on this page so don't do anything
+                    selectedActivity = new Intent(RoutineActivity.this, RoutineActivity.class);
                     break;
                 case R.id.nav_progress:
                     selectedActivity = new Intent(RoutineActivity.this, ProgressActivity.class);
@@ -107,7 +107,9 @@ public class RoutineActivity extends AppCompatActivity {
             public void onItemClick(int position)
             {
                 Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
-                selectWorkFromRoutine.putParcelableArrayListExtra("routine_item", routineModels.get(position).getWorkouts());
+                ArrayList<WorkoutModel> temp = routineModels.get(position).getWorkouts();
+                ArrayList<WorkoutExerciseModel> temp2 = temp.get(0).getExercises();
+                selectWorkFromRoutine.putParcelableArrayListExtra("workout_item", temp);
                 selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
 
                 startActivity(selectWorkFromRoutine);
@@ -214,6 +216,7 @@ public class RoutineActivity extends AppCompatActivity {
                                             //Create ExerciseModel for Workout
                                             ExerciseModel exerciseModel = new ExerciseModel(exerciseName);
                                             workoutExerciseModel.setExercise(exerciseModel);
+
                                             listOfExercises.add(workoutExerciseModel);
                                             workoutExerciseModel = new WorkoutExerciseModel(); //Clear exercise model
                                         }
@@ -227,7 +230,7 @@ public class RoutineActivity extends AppCompatActivity {
                             routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
 
                             //Check local database
-                            for (RoutineModel r : db.getAllRoutines())
+                            /*for (RoutineModel r : db.getAllRoutines())
                             {
                                 System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
                             }
@@ -251,11 +254,7 @@ public class RoutineActivity extends AppCompatActivity {
                             for (ExerciseModel e : db.getAllExercises())
                             {
                                 System.out.println(e.getExerciseName());
-                            }
-
-
-
-
+                            }*/
                         }
                         catch (JSONException e)
                         {

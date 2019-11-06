@@ -15,15 +15,22 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
-import liftinggoals.adapters.RoutineAdapter;
-import liftinggoals.classes.RoutineModel;
+import liftinggoals.adapters.ExerciseAdapter;
+import liftinggoals.adapters.VolumeAdapter;
+import liftinggoals.classes.ExerciseModel;
+import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
+import liftinggoals.misc.VolumeGroupItem;
 
 public class ProgressActivity extends AppCompatActivity {
-    public ArrayList<String> volumeGroups;
-    private RecyclerView recyclerView;
-    private RoutineAdapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    public ArrayList<VolumeGroupItem> volumeGroups;
+    private RecyclerView volumeRecyclerView;
+    private RecyclerView.Adapter volumeAdapter;
+    private RecyclerView.LayoutManager volumeLayoutManager;
+    public ArrayList<ExerciseModel> exercisesList;
+    private RecyclerView exerciseRecyclerView;
+    private RecyclerView.Adapter exerciseAdapter;
+    private RecyclerView.LayoutManager exerciseLayoutManager;
     private SearchView search;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +38,9 @@ public class ProgressActivity extends AppCompatActivity {
         setContentView(R.layout.activity_progress);
 
         volumeGroups = new ArrayList<>();
-        recyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
+        exercisesList = new ArrayList<>();
 
-
+        initializeRecyclerView();
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_progress_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
@@ -41,34 +48,37 @@ public class ProgressActivity extends AppCompatActivity {
     }
 
     private void initializeRecyclerView() {
-        recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
+        volumeRecyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
+        volumeRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
-        layoutManager = new LinearLayoutManager(this);
-        adapter = new RoutineAdapter(routineModels);
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Biceps"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Chest"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Hamstrings"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Legs"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Quads"));
+        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Triceps"));
 
-        adapter.setOnItemClickListener(new RoutineAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position)
-            {
-                Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
-                selectWorkFromRoutine.putParcelableArrayListExtra("routine_item", routineModels.get(position).getWorkouts());
-                selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
+        volumeLayoutManager = new LinearLayoutManager(this);
+        volumeAdapter = new VolumeAdapter(volumeGroups);
+        volumeRecyclerView.setLayoutManager(volumeLayoutManager);
+        volumeRecyclerView.setAdapter(volumeAdapter);
 
-                startActivity(selectWorkFromRoutine);
-            }
 
-            @Override
-            public void onItemEdit(int position) {
-                Intent editRoutineActivity = new Intent(RoutineActivity.this, RoutinesEditActivity.class);
-                editRoutineActivity.putExtra("routine_name", routineModels.get(position).getRoutineName());
-                startActivity(editRoutineActivity);
-            }
+        exerciseRecyclerView = findViewById(R.id.activity_progress_exercises_recycler_view);
+        exerciseRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
-        });
+        DatabaseHelper db = new DatabaseHelper(getApplicationContext());
+        db.openDB();
+        exercisesList = (ArrayList<ExerciseModel>) db.getAllExercises();
 
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        exerciseLayoutManager = new LinearLayoutManager(this);
+        exerciseAdapter = new ExerciseAdapter(exercisesList);
+        exerciseRecyclerView.setLayoutManager(exerciseLayoutManager);
+        exerciseRecyclerView.setAdapter(exerciseAdapter);
+
+        db.closeDB();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {

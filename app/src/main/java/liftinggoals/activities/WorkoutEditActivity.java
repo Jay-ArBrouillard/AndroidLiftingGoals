@@ -12,14 +12,22 @@ import android.view.WindowManager;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+
+import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.misc.VolumeGroupItem;
+
 public class WorkoutEditActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
+    public ArrayList<WorkoutExerciseModel> workoutExerciseModels;
+    private RecyclerView exerciseRecyclerView;
+    private RecyclerView.Adapter volumeAdapter;
+    private RecyclerView.LayoutManager volumeLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_edit);
 
-        recyclerView = findViewById(R.id.edit_routine_recycler_view);
+        exerciseRecyclerView = findViewById(R.id.edit_routine_recycler_view);
         initializeRecyclerView();
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_workout_edit_bottom_navigation);

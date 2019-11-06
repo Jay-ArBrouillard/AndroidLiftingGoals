@@ -56,7 +56,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
     @NonNull
     @Override
     public WorkoutViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.routine_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.workout_item, parent, false);
         WorkoutViewHolder wvh = new WorkoutViewHolder(view, listener);
         return wvh;
     }

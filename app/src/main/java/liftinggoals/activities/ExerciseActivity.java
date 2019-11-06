@@ -1,10 +1,12 @@
 package liftinggoals.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -18,12 +20,19 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
+import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.data.DatabaseHelper;
+import liftinggoals.data.WorkoutExercisesTable;
+
 public class ExerciseActivity extends AppCompatActivity {
-    LineChart lineChart;
-    Button button;
+    private LineChart lineChart;
+    private Button button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +43,6 @@ public class ExerciseActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent intent = new Intent(ExerciseActivity.this, MainActivity.class);
-                startActivity(intent);*/
                 finish();
             }
         });
@@ -46,7 +53,13 @@ public class ExerciseActivity extends AppCompatActivity {
 
         Spinner exerciseSpinner = findViewById(R.id.exercise_selection);
 
-        ArrayAdapter<String> exerciseAdapter = new ArrayAdapter<>(ExerciseActivity.this, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.Monday5x5Exercises));
+        ArrayList<WorkoutExerciseModel> list = getIntent().getExtras().getParcelableArrayList("exercise_list");
+        ArrayList<String> exerciseNames = new ArrayList<>();
+        for (WorkoutExerciseModel e : list)
+        {
+            exerciseNames.add(e.getExercise().getExerciseName());
+        }
+        ArrayAdapter<String> exerciseAdapter = new ArrayAdapter<>(ExerciseActivity.this, android.R.layout.simple_list_item_1, exerciseNames);
         exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         exerciseSpinner.setAdapter(exerciseAdapter);
 
@@ -85,6 +98,6 @@ public class ExerciseActivity extends AppCompatActivity {
         Description description = new Description();
         description.setText("");
         lineChart.setDescription(description);
-    }
 
+    }
 }

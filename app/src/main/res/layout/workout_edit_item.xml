@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/sets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="A"
+            android:layout_above="@+id/exercise_name"/>
+
+        <TextView
+            android:id="@+id/exercise_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:text="Squat"/>
+
+        <TextView
+            android:id="@+id/reps_string"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Reps"
+            android:layout_above="@+id/reps"
+            android:layout_toRightOf="@+id/exercise_name"/>
+
+        <TextView
+            android:id="@+id/intensity_string"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Int"
+            android:layout_above="@+id/intensity"
+            android:layout_toRightOf="@+id/exercise_name"/>
+
+        <TextView
+            android:id="@+id/reps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:text="10"
+            android:layout_toRightOf="@+id/exercise_name"/>
+
+        <TextView
+            android:id="@+id/intensity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:text="50%"
+            android:layout_toRightOf="@+id/exercise_name"/>
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

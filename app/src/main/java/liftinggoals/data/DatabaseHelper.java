@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.List;
 
 import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.RecordModel;
 import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.RoutineWorkoutModel;
 import liftinggoals.classes.WorkoutExerciseModel;
@@ -211,6 +212,36 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public List<ExerciseModel> getAllExercises()
     {
         return ExercisesTable.getAllExercises(myDB);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////RECORD METHODS /////////////////////////////////////////////////////
+
+
+    public long insertRecord(int userId, int exercise_id, double intensity, int reps)
+    {
+        return RecordsTable.insert(myDB, userId, exercise_id, intensity, reps);
+    }
+
+    public long updateRecord(int userId, int exercise_id, double intensity, int reps)
+    {
+        return RecordsTable.update(myDB, userId, exercise_id, intensity, reps);
+    }
+
+    public long deleteRecord(int recordId)
+    {
+        return RecordsTable.delete(myDB, recordId);
+    }
+
+    public RecordModel getRecord(int recordId)
+    {
+        return RecordsTable.getRecord(myDB, recordId);
+    }
+
+    public List<RecordModel> getAllRecords()
+    {
+        return RecordsTable.getAllRecords(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

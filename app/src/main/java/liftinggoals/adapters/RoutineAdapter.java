@@ -57,7 +57,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     @NonNull
     @Override
     public RoutineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.workout_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.routine_item, parent, false);
         RoutineViewHolder rvh = new RoutineViewHolder(view, listener);
         return rvh;
     }

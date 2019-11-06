@@ -2,6 +2,8 @@ package liftinggoals.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -12,16 +14,19 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.liftinggoals.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 import liftinggoals.adapters.WorkoutAdapter;
 import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class WorkoutActivity extends AppCompatActivity {
     private ArrayList<WorkoutModel> workoutsList;
-    private ArrayList<String> workoutItems;
-    private ArrayList<ExerciseModel> exerciseList;
+//    private ArrayList<String> workoutItems;
+//    private ArrayList<ExerciseModel> exerciseList;
     private RecyclerView recyclerView;
     private WorkoutAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -32,7 +37,7 @@ public class WorkoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_workout);
 
         //Get info from Intent->Bundle
-        workoutsList = getIntent().getExtras().getParcelableArrayList("routine_item");
+        workoutsList = getIntent().getExtras().getParcelableArrayList("workout_item");
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
         title.setText(getIntent().getExtras().getString("routine_name"));
 
@@ -41,7 +46,42 @@ public class WorkoutActivity extends AppCompatActivity {
         initializeActionSearch();
         initializeSwipe();
 
+        BottomNavigationView bottomNavigation = findViewById(R.id.activity_workout_bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            Intent selectedActivity = null;
+
+            switch (menuItem.getItemId()) {
+                case R.id.nav_routine:
+                    selectedActivity = new Intent(WorkoutActivity.this, RoutineActivity.class);
+                    break;
+                case R.id.nav_progress:
+                    selectedActivity = new Intent(WorkoutActivity.this, ProgressActivity.class);
+                    break;
+                case R.id.nav_history:
+                    selectedActivity = new Intent(WorkoutActivity.this, HistoryActivity.class);
+                    break;
+                case R.id.nav_maps:
+                    selectedActivity = new Intent(WorkoutActivity.this, MapsActivity.class);
+                    break;
+                case R.id.nav_settings:
+                    selectedActivity = new Intent(WorkoutActivity.this, SettingsActivity.class);
+                    break;
+
+            }
+            if (selectedActivity != null)
+            {
+                startActivity(selectedActivity);
+            }
+
+            return true;    //Means we want to select the clicked item
+        }
+    };
 
     private void initializeRecyclerView() {
         recyclerView.setHasFixedSize(true);
@@ -54,6 +94,8 @@ public class WorkoutActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 Intent startExerciseActivity = new Intent(WorkoutActivity.this, ExerciseActivity.class);
+                ArrayList<WorkoutExerciseModel> temp =  workoutsList.get(position).getExercises();
+                startExerciseActivity.putParcelableArrayListExtra("exercise_list", temp);
                 startActivity(startExerciseActivity);
             }
 
