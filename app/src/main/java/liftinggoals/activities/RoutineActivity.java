@@ -107,7 +107,6 @@ public class RoutineActivity extends AppCompatActivity {
             {
                 Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
                 ArrayList<WorkoutModel> temp = routineModels.get(position).getWorkouts();
-                ArrayList<WorkoutExerciseModel> temp2 = temp.get(0).getExercises();
                 selectWorkFromRoutine.putParcelableArrayListExtra("workout_item", temp);
                 selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
 
@@ -139,30 +138,40 @@ public class RoutineActivity extends AppCompatActivity {
                         try
                         {
                             System.out.println("response length: " + response.length());
-                            ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>(); //Ex: Workout A and Workout B
-                            ArrayList<WorkoutExerciseModel> listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
+                            ArrayList<WorkoutModel> listOfWorkouts; //Ex: Workout A and Workout B
+                            ArrayList<WorkoutExerciseModel> listOfExercises; //Ex: Workout A contains Squat(rep,set data), Bench, Row
                             String routineName = null;
                             String routineDesc = null;
                             int i = 0;
-                            while (i < response.length())
+                            int length = response.length();
+                            while (i < length)
                             {
+                                listOfWorkouts = new ArrayList<>(); //Ex: Workout A and Workout B
+                                listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
                                 JSONObject routineObj = response.getJSONObject(i);
                                 routineName = routineObj.getString("routine_name");
                                 routineDesc = routineObj.getString("description");
                                 int totalWorkouts = routineObj.getInt("number_workouts");
 
                                 if (db.getRoutine(routineName) == null)
-                                db.insertRoutine(routineName, routineDesc, totalWorkouts);
+                                {
+                                    db.insertRoutine(routineName, routineDesc, totalWorkouts);
+                                }
 
                                 for (int j = 0 ; j < totalWorkouts; j++)
                                 {
+                                    if (i+1 == length)
+                                    {
+                                        break;
+                                    }
                                     i++;
                                     JSONObject routineWorkoutObj = response.getJSONObject(i);
-
                                     int routineId = routineWorkoutObj.getInt("routine_id");
                                     int workoutId = routineWorkoutObj.getInt("workout_id");
                                     if (routineWorkoutObj.has("routine_workout_id") && db.getRoutineWorkout(routineId,workoutId) == null)
+                                    {
                                         db.insertRoutineWorkout(routineId, workoutId);
+                                    }
 
                                     i++;
                                     JSONObject nextObj = response.getJSONObject(i);
@@ -170,12 +179,18 @@ public class RoutineActivity extends AppCompatActivity {
                                     int totalExercises = nextObj.getInt("number_exercises");
 
                                     if (db.getWorkout(nextObj.getInt("workout_id")) == null)
+                                    {
                                         db.insertWorkout(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration"), totalExercises);
+                                    }
 
                                     listOfExercises.clear();
                                     WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
                                     for (int k = 0; k < totalExercises*2; k++)
                                     {
+                                        if (i+1 == length)
+                                        {
+                                            break;
+                                        }
                                         i++;
                                         JSONObject exerciseObj = response.getJSONObject(i);
                                         if (k % 2 == 0)
@@ -223,13 +238,20 @@ public class RoutineActivity extends AppCompatActivity {
 
                                     listOfWorkouts.get(listOfWorkouts.size()-1).setExercises(listOfExercises);
                                 }
+
+                                routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
+
                                 i++;
                             }   //End outer for loop
 
-                            routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
+                            for (RoutineModel rm : routineModels)
+                            {
+                                System.out.println("aye: " + rm.getRoutineName());
+                            }
+
 
                             //Check local database
-                            /*for (RoutineModel r : db.getAllRoutines())
+                            for (RoutineModel r : db.getAllRoutines())
                             {
                                 System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
                             }
@@ -253,7 +275,7 @@ public class RoutineActivity extends AppCompatActivity {
                             for (ExerciseModel e : db.getAllExercises())
                             {
                                 System.out.println(e.getExerciseName());
-                            }*/
+                            }
                         }
                         catch (JSONException e)
                         {
