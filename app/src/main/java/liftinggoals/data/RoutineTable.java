@@ -100,6 +100,7 @@ public class RoutineTable{
 
             while(c.moveToNext()){
                 RoutineModel routineModel = new RoutineModel();
+                routineModel.setRoutineId(c.getInt(c.getColumnIndexOrThrow(RoutineEntry._ID)));
                 routineModel.setRoutineName(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_ROUTINE_NAME)));
                 routineModel.setRoutineDescription(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_DESCRIPTION)));
                 routines.add(routineModel);

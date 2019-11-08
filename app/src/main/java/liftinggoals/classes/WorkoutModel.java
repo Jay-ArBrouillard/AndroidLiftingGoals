@@ -20,18 +20,12 @@ public class WorkoutModel implements Parcelable {
 
     }
 
-    public WorkoutModel(String workoutName) {
-
-        this.workoutName = workoutName;
-    }
-
     public WorkoutModel(String workoutName, String description, double estimatedDuration) {
 
         this.workoutName = workoutName;
         this.description = description;
         this.estimatedDuration = estimatedDuration;
     }
-
 
     protected WorkoutModel(Parcel in) {
         workoutId = in.readInt();

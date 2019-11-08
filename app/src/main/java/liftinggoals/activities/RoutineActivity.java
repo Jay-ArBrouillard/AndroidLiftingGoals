@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import liftinggoals.Services.ExampleJobIntentService;
 import liftinggoals.adapters.RoutineAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
@@ -37,7 +38,7 @@ import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class RoutineActivity extends AppCompatActivity {
-    public ArrayList<RoutineModel> routineModels = new ArrayList<>();
+    public ArrayList<RoutineModel> routineModels;// = new ArrayList<>();
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -47,7 +48,7 @@ public class RoutineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routine);
-
+        routineModels = new ArrayList<>();
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
 
         db = new DatabaseHelper(getApplicationContext());
@@ -58,7 +59,12 @@ public class RoutineActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+    }
 
+    public void enqueueWork(View view)
+    {
+        Intent serviceIntent = new Intent(this, ExampleJobIntentService.class);
+        ExampleJobIntentService.enqueueWork(this, serviceIntent);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -94,7 +100,42 @@ public class RoutineActivity extends AppCompatActivity {
     };
 
     private void initializeRecyclerView() {
-        fetchRemoteData(); //later we will periodically check remote data
+        //fetchRemoteData(); //later we will periodically check remote data
+
+        routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
+        for (int i = 0; i < routineModels.size(); i++)
+        {
+            ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>();
+            int routineId = routineModels.get(i).getRoutineId();
+
+            ArrayList<RoutineWorkoutModel> routineWorkoutList = (ArrayList<RoutineWorkoutModel>) db.getRoutineWorkoutsByRoutineId(routineId);
+            if (routineWorkoutList == null) routineWorkoutList = new ArrayList<>();
+
+            WorkoutModel workout = null;
+            for (int j = 0; j < routineWorkoutList.size(); j++)
+            {
+                int workoutId = routineWorkoutList.get(j).getWorkoutId();
+                workout = db.getWorkout(workoutId);
+                listOfWorkouts.add(workout);
+                ArrayList<WorkoutExerciseModel> workoutExerciseList = (ArrayList<WorkoutExerciseModel>) db.getAllWorkoutExercisesByWorkoutId(workoutId);
+                if (workoutExerciseList == null) workoutExerciseList = new ArrayList<>();
+
+                for (int k = 0; k < workoutExerciseList.size(); k++)
+                {
+                    int exerciseId = workoutExerciseList.get(k).getExerciseId();
+                    ExerciseModel exerciseModel = db.getExercise(exerciseId);
+                    workoutExerciseList.get(k).setExercise(exerciseModel);
+                }
+
+                listOfWorkouts.get(j).setExercises(workoutExerciseList);
+            }
+
+            routineModels.get(i).setWorkouts(listOfWorkouts);
+
+        }
+
+        db.closeDB();
+
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
@@ -223,7 +264,8 @@ public class RoutineActivity extends AppCompatActivity {
                                         else
                                         {
                                             String exerciseName = exerciseObj.getString("exercise_name");
-                                            if (db.getExercise(exerciseName) == null)
+                                            int exerciseId = exerciseObj.getInt("exercise_id");
+                                            if (db.getExercise(exerciseId) == null)
                                             {
                                                 db.insertExercise(exerciseName);
                                             }
@@ -243,12 +285,6 @@ public class RoutineActivity extends AppCompatActivity {
 
                                 i++;
                             }   //End outer for loop
-
-                            for (RoutineModel rm : routineModels)
-                            {
-                                System.out.println("aye: " + rm.getRoutineName());
-                            }
-
 
                             //Check local database
                             for (RoutineModel r : db.getAllRoutines())

@@ -15,7 +15,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 import liftinggoals.classes.WorkoutExerciseModel;
-import liftinggoals.misc.VolumeGroupItem;
 
 public class WorkoutEditActivity extends AppCompatActivity {
     public ArrayList<WorkoutExerciseModel> workoutExerciseModels;

@@ -20,10 +20,10 @@ import liftinggoals.adapters.VolumeAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
-import liftinggoals.misc.VolumeGroupItem;
+import liftinggoals.classes.VolumeGroupModel;
 
 public class ProgressActivity extends AppCompatActivity {
-    public ArrayList<VolumeGroupItem> volumeGroups;
+    public ArrayList<VolumeGroupModel> volumeGroups;
     private RecyclerView volumeRecyclerView;
     private RecyclerView.Adapter volumeAdapter;
     private RecyclerView.LayoutManager volumeLayoutManager;
@@ -51,14 +51,14 @@ public class ProgressActivity extends AppCompatActivity {
         volumeRecyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
         volumeRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Biceps"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Chest"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Hamstrings"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Legs"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Quads"));
-        volumeGroups.add(new VolumeGroupItem(R.drawable.ic_keyboard_arrow_right_white_24dp, "Triceps"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Biceps"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Chest"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Hamstrings"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Legs"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Quads"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Triceps"));
 
         volumeLayoutManager = new LinearLayoutManager(this);
         volumeAdapter = new VolumeAdapter(volumeGroups);

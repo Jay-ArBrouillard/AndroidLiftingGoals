@@ -49,11 +49,11 @@ public class ExercisesTable {
         return myDB.delete(ExerciseEntry.TABLE_NAME, where, null);
     }
 
-    public static ExerciseModel getExercise(SQLiteDatabase myDB, String name)
+    public static ExerciseModel getExercise(SQLiteDatabase myDB, int exerciseId)
     {
-        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry.COLUMN_EXERCISE_NAME  + " = ?";
+        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry._ID  + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[] {name});
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});
 
         if (c.getCount() == 0)
         {

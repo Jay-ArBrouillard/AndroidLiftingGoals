@@ -26,8 +26,15 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
     private WorkoutModel removedItem;
 
     public WorkoutAdapter(ArrayList<WorkoutModel> workoutList) {
-        this.workoutList = workoutList;
-        workoutListFull = new ArrayList<>(workoutList);
+        if (workoutList == null)
+        {
+            this.workoutList = new ArrayList<>();
+            workoutListFull = new ArrayList<>();
+        }
+        else {
+            this.workoutList = workoutList;
+            workoutListFull = new ArrayList<>(workoutList);
+        }
     }
 
     public WorkoutModel getItem(int position) {

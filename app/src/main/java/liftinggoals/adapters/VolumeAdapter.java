@@ -13,10 +13,10 @@ import com.example.liftinggoals.R;
 
 import java.util.ArrayList;
 
-import liftinggoals.misc.VolumeGroupItem;
+import liftinggoals.classes.VolumeGroupModel;
 
 public class VolumeAdapter extends RecyclerView.Adapter<VolumeAdapter.VolumeViewHolder> {
-    private ArrayList<VolumeGroupItem> volumeGroupItems;
+    private ArrayList<VolumeGroupModel> volumeGroupModels;
 
     public static class VolumeViewHolder extends RecyclerView.ViewHolder {
         public ImageView imageView;
@@ -29,9 +29,9 @@ public class VolumeAdapter extends RecyclerView.Adapter<VolumeAdapter.VolumeView
         }
     }
 
-    public VolumeAdapter (ArrayList<VolumeGroupItem> volumeGroupItems)
+    public VolumeAdapter (ArrayList<VolumeGroupModel> volumeGroupModels)
     {
-        this.volumeGroupItems = volumeGroupItems;
+        this.volumeGroupModels = volumeGroupModels;
     }
 
     @NonNull
@@ -44,7 +44,7 @@ public class VolumeAdapter extends RecyclerView.Adapter<VolumeAdapter.VolumeView
 
     @Override
     public void onBindViewHolder(@NonNull VolumeViewHolder holder, int position) {
-        VolumeGroupItem currentItem = volumeGroupItems.get(position);
+        VolumeGroupModel currentItem = volumeGroupModels.get(position);
 
         holder.imageView.setImageResource(currentItem.getImageResource());
         holder.textView.setText(currentItem.getVolumeGroup());
@@ -52,6 +52,6 @@ public class VolumeAdapter extends RecyclerView.Adapter<VolumeAdapter.VolumeView
 
     @Override
     public int getItemCount() {
-        return volumeGroupItems.size();
+        return volumeGroupModels.size();
     }
 }

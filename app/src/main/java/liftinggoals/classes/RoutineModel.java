@@ -11,7 +11,6 @@ public class RoutineModel implements Parcelable {
     private int routineId;
     private String routineName;
     private String description;
-    private Date lastPerformed;
     private ArrayList<WorkoutModel> workouts;
 
     public RoutineModel() {
@@ -43,6 +42,14 @@ public class RoutineModel implements Parcelable {
         }
     };
 
+    public int getRoutineId() {
+        return routineId;
+    }
+
+    public void setRoutineId(int routineId) {
+        this.routineId = routineId;
+    }
+
     public String getRoutineName() {
         return routineName;
     }
@@ -65,14 +72,6 @@ public class RoutineModel implements Parcelable {
 
     public void setImageResource(int imageResource) {
         this.imageResource = imageResource;
-    }
-
-    public Date getLastPerformed() {
-        return lastPerformed;
-    }
-
-    public void setLastPerformed(Date lastPerformed) {
-        this.lastPerformed = lastPerformed;
     }
 
     public ArrayList<WorkoutModel> getWorkouts() {

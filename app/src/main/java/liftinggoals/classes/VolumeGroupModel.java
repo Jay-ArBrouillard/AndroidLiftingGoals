@@ -1,10 +1,10 @@
-package liftinggoals.misc;
+package liftinggoals.classes;
 
-public class VolumeGroupItem {
+public class VolumeGroupModel {
     private int imageResource;
     private String volumeGroup;
 
-    public VolumeGroupItem(int imageResource, String volumeGroup) {
+    public VolumeGroupModel(int imageResource, String volumeGroup) {
         this.imageResource = imageResource;
         this.volumeGroup = volumeGroup;
     }

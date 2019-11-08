@@ -15,7 +15,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 15;
+    public static final int DATABASE_VERSION = 16;
 
     public SQLiteDatabase myDB;
 
@@ -41,6 +41,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(RoutineWorkoutsTable.SQL_DROP_ROUTINE_WORKOUTS_TABLE);
         db.execSQL(WorkoutsTable.SQL_DROP_WORKOUT_TABLE);
         db.execSQL(WorkoutExercisesTable.SQL_DROP_WORKOUT_EXERCISES_TABLE);
+        db.execSQL(ExercisesTable.SQL_DROP_EXERCISE_TABLE);
         onCreate(db);
     }
 
@@ -117,6 +118,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineWorkoutsTable.getRoutineWorkout(myDB, routineId, workoutId);
     }
 
+    public List<RoutineWorkoutModel> getRoutineWorkoutsByRoutineId (int routineId)
+    {
+        return RoutineWorkoutsTable.getRoutineWorkoutsByRoutineId(myDB, routineId);
+    }
+
     public List<RoutineWorkoutModel> getAllRoutineWorkouts()
     {
         return RoutineWorkoutsTable.getAllRoutineWorkouts(myDB);
@@ -179,6 +185,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return WorkoutExercisesTable.getWorkoutExercise(myDB, workoutExerciseId);
     }
 
+    public List<WorkoutExerciseModel> getAllWorkoutExercisesByWorkoutId(int workoutId)
+    {
+        return WorkoutExercisesTable.getAllWorkoutExercisesByWorkoutId(myDB, workoutId);
+    }
+
     public List<WorkoutExerciseModel> getAllWorkoutExercises()
     {
         return WorkoutExercisesTable.getAllWorkoutExercises(myDB);
@@ -204,9 +215,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return ExercisesTable.delete(myDB, exerciseName);
     }
 
-    public ExerciseModel getExercise(String exerciseName)
+
+    public ExerciseModel getExercise(int exerciseId)
     {
-        return ExercisesTable.getExercise(myDB, exerciseName);
+        return ExercisesTable.getExercise(myDB, exerciseId);
     }
 
     public List<ExerciseModel> getAllExercises()
