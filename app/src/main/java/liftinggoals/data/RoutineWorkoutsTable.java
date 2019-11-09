@@ -35,13 +35,13 @@ public class RoutineWorkoutsTable {
         return myDB.insert(RoutineWorkoutEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int routineId, int workoutId)
+    public static long update(SQLiteDatabase myDB, int routineWorkoutId, int routineId, int workoutId)
     {
         ContentValues values = new ContentValues();
         values.put(RoutineWorkoutEntry.COLUMN_ROUTINE_ID, routineId);
         values.put(RoutineWorkoutEntry.COLUMN_WORKOUT_ID, workoutId);
 
-        return myDB.update(RoutineWorkoutEntry.TABLE_NAME, values, null, null);
+        return myDB.update(RoutineWorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(routineWorkoutId)});
     }
 
     public static long delete(SQLiteDatabase myDB, int routineId, int workoutId)

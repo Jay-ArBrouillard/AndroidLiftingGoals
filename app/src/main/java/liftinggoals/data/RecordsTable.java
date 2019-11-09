@@ -45,7 +45,7 @@ public class RecordsTable {
         return myDB.insert(RecordEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int userId, int exercise_id, double intensity, int reps)
+    public static long update(SQLiteDatabase myDB, int recordId, int userId, int exercise_id, double intensity, int reps)
     {
         ContentValues values = new ContentValues();
         values.put(RecordEntry.COLUMN_USER_ID, userId);
@@ -53,7 +53,7 @@ public class RecordsTable {
         values.put(RecordEntry.COLUMN_INTENSITY, intensity);
         values.put(RecordEntry.COLUMN_REPS_PERFORMED, reps);
 
-        return myDB.update(RecordEntry.TABLE_NAME, values, null, null);
+        return myDB.update(RecordEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(recordId)});
     }
 
     public static long delete(SQLiteDatabase myDB, int id)

@@ -39,7 +39,7 @@ public class ExercisesTable {
         ContentValues values = new ContentValues();
         values.put(ExerciseEntry.COLUMN_EXERCISE_NAME, name);
 
-        return myDB.update(ExerciseEntry.TABLE_NAME, values, null, null);
+        return myDB.update(ExerciseEntry.TABLE_NAME, values, "exercise_name = ?", new String[] {name});
     }
 
     public static long delete(SQLiteDatabase myDB, String name)

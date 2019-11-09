@@ -45,13 +45,14 @@ public class RoutineTable{
         return myDB.update(RoutineEntry.TABLE_NAME, values, null, null);
     }
 
-    public static long update(SQLiteDatabase myDB, String name, String description)
+    public static long update(SQLiteDatabase myDB, int routineId, String name, String description, int numberWorkouts)
     {
         ContentValues values = new ContentValues();
         values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
         values.put(RoutineEntry.COLUMN_DESCRIPTION, description);
+        values.put(RoutineEntry.COLUMN_NUMBER_WORKOUTS, numberWorkouts);
 
-        return myDB.update(RoutineEntry.TABLE_NAME, values, null, null);
+        return myDB.update(RoutineEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(routineId)});
     }
 
     public static long delete(SQLiteDatabase myDB, String name)

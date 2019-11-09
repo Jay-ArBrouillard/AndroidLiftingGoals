@@ -53,7 +53,7 @@ public class WorkoutExercisesTable {
         return myDB.insert(WorkoutExercisesEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int workoutId, int exerciseId,
+    public static long update(SQLiteDatabase myDB, int workoutExerciseId, int workoutId, int exerciseId,
                               int minimumSets, int minimumReps, int maximumSets, int maximumReps)
     {
         ContentValues values = new ContentValues();
@@ -68,7 +68,7 @@ public class WorkoutExercisesTable {
         if (maximumReps != -1)
             values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS, maximumReps);
 
-        return myDB.update(WorkoutExercisesEntry.TABLE_NAME, values, null, null);
+        return myDB.update(WorkoutExercisesEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutExerciseId)});
     }
 
     public static long delete(SQLiteDatabase myDB, int id)

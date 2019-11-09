@@ -1,13 +1,20 @@
 package liftinggoals.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,7 +34,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import liftinggoals.Services.ExampleJobIntentService;
+import liftinggoals.Services.RoutineService;
 import liftinggoals.adapters.RoutineAdapter;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
@@ -44,6 +51,7 @@ public class RoutineActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private SearchView search;
     private DatabaseHelper db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,13 +67,24 @@ public class RoutineActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+
+        Intent myIntent = new Intent(this, RoutineService.class);
+        startService(myIntent);
     }
 
-    public void enqueueWork(View view)
-    {
-        Intent serviceIntent = new Intent(this, ExampleJobIntentService.class);
-        ExampleJobIntentService.enqueueWork(this, serviceIntent);
+    public class ResponseReceiver extends BroadcastReceiver {
+        private ResponseReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d("RoutineActivity", intent.getStringExtra("test"));
+            Toast.makeText(context, intent.getStringExtra("test") , Toast.LENGTH_LONG).show();
+            //routineModels = intent.getParcelableArrayListExtra("someKey");
+        }
     }
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -101,40 +120,7 @@ public class RoutineActivity extends AppCompatActivity {
 
     private void initializeRecyclerView() {
         //fetchRemoteData(); //later we will periodically check remote data
-
-        routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
-        for (int i = 0; i < routineModels.size(); i++)
-        {
-            ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>();
-            int routineId = routineModels.get(i).getRoutineId();
-
-            ArrayList<RoutineWorkoutModel> routineWorkoutList = (ArrayList<RoutineWorkoutModel>) db.getRoutineWorkoutsByRoutineId(routineId);
-            if (routineWorkoutList == null) routineWorkoutList = new ArrayList<>();
-
-            WorkoutModel workout = null;
-            for (int j = 0; j < routineWorkoutList.size(); j++)
-            {
-                int workoutId = routineWorkoutList.get(j).getWorkoutId();
-                workout = db.getWorkout(workoutId);
-                listOfWorkouts.add(workout);
-                ArrayList<WorkoutExerciseModel> workoutExerciseList = (ArrayList<WorkoutExerciseModel>) db.getAllWorkoutExercisesByWorkoutId(workoutId);
-                if (workoutExerciseList == null) workoutExerciseList = new ArrayList<>();
-
-                for (int k = 0; k < workoutExerciseList.size(); k++)
-                {
-                    int exerciseId = workoutExerciseList.get(k).getExerciseId();
-                    ExerciseModel exerciseModel = db.getExercise(exerciseId);
-                    workoutExerciseList.get(k).setExercise(exerciseModel);
-                }
-
-                listOfWorkouts.get(j).setExercises(workoutExerciseList);
-            }
-
-            routineModels.get(i).setWorkouts(listOfWorkouts);
-
-        }
-
-        db.closeDB();
+        populateRoutines();
 
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
@@ -165,166 +151,49 @@ public class RoutineActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+        //Start service to get newly added default routines
+    }
+
+    private void populateRoutines()
+    {
+        routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
+        if (routineModels == null) routineModels = new ArrayList<>();
+        for (int i = 0; i < routineModels.size(); i++)
+        {
+            ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>();
+            int routineId = routineModels.get(i).getRoutineId();
+
+            ArrayList<RoutineWorkoutModel> routineWorkoutList = (ArrayList<RoutineWorkoutModel>) db.getRoutineWorkoutsByRoutineId(routineId);
+            if (routineWorkoutList == null) routineWorkoutList = new ArrayList<>();
+
+            WorkoutModel workout = null;
+            for (int j = 0; j < routineWorkoutList.size(); j++)
+            {
+                int workoutId = routineWorkoutList.get(j).getWorkoutId();
+                workout = db.getWorkout(workoutId);
+                listOfWorkouts.add(workout);
+                ArrayList<WorkoutExerciseModel> workoutExerciseList = (ArrayList<WorkoutExerciseModel>) db.getAllWorkoutExercisesByWorkoutId(workoutId);
+                if (workoutExerciseList == null) workoutExerciseList = new ArrayList<>();
+
+                for (int k = 0; k < workoutExerciseList.size(); k++)
+                {
+                    int exerciseId = workoutExerciseList.get(k).getExerciseId();
+                    ExerciseModel exerciseModel = db.getExercise(exerciseId);
+                    workoutExerciseList.get(k).setExercise(exerciseModel);
+                }
+
+                listOfWorkouts.get(j).setExercises(workoutExerciseList);
+            }
+
+            routineModels.get(i).setWorkouts(listOfWorkouts);
+        }
+
     }
 
     private void fetchRemoteData()
     {
-        final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
-        db.openDB();
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "http://3.221.56.60/initializeRoutines.php";
-        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
-                Response.Listener<JSONArray>() {
-                    public void onResponse(JSONArray response) {
-                        try
-                        {
-                            System.out.println("response length: " + response.length());
-                            ArrayList<WorkoutModel> listOfWorkouts; //Ex: Workout A and Workout B
-                            ArrayList<WorkoutExerciseModel> listOfExercises; //Ex: Workout A contains Squat(rep,set data), Bench, Row
-                            String routineName = null;
-                            String routineDesc = null;
-                            int i = 0;
-                            int length = response.length();
-                            while (i < length)
-                            {
-                                listOfWorkouts = new ArrayList<>(); //Ex: Workout A and Workout B
-                                listOfExercises = new ArrayList<>(); //Ex: Workout A contains Squat(rep,set data), Bench, Row
-                                JSONObject routineObj = response.getJSONObject(i);
-                                routineName = routineObj.getString("routine_name");
-                                routineDesc = routineObj.getString("description");
-                                int totalWorkouts = routineObj.getInt("number_workouts");
 
-                                if (db.getRoutine(routineName) == null)
-                                {
-                                    db.insertRoutine(routineName, routineDesc, totalWorkouts);
-                                }
-
-                                for (int j = 0 ; j < totalWorkouts; j++)
-                                {
-                                    if (i+1 == length)
-                                    {
-                                        break;
-                                    }
-                                    i++;
-                                    JSONObject routineWorkoutObj = response.getJSONObject(i);
-                                    int routineId = routineWorkoutObj.getInt("routine_id");
-                                    int workoutId = routineWorkoutObj.getInt("workout_id");
-                                    if (routineWorkoutObj.has("routine_workout_id") && db.getRoutineWorkout(routineId,workoutId) == null)
-                                    {
-                                        db.insertRoutineWorkout(routineId, workoutId);
-                                    }
-
-                                    i++;
-                                    JSONObject nextObj = response.getJSONObject(i);
-                                    listOfWorkouts.add(new WorkoutModel(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration")));
-                                    int totalExercises = nextObj.getInt("number_exercises");
-
-                                    if (db.getWorkout(nextObj.getInt("workout_id")) == null)
-                                    {
-                                        db.insertWorkout(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration"), totalExercises);
-                                    }
-
-                                    listOfExercises.clear();
-                                    WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
-                                    for (int k = 0; k < totalExercises*2; k++)
-                                    {
-                                        if (i+1 == length)
-                                        {
-                                            break;
-                                        }
-                                        i++;
-                                        JSONObject exerciseObj = response.getJSONObject(i);
-                                        if (k % 2 == 0)
-                                        {
-                                            String strMinSets = exerciseObj.getString("minimum_sets");
-                                            String strMinReps = exerciseObj.getString("minimum_reps");
-                                            String strMaxSets = exerciseObj.getString("maximum_sets");
-                                            String strMaxReps = exerciseObj.getString("maximum_reps");
-                                            //Quick null fix
-                                            if (strMinSets == "null")
-                                                strMinSets = "-1";
-                                            if (strMinReps == "null")
-                                                strMinReps = "-1";
-                                            if (strMaxSets == "null")
-                                                strMaxSets = "-1";
-                                            if (strMaxReps == "null")
-                                                strMaxReps = "-1";
-                                            //Fix later
-                                            workoutExerciseModel.setMinimumReps(Integer.parseInt(strMinSets));
-                                            workoutExerciseModel.setMinimumReps(Integer.parseInt(strMinReps));
-                                            workoutExerciseModel.setMaximumSets(Integer.parseInt(strMaxSets));
-                                            workoutExerciseModel.setMaximumReps(Integer.parseInt(strMaxReps));
-
-                                            if (db.getWorkoutExercise(exerciseObj.getInt("workout_exercise_id")) == null)
-                                            {
-                                                db.insertWorkoutExercise(exerciseObj.getInt("workout_id"), exerciseObj.getInt("exercise_id"),
-                                                        Integer.parseInt(strMinSets), Integer.parseInt(strMinReps), Integer.parseInt(strMaxSets), Integer.parseInt(strMaxReps));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            String exerciseName = exerciseObj.getString("exercise_name");
-                                            int exerciseId = exerciseObj.getInt("exercise_id");
-                                            if (db.getExercise(exerciseId) == null)
-                                            {
-                                                db.insertExercise(exerciseName);
-                                            }
-                                            //Create ExerciseModel for Workout
-                                            ExerciseModel exerciseModel = new ExerciseModel(exerciseName);
-                                            workoutExerciseModel.setExercise(exerciseModel);
-
-                                            listOfExercises.add(workoutExerciseModel);
-                                            workoutExerciseModel = new WorkoutExerciseModel(); //Clear exercise model
-                                        }
-                                    }
-
-                                    listOfWorkouts.get(listOfWorkouts.size()-1).setExercises(listOfExercises);
-                                }
-
-                                routineModels.add(new RoutineModel(routineName, routineDesc, listOfWorkouts));
-
-                                i++;
-                            }   //End outer for loop
-
-                            //Check local database
-                            for (RoutineModel r : db.getAllRoutines())
-                            {
-                                System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
-                            }
-
-                            for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
-                            {
-                                System.out.println(rWM.getRoutineId() + ": " + rWM.getWorkoutId());
-                            }
-
-
-                            for (WorkoutModel w : db.getAllWorkouts())
-                            {
-                                System.out.println(w.getWorkoutName() + ": " + w.getDescription() + ": " + w.getEstimatedDuration() + ": " + w.getNumberExercises());
-                            }
-
-                            for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
-                            {
-                                System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
-                            }
-
-                            for (ExerciseModel e : db.getAllExercises())
-                            {
-                                System.out.println(e.getExerciseName());
-                            }
-                        }
-                        catch (JSONException e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-
-        queue.add(jsObjRequest);
     }
 
     private void initializeActionSearch() {
@@ -389,4 +258,5 @@ public class RoutineActivity extends AppCompatActivity {
         super.onDestroy();
         db.closeDB();
     }
+
 }

@@ -15,7 +15,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 16;
+    public static final int DATABASE_VERSION = 18;
 
     public SQLiteDatabase myDB;
 
@@ -74,9 +74,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.update(myDB, name);
     }
 
-    public long updateRoutine(String name, String description)
+    public long updateRoutine(int routineId, String name, String description, int numberWorkouts)
     {
-        return RoutineTable.update(myDB, name, description);
+        return RoutineTable.update(myDB, routineId, name, description, numberWorkouts);
     }
 
     public long deleteRoutine(String name)
@@ -103,9 +103,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineWorkoutsTable.insert(myDB, routineId, workoutId);
     }
 
-    public long updateRoutineWorkout(int routineId, int workoutId)
+    public long updateRoutineWorkout(int routineWorkoutId ,int routineId, int workoutId)
     {
-        return RoutineWorkoutsTable.update(myDB, routineId, workoutId);
+        return RoutineWorkoutsTable.update(myDB, routineWorkoutId, routineId, workoutId);
     }
 
     public long deleteRoutineWorkout(int routineId, int workoutId)
@@ -138,9 +138,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return WorkoutsTable.insert(myDB, name, description, duration, exercises);
     }
 
-    public long updateWorkout(String name, String description, double duration, int exercises)
+    public long updateWorkout(int workoutId, String name, String description, double duration, int exercises)
     {
-        return WorkoutsTable.update(myDB, name, description, duration, exercises);
+        return WorkoutsTable.update(myDB, workoutId, name, description, duration, exercises);
     }
 
     public long deleteWorkout(int workoutId)
@@ -169,10 +169,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return WorkoutExercisesTable.insert(myDB, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
     }
 
-    public long updateWorkoutExcercise(int workoutId, int exerciseId, int minimumSets,
+    public long updateWorkoutExcercise(int workoutExerciseId ,int workoutId, int exerciseId, int minimumSets,
                               int minimumReps, int maximumSets, int maximumReps)
     {
-        return WorkoutExercisesTable.update(myDB, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
+        return WorkoutExercisesTable.update(myDB, workoutExerciseId, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
     }
 
     public long deleteWorkoutExercise(int workoutExerciseId)
@@ -236,9 +236,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RecordsTable.insert(myDB, userId, exercise_id, intensity, reps);
     }
 
-    public long updateRecord(int userId, int exercise_id, double intensity, int reps)
+    public long updateRecord(int recordId, int userId, int exercise_id, double intensity, int reps)
     {
-        return RecordsTable.update(myDB, userId, exercise_id, intensity, reps);
+        return RecordsTable.update(myDB, recordId, userId, exercise_id, intensity, reps);
     }
 
     public long deleteRecord(int recordId)

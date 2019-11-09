@@ -42,7 +42,7 @@ public class WorkoutsTable {
         return myDB.insert(WorkoutEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, String name, String description, double duration, int exercises)
+    public static long update(SQLiteDatabase myDB, int workoutId, String name, String description, double duration, int exercises)
     {
         ContentValues values = new ContentValues();
         values.put(WorkoutEntry.COLUMN_WORKOUT_NAME, name);
@@ -50,7 +50,7 @@ public class WorkoutsTable {
         values.put(WorkoutEntry.COLUMN_DURATION, duration);
         values.put(WorkoutEntry.COLUMN_NUMBER_EXERCISES, exercises);
 
-        return myDB.update(WorkoutEntry.TABLE_NAME, values, null, null);
+        return myDB.update(WorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutId)});
     }
 
     public static long delete(SQLiteDatabase myDB, int id)
