@@ -23,6 +23,7 @@ public class RoutinesEditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_routines_edit);
 
         routineNameEditText = findViewById(R.id.activity_routines_edit_edit_text);
+        db = new DatabaseHelper(this);
         db.openDB();
 
         routineNameEditText.addTextChangedListener(new TextWatcher() {

@@ -15,7 +15,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 20;
 
     public SQLiteDatabase myDB;
 
@@ -64,14 +64,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////ROUTINE METHODS/////////////////////////////////////////////////////
 
-    public long insertRoutine(String name, String description, int numberWorkouts)
+    public long insertRoutine(int userId, String name, String description, int numberWorkouts)
     {
-        return RoutineTable.insert(myDB, name, description, numberWorkouts);
+        return RoutineTable.insert(myDB, userId, name, description, numberWorkouts);
     }
 
-    public long updateRoutineName(String name)
+    public long updateRoutineName(int routineId, String name)
     {
-        return RoutineTable.update(myDB, name);
+        return RoutineTable.update(myDB, routineId, name);
     }
 
     public long updateRoutine(int routineId, String name, String description, int numberWorkouts)

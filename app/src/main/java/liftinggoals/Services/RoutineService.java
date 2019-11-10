@@ -31,25 +31,21 @@ import liftinggoals.data.DatabaseHelper;
 
 public class RoutineService extends IntentService {
     private static final String TAG = "RoutineService";
+    private DatabaseHelper db;
+    private String databaseUpdated;
 
     public RoutineService() {
         super(TAG);
-        System.out.println("here");
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        /*for (int i = 0; i < 10; i++)
-        {
-            Log.d(TAG, "input - " + i);
-            SystemClock.sleep(1000);
-        }*/
-        fetchRemote();
 
+        fetchRemote();
     }
 
     private void fetchRemote() {
-        final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
+        db = new DatabaseHelper(getApplicationContext());
         db.openDB();
 
         final ArrayList<RoutineModel> routineModels =  new ArrayList<>();
@@ -60,7 +56,6 @@ public class RoutineService extends IntentService {
                     public void onResponse(JSONArray response) {
                         try
                         {
-                            System.out.println("response length: " + response.length());
                             ArrayList<WorkoutModel> listOfWorkouts; //Ex: Workout A and Workout B
                             ArrayList<WorkoutExerciseModel> listOfExercises; //Ex: Workout A contains Squat(rep,set data), Bench, Row
                             String routineName = null;
@@ -74,15 +69,17 @@ public class RoutineService extends IntentService {
                                 JSONObject routineObj = response.getJSONObject(i);
                                 routineName = routineObj.getString("routine_name");
                                 routineDesc = routineObj.getString("description");
+                                int userId = routineObj.getInt("user_id");
                                 int totalWorkouts = routineObj.getInt("number_workouts");
 
-
                                 if (db.getRoutine(routineName) == null) {
-                                    db.insertRoutine(routineName, routineDesc, totalWorkouts);
+                                    db.insertRoutine(userId, routineName, routineDesc, totalWorkouts);
+                                    databaseUpdated = "added";
                                 }
                                 else {
                                     int routineId = Integer.parseInt(routineObj.getString("routine_id"));
                                     db.updateRoutine( routineId, routineName, routineDesc, totalWorkouts);
+                                    databaseUpdated = "updated";
                                 }
 
                                 for (int j = 0 ; j < totalWorkouts; j++)
@@ -190,31 +187,25 @@ public class RoutineService extends IntentService {
                                 i++;
                             }   //End outer for loop
 
-                            //Check local database
-                            for (RoutineModel r : db.getAllRoutines())
+                            //String message = intent.getStringExtra("message");
+                            //intent.setAction("action");
+                            //SystemClock.sleep(3000);
+                            //String echoMessage = "IntentService after a pause of 3 seconds echoes " + message;
+                            if (databaseUpdated != null)
                             {
-                                System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
-                            }
+                                Intent intent = new Intent("action");
+                                intent.putExtra("updatedRoutines", routineModels);
 
-                            for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
-                            {
-                                System.out.println(rWM.getRoutineId() + ": " + rWM.getWorkoutId());
-                            }
+                                if (databaseUpdated.equals("added"))
+                                {
+                                    intent.putExtra("message", "New Default Routine added");
+                                }
+                                else if (databaseUpdated.equals("updated")) {
+                                    intent.putExtra("message", "Default Routines were automatically updated");
+                                }
 
+                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
-                            for (WorkoutModel w : db.getAllWorkouts())
-                            {
-                                System.out.println(w.getWorkoutName() + ": " + w.getDescription() + ": " + w.getEstimatedDuration() + ": " + w.getNumberExercises());
-                            }
-
-                            for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
-                            {
-                                System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
-                            }
-
-                            for (ExerciseModel e : db.getAllExercises())
-                            {
-                                System.out.println(e.getExerciseName());
                             }
 
                             db.closeDB();
@@ -231,12 +222,36 @@ public class RoutineService extends IntentService {
             }
         });
 
-        Intent intent = new Intent("someString");
-        //intent.putParcelableArrayListExtra("someKey", routineModels);
-        intent.putExtra("test", "TestStringValue");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
         queue.add(jsObjRequest);
+    }
+
+    private void printLocalDatabase()
+    {
+        for (RoutineModel r : db.getAllRoutines())
+        {
+            System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
+        }
+
+        for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
+        {
+            System.out.println(rWM.getRoutineId() + ": " + rWM.getWorkoutId());
+        }
+
+
+        for (WorkoutModel w : db.getAllWorkouts())
+        {
+            System.out.println(w.getWorkoutName() + ": " + w.getDescription() + ": " + w.getEstimatedDuration() + ": " + w.getNumberExercises());
+        }
+
+        for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
+        {
+            System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
+        }
+
+        for (ExerciseModel e : db.getAllExercises())
+        {
+            System.out.println(e.getExerciseName());
+        }
     }
 
     @Override

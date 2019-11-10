@@ -51,6 +51,7 @@ public class RoutineActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private SearchView search;
     private DatabaseHelper db;
+    private ResponseReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,15 +62,20 @@ public class RoutineActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
+
         initializeRecyclerView();
         initializeActionSearch();
         initializeSwipe();
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+    }
 
-        Intent myIntent = new Intent(this, RoutineService.class);
-        startService(myIntent);
+    private void setReceiver() {
+        myReceiver = new ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("action");
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
     }
 
     public class ResponseReceiver extends BroadcastReceiver {
@@ -78,10 +84,11 @@ public class RoutineActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.d("RoutineActivity", intent.getStringExtra("test"));
-            Toast.makeText(context, intent.getStringExtra("test") , Toast.LENGTH_LONG).show();
-            //routineModels = intent.getParcelableArrayListExtra("someKey");
+            //String message = intent.getStringExtra("broadcastMessage");
+            //Log.d("RoutineActivity" , "Broadcasting message: " + message);
+            Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
+            routineModels = intent.getParcelableArrayListExtra("updatedRoutines");
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -133,10 +140,8 @@ public class RoutineActivity extends AppCompatActivity {
             public void onItemClick(int position)
             {
                 Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
-                ArrayList<WorkoutModel> temp = routineModels.get(position).getWorkouts();
-                selectWorkFromRoutine.putParcelableArrayListExtra("workout_item", temp);
+                selectWorkFromRoutine.putParcelableArrayListExtra("workout_item", routineModels.get(position).getWorkouts());
                 selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
-
                 startActivity(selectWorkFromRoutine);
             }
 
@@ -153,6 +158,9 @@ public class RoutineActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         //Start service to get newly added default routines
+        Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
+        //intent.putExtra("message", "The Quick Brown Fox jumped over the lazy dog");
+        startService(intent);
     }
 
     private void populateRoutines()
@@ -189,10 +197,6 @@ public class RoutineActivity extends AppCompatActivity {
             routineModels.get(i).setWorkouts(listOfWorkouts);
         }
 
-    }
-
-    private void fetchRemoteData()
-    {
 
     }
 
@@ -251,6 +255,18 @@ public class RoutineActivity extends AppCompatActivity {
         {
             routineModels = savedInstanceState.getParcelableArrayList("routineModels");
         }
+    }
+
+    @Override
+    protected void onStart() {
+        setReceiver();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        super.onStop();
     }
 
     @Override

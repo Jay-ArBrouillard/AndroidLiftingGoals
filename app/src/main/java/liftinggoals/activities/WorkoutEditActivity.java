@@ -2,33 +2,43 @@ package liftinggoals.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
+import liftinggoals.adapters.WorkoutEditAdapter;
 import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class WorkoutEditActivity extends AppCompatActivity {
     public ArrayList<WorkoutExerciseModel> workoutExerciseModels;
-    private RecyclerView exerciseRecyclerView;
-    private RecyclerView.Adapter volumeAdapter;
-    private RecyclerView.LayoutManager volumeLayoutManager;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private String workoutName;
+    private String duration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_edit);
 
-        exerciseRecyclerView = findViewById(R.id.edit_routine_recycler_view);
-        initializeRecyclerView();
+        workoutName = getIntent().getExtras().getString("workout_name");
+        duration = Double.toString(getIntent().getExtras().getDouble("workout_duration"));
 
+        ((TextView)findViewById(R.id.edit_routine_name_text_view)).setText(workoutName);
+        ((TextView)findViewById(R.id.edit_routine_duration_text_view)).setText(duration + " minutes");
+
+        initializeRecyclerView();
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_workout_edit_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
@@ -69,6 +79,15 @@ public class WorkoutEditActivity extends AppCompatActivity {
 
     private void initializeRecyclerView()
     {
-        //Todo
+        recyclerView = findViewById(R.id.edit_routine_recycler_view);
+        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("exercise_list");
+        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
+        recyclerView.setHasFixedSize(true);
+
+        layoutManager = new LinearLayoutManager(this);
+        adapter = new WorkoutEditAdapter(workoutExerciseModels);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
     }
 }

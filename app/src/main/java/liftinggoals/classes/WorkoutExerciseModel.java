@@ -2,6 +2,7 @@ package liftinggoals.classes;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.ImageView;
 
 public class WorkoutExerciseModel implements Parcelable {
     private int workoutExerciseId;
@@ -12,6 +13,7 @@ public class WorkoutExerciseModel implements Parcelable {
     private int maximumSets;
     private int maximumReps;
     private ExerciseModel exercise;
+    private ImageView imageView;
 
     public WorkoutExerciseModel()
     {
@@ -103,6 +105,14 @@ public class WorkoutExerciseModel implements Parcelable {
 
     public void setExercise(ExerciseModel exercise) {
         this.exercise = exercise;
+    }
+
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
     }
 
     @Override

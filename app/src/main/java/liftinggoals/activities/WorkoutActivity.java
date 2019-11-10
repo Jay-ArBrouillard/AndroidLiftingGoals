@@ -25,8 +25,6 @@ import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class WorkoutActivity extends AppCompatActivity {
     private ArrayList<WorkoutModel> workoutsList;
-//    private ArrayList<String> workoutItems;
-//    private ArrayList<ExerciseModel> exerciseList;
     private RecyclerView recyclerView;
     private WorkoutAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -94,16 +92,17 @@ public class WorkoutActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 Intent startExerciseActivity = new Intent(WorkoutActivity.this, ExerciseActivity.class);
-                ArrayList<WorkoutExerciseModel> temp =  workoutsList.get(position).getExercises();
-                startExerciseActivity.putParcelableArrayListExtra("exercise_list", temp);
+                startExerciseActivity.putParcelableArrayListExtra("exercise_list", workoutsList.get(position).getExercises());
                 startActivity(startExerciseActivity);
             }
 
             @Override
             public void onItemEdit(int position) {
                 Intent editWorkoutActivity = new Intent(WorkoutActivity.this, WorkoutEditActivity.class);
+                editWorkoutActivity.putParcelableArrayListExtra("exercise_list", workoutsList.get(position).getExercises());
+                editWorkoutActivity.putExtra("workout_name", workoutsList.get(position).getWorkoutName());
+                editWorkoutActivity.putExtra("workout_duration", workoutsList.get(position).getEstimatedDuration());
                 startActivity(editWorkoutActivity);
-
             }
 
         });

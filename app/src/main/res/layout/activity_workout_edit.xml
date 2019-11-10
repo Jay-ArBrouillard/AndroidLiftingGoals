@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
-            android:text="Routine Name"
+            android:text="Workout Name"
             android:textColor="@android:color/darker_gray"
             android:textSize="20dp" />
 
@@ -48,6 +48,7 @@
             android:layout_marginBottom="40dp">
 
             <EditText
+                android:id="@+id/edit_routine_name_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -77,6 +78,7 @@
                     android:textSize="20dp" />
 
                 <TextView
+                    android:id="@+id/edit_routine_duration_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"

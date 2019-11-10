@@ -13,6 +13,7 @@ public class RoutineTable{
     public static final String SQL_CREATE_ROUTINE_TABLE = "CREATE TABLE " +
             RoutineEntry.TABLE_NAME + " (" +
             RoutineEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            RoutineEntry.COLUMN_USER_ID + " INTEGER NOT NULL, " +
             RoutineEntry.COLUMN_ROUTINE_NAME + " TEXT NOT NULL, " +
             RoutineEntry.COLUMN_DESCRIPTION + " TEXT, " +
             RoutineEntry.COLUMN_NUMBER_WORKOUTS + " TEXT" +
@@ -23,13 +24,15 @@ public class RoutineTable{
     public static abstract class RoutineEntry implements BaseColumns
     {
         public static final String TABLE_NAME = "Routines";
+        public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_ROUTINE_NAME = "routine_name";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_NUMBER_WORKOUTS = "number_workouts";
     }
-    public static long insert(SQLiteDatabase myDB, String name, String description, int workouts)
+    public static long insert(SQLiteDatabase myDB, int userId, String name, String description, int workouts)
     {
         ContentValues values = new ContentValues();
+        values.put(RoutineEntry.COLUMN_USER_ID, userId);
         values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
         values.put(RoutineEntry.COLUMN_DESCRIPTION, description);
         values.put(RoutineEntry.COLUMN_NUMBER_WORKOUTS, workouts);
@@ -37,12 +40,12 @@ public class RoutineTable{
         return myDB.insert(RoutineEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, String name)
+    public static long update(SQLiteDatabase myDB, int routineId, String name)
     {
         ContentValues values = new ContentValues();
         values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
 
-        return myDB.update(RoutineEntry.TABLE_NAME, values, null, null);
+        return myDB.update(RoutineEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(routineId)});
     }
 
     public static long update(SQLiteDatabase myDB, int routineId, String name, String description, int numberWorkouts)
@@ -57,9 +60,9 @@ public class RoutineTable{
 
     public static long delete(SQLiteDatabase myDB, String name)
     {
-        String where = RoutineEntry.COLUMN_ROUTINE_NAME + " = " + name;
+        String where = RoutineEntry.COLUMN_ROUTINE_NAME + " = ?";
 
-        return myDB.delete(RoutineEntry.TABLE_NAME, where, null);
+        return myDB.delete(RoutineEntry.TABLE_NAME, where, new String[] {name});
     }
 
     public static RoutineModel getRoutine(SQLiteDatabase myDB, String routineName)
@@ -77,6 +80,7 @@ public class RoutineTable{
             RoutineModel routineModel = new RoutineModel();
 
             while(c.moveToNext()){
+                routineModel.setRoutineId(c.getInt(c.getColumnIndexOrThrow(RoutineEntry._ID)));
                 routineModel.setRoutineName(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_ROUTINE_NAME)));
                 routineModel.setRoutineDescription(c.getString(c.getColumnIndexOrThrow(RoutineEntry.COLUMN_DESCRIPTION)));
             }

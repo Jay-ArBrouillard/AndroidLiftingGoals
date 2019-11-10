@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:weightSum="5">
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -83,6 +83,12 @@
 
         </RelativeLayout>
 
+        <ImageView
+            android:id="@+id/workout_edit_item_right_arrow"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_weight="1"/>
 
     </LinearLayout>
 

@@ -21,8 +21,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="liftinggoals.activities.WorkoutEditActivity"></activity>
-        <activity android:name="liftinggoals.activities.SettingsActivity" />
+        <activity android:name="liftinggoals.activities.WorkoutEditActivity" android:launchMode="singleTask"></activity>
+        <activity android:name="liftinggoals.activities.SettingsActivity" android:launchMode="singleTask"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -37,14 +37,15 @@
 
         <activity
             android:name="liftinggoals.activities.MapsActivity"
-            android:label="@string/title_activity_maps" />
-        <activity android:name="liftinggoals.activities.HistoryActivity" />
-        <activity android:name="liftinggoals.activities.ProgressActivity" />
-        <activity android:name="liftinggoals.activities.RoutinesEditActivity" />
-        <activity android:name="liftinggoals.activities.WorkoutActivity" />
+            android:label="@string/title_activity_maps"
+            android:launchMode="singleTask"/>
+        <activity android:name="liftinggoals.activities.HistoryActivity" android:launchMode="singleTask"/>
+        <activity android:name="liftinggoals.activities.ProgressActivity" android:launchMode="singleTask"/>
+        <activity android:name="liftinggoals.activities.RoutinesEditActivity" android:launchMode="singleTask"/>
+        <activity android:name="liftinggoals.activities.WorkoutActivity" android:launchMode="singleTask"/>
         <activity android:name="liftinggoals.activities.RoutineActivity" android:launchMode="singleTask"/>
-        <activity android:name="liftinggoals.activities.ExerciseActivity" />
-        <activity android:name="liftinggoals.activities.LoginActivity">
+        <activity android:name="liftinggoals.activities.ExerciseActivity" android:launchMode="singleTask"/>
+        <activity android:name="liftinggoals.activities.LoginActivity" android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
