@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
@@ -19,18 +17,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -52,6 +40,8 @@ public class RoutineActivity extends AppCompatActivity {
     private SearchView search;
     private DatabaseHelper db;
     private ResponseReceiver myReceiver;
+    private String username;
+    private boolean isFirstLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +49,8 @@ public class RoutineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_routine);
         routineModels = new ArrayList<>();
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
+        username = getIntent().getStringExtra("username");
+        isFirstLogin = getIntent().getBooleanExtra("firstLogin", false);
 
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
@@ -69,6 +61,14 @@ public class RoutineActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+
+        //If it is the first Login Start service to get default routines
+        if (isFirstLogin)
+        {
+            Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
+            intent.putExtra("username", username);
+            startService(intent);
+        }
     }
 
     private void setReceiver() {
@@ -126,7 +126,6 @@ public class RoutineActivity extends AppCompatActivity {
     };
 
     private void initializeRecyclerView() {
-        //fetchRemoteData(); //later we will periodically check remote data
         populateRoutines();
 
         recyclerView.setHasFixedSize(true);
@@ -156,11 +155,6 @@ public class RoutineActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-
-        //Start service to get newly added default routines
-        Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
-        //intent.putExtra("message", "The Quick Brown Fox jumped over the lazy dog");
-        startService(intent);
     }
 
     private void populateRoutines()
@@ -192,12 +186,47 @@ public class RoutineActivity extends AppCompatActivity {
                 }
 
                 listOfWorkouts.get(j).setExercises(workoutExerciseList);
+
+                for (WorkoutExerciseModel m : workoutExerciseList)
+                {
+                    System.out.println(m.getExercise().getExerciseName());
+                }
+
             }
 
             routineModels.get(i).setWorkouts(listOfWorkouts);
         }
 
+    }
 
+    // Print Helper
+    private void printLocalDatabase()
+    {
+        for (RoutineModel r : db.getAllRoutines())
+        {
+            System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
+        }
+
+        for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
+        {
+            System.out.println(rWM.getRoutineId() + ": " + rWM.getWorkoutId());
+        }
+
+
+        for (WorkoutModel w : db.getAllWorkouts())
+        {
+            System.out.println(w.getWorkoutName() + ": " + w.getDescription() + ": " + w.getEstimatedDuration() + ": " + w.getNumberExercises());
+        }
+
+        for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
+        {
+            System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
+        }
+
+        for (ExerciseModel e : db.getAllExercises())
+        {
+            System.out.println(e.getExerciseName());
+        }
     }
 
     private void initializeActionSearch() {

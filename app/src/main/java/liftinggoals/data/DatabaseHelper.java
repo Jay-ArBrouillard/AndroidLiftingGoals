@@ -15,7 +15,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 20;
+    public static final int DATABASE_VERSION = 22;
 
     public SQLiteDatabase myDB;
 

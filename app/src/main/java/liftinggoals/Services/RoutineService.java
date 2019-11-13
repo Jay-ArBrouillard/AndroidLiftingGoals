@@ -14,6 +14,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -21,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
@@ -32,7 +37,6 @@ import liftinggoals.data.DatabaseHelper;
 public class RoutineService extends IntentService {
     private static final String TAG = "RoutineService";
     private DatabaseHelper db;
-    private String databaseUpdated;
 
     public RoutineService() {
         super(TAG);
@@ -40,8 +44,10 @@ public class RoutineService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-
-        fetchRemote();
+        if (intent != null)
+        {
+            fetchRemote();
+        }
     }
 
     private void fetchRemote() {
@@ -74,12 +80,6 @@ public class RoutineService extends IntentService {
 
                                 if (db.getRoutine(routineName) == null) {
                                     db.insertRoutine(userId, routineName, routineDesc, totalWorkouts);
-                                    databaseUpdated = "added";
-                                }
-                                else {
-                                    int routineId = Integer.parseInt(routineObj.getString("routine_id"));
-                                    db.updateRoutine( routineId, routineName, routineDesc, totalWorkouts);
-                                    databaseUpdated = "updated";
                                 }
 
                                 for (int j = 0 ; j < totalWorkouts; j++)
@@ -96,11 +96,6 @@ public class RoutineService extends IntentService {
                                     {
                                         db.insertRoutineWorkout(routineId, workoutId);
                                     }
-                                    else
-                                    {
-                                        int routineWorkoutId = Integer.parseInt(routineWorkoutObj.getString("routine_workout_id"));
-                                        db.updateRoutineWorkout(routineWorkoutId, routineId, workoutId);
-                                    }
 
                                     i++;
                                     JSONObject nextObj = response.getJSONObject(i);
@@ -111,11 +106,6 @@ public class RoutineService extends IntentService {
                                     {
                                         db.insertWorkout(nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration"), totalExercises);
                                     }
-                                    else
-                                    {
-                                        db.updateWorkout(workoutId, nextObj.getString("workout_name"), nextObj.getString("description"), nextObj.getDouble("duration"), totalExercises);
-                                    }
-
 
                                     listOfExercises.clear();
                                     WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
@@ -150,14 +140,10 @@ public class RoutineService extends IntentService {
 
                                             if (db.getWorkoutExercise(exerciseObj.getInt("workout_exercise_id")) == null)
                                             {
-                                                db.insertWorkoutExercise(exerciseObj.getInt("workout_id"), exerciseObj.getInt("exercise_id"),
+                                                db.insertWorkoutExercise(workoutId, exerciseObj.getInt("exercise_id"),
                                                         Integer.parseInt(strMinSets), Integer.parseInt(strMinReps), Integer.parseInt(strMaxSets), Integer.parseInt(strMaxReps));
                                             }
-                                            else
-                                            {
-                                                db.updateWorkoutExcercise(workoutId, exerciseObj.getInt("workout_id"), exerciseObj.getInt("exercise_id"),
-                                                        Integer.parseInt(strMinSets), Integer.parseInt(strMinReps), Integer.parseInt(strMaxSets), Integer.parseInt(strMaxReps));
-                                            }
+
                                         }
                                         else
                                         {
@@ -167,9 +153,7 @@ public class RoutineService extends IntentService {
                                             {
                                                 db.insertExercise(exerciseName);
                                             }
-                                            else {
-                                                db.updateExerciseName(exerciseName);
-                                            }
+
                                             //Create ExerciseModel for Workout
                                             ExerciseModel exerciseModel = new ExerciseModel(exerciseName);
                                             workoutExerciseModel.setExercise(exerciseModel);
@@ -191,25 +175,13 @@ public class RoutineService extends IntentService {
                             //intent.setAction("action");
                             //SystemClock.sleep(3000);
                             //String echoMessage = "IntentService after a pause of 3 seconds echoes " + message;
-                            if (databaseUpdated != null)
-                            {
-                                Intent intent = new Intent("action");
-                                intent.putExtra("updatedRoutines", routineModels);
+                            Intent intent = new Intent("action");
+                            intent.putExtra("updatedRoutines", routineModels);
+                            intent.putExtra("message", "Default routines added");
 
-                                if (databaseUpdated.equals("added"))
-                                {
-                                    intent.putExtra("message", "New Default Routine added");
-                                }
-                                else if (databaseUpdated.equals("updated")) {
-                                    intent.putExtra("message", "Default Routines were automatically updated");
-                                }
-
-                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-                            }
+                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
                             db.closeDB();
-
                         }
                         catch (JSONException e)
                         {
@@ -223,6 +195,8 @@ public class RoutineService extends IntentService {
         });
 
         queue.add(jsObjRequest);
+
+        printLocalDatabase();
     }
 
     private void printLocalDatabase()

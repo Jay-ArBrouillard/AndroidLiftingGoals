@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -95,22 +96,44 @@ public class LoginActivity extends AppCompatActivity {
                 Response.Listener<JSONArray>() {
                     public void onResponse(JSONArray response) {
                         try {
-                            JSONObject jso = response.getJSONObject(0);
-                            if (jso.has("ErrorStatus")) {
-                                String errorStatus = jso.getString("ErrorStatus");
-                                if (errorStatus.equals("UserNonExisting")) {
-                                    loadToast.error();
-                                    Toast.makeText(getApplicationContext(), "The username you typed in doesn't exist", Toast.LENGTH_LONG).show();
-                                } else if (errorStatus.equals("PasswordIncorrect")) {
-                                    loadToast.error();
-                                    Toast.makeText(getApplicationContext(), "Password is incorrect", Toast.LENGTH_LONG).show();
-                                }
+                            JSONObject jso1 = response.getJSONObject(0);
+                            String status = null;
+
+                            if (response.length() == 2)
+                            {
+                                JSONObject jso2 = response.getJSONObject(1);
+                                status = jso2.getString("Status");
+                            }
+                            else
+                            {
+                                status = jso1.getString("Status");
+                            }
+
+                            if (status.equals("UserNonExisting")) {
+                                loadToast.error();
+                                Toast.makeText(getApplicationContext(), "The username you typed in doesn't exist", Toast.LENGTH_LONG).show();
+                            } else if (status.equals("PasswordIncorrect")) {
+                                loadToast.error();
+                                Toast.makeText(getApplicationContext(), "Password is incorrect", Toast.LENGTH_LONG).show();
                             }
                             else
                             {
                                 loadToast.success();
                                 Toast.makeText(getApplicationContext(), "Successful login: " + userNameInput, Toast.LENGTH_LONG).show();
                                 Intent startMainActivity = new Intent(LoginActivity.this, RoutineActivity.class);
+                                startMainActivity.putExtra("username", userNameInput);
+                                if (status.equals("firstLogin"))
+                                {
+                                    startMainActivity.putExtra("firstLogin", true);
+                                    Log.d("LoginActivity", "True");
+
+                                }
+                                else
+                                {
+                                    startMainActivity.putExtra("firstLogin", false);
+                                    Log.d("LoginActivity", "False");
+
+                                }
                                 startActivity(startMainActivity);
                                 finish();   //Prevent user from pressing back button and going to login page
                             }
