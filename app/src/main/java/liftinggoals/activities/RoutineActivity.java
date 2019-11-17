@@ -4,9 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -20,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import net.steamcrafted.loadtoast.LoadToast;
+
 import java.util.ArrayList;
 
 import liftinggoals.Services.RoutineService;
@@ -30,6 +35,7 @@ import liftinggoals.classes.RoutineWorkoutModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
+import liftinggoals.misc.DefaultRoutineDialog;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class RoutineActivity extends AppCompatActivity {
@@ -42,6 +48,8 @@ public class RoutineActivity extends AppCompatActivity {
     private ResponseReceiver myReceiver;
     private String username;
     private boolean isFirstLogin;
+    private Button fetchButton;
+    private LoadToast loadToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +59,8 @@ public class RoutineActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
         username = getIntent().getStringExtra("username");
         isFirstLogin = getIntent().getBooleanExtra("firstLogin", false);
+        loadToast = new LoadToast(this);
+
 
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
@@ -61,6 +71,20 @@ public class RoutineActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+
+        fetchButton = findViewById(R.id.fetch_remote_data);
+        fetchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadToast.setText("Fetching default routines...");
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                loadToast.setTranslationY(displayMetrics.heightPixels/2);
+                loadToast.setBorderWidthDp(100);
+                DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, loadToast);
+                dialog.show(getSupportFragmentManager(), "Routine Dialog");
+            }
+        });
 
         //If it is the first Login Start service to get default routines
         if (isFirstLogin)
@@ -84,11 +108,12 @@ public class RoutineActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //String message = intent.getStringExtra("broadcastMessage");
-            //Log.d("RoutineActivity" , "Broadcasting message: " + message);
             Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
             routineModels = intent.getParcelableArrayListExtra("updatedRoutines");
-            adapter.notifyDataSetChanged();
+            initializeRecyclerView();
+            initializeActionSearch();
+            initializeSwipe();
+            loadToast.success();
         }
     }
 
@@ -269,7 +294,6 @@ public class RoutineActivity extends AppCompatActivity {
             }
         }).attachToRecyclerView(recyclerView);
     }
-
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

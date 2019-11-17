@@ -2,6 +2,7 @@ package liftinggoals.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -18,6 +19,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import net.steamcrafted.loadtoast.LoadToast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -195,8 +198,6 @@ public class RoutineService extends IntentService {
         });
 
         queue.add(jsObjRequest);
-
-        printLocalDatabase();
     }
 
     private void printLocalDatabase()

@@ -2,7 +2,7 @@ CREATE TABLE UserExerciseLog (
 	user_exercise_log_id int NOT NULL AUTO_INCREMENT,
 	user_routine_id int NOT NULL,
 	workout_exercise_id int NOT NULL,
-	sets_performed int DEFAULT '0',
+	set_performed int NOT NULL,
 	reps_performed int DEFAULT '0',
 	intensity double DEFAULT '0',
 	rating_perceived_exertion double DEFAULT NULL,

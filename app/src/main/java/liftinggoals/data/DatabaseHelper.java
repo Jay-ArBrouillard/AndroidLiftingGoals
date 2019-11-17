@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import java.util.List;
 
+import liftinggoals.classes.ExerciseLogModel;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RecordModel;
 import liftinggoals.classes.RoutineModel;
@@ -15,7 +16,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 22;
+    public static final int DATABASE_VERSION = 41;
 
     public SQLiteDatabase myDB;
 
@@ -32,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(WorkoutsTable.SQL_CREATE_WORKOUT_TABLE);
         db.execSQL(WorkoutExercisesTable.SQL_CREATE_WORKOUT_EXERCISES_TABLE);
         db.execSQL(ExercisesTable.SQL_CREATE_EXERCISE_TABLE);
+        db.execSQL(ExerciseLogTable.SQL_CREATE_EXERCISE_LOG_TABLE);
     }
 
     @Override
@@ -42,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(WorkoutsTable.SQL_DROP_WORKOUT_TABLE);
         db.execSQL(WorkoutExercisesTable.SQL_DROP_WORKOUT_EXERCISES_TABLE);
         db.execSQL(ExercisesTable.SQL_DROP_EXERCISE_TABLE);
+        db.execSQL(ExerciseLogTable.SQL_DROP_EXERCISE_LOG_TABLE);
         onCreate(db);
     }
 
@@ -199,7 +202,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////EXERCISE METHODS ///////////////////////////////////////////////////
 
-
     public long insertExercise(String exerciseName)
     {
         return ExercisesTable.insert(myDB, exerciseName);
@@ -254,6 +256,20 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public List<RecordModel> getAllRecords()
     {
         return RecordsTable.getAllRecords(myDB);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////EXERCISE LOG METHODS ///////////////////////////////////////////////////
+
+    public long insertExerciseLog(ExerciseLogModel exerciseLogModel)
+    {
+        return ExerciseLogTable.insert(myDB, exerciseLogModel);
+    }
+
+    public List<ExerciseLogModel> getAllExerciseLogs()
+    {
+        return ExerciseLogTable.getAllExercisesLogs(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
