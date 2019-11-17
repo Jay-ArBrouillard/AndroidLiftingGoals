@@ -123,20 +123,8 @@ public class ExerciseActivity extends AppCompatActivity {
     private void initializeLineGraph()
     {
         lineChart = findViewById(R.id.line_graph);
-        lineChart.setDragEnabled(true);
         lineChart.setScaleEnabled(true);
-
-//        entries.add(new Entry(0,945f));
-//        entries.add(new Entry(1,1040f));
-//        entries.add(new Entry(2,1133f));
-//        entries.add(new Entry(3,1240f));
-//        entries.add(new Entry(4,1369f));
-//        entries.add(new Entry(5,1487f));
-//        entries.add(new Entry(6,1501f));
-//        entries.add(new Entry(7,1645f));
-//        entries.add(new Entry(8,1578f));
-//        entries.add(new Entry(9,1695f));
-
+        lineChart.setDragEnabled(true);
 
         LineDataSet lineDataSet = new LineDataSet(entries, "Weight");
         lineDataSet.setFillAlpha(110);
@@ -149,7 +137,7 @@ public class ExerciseActivity extends AppCompatActivity {
         LineData data = new LineData(dataSets);
 
         lineChart.setVisibility(View.VISIBLE);
-        //lineChart.animateY(1000);
+        lineChart.animateY(100);
         lineChart.setData(data);
         lineChart.invalidate();
 
