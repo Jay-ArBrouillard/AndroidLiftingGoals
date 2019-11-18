@@ -138,7 +138,9 @@ public class WorkoutExercisesTable {
 
     public static List<Integer> getAllWorkoutExerciseIdsByExerciseId(SQLiteDatabase myDB, int exerciseId)
     {
-        String query = "SELECT " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " FROM " + WorkoutExercisesEntry.TABLE_NAME + " WHERE " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " = ?";
+        //List<WorkoutExerciseModel> temp = getAllWorkoutExercises(myDB);
+
+        String query = "SELECT " + WorkoutExercisesEntry._ID + " FROM " + WorkoutExercisesEntry.TABLE_NAME + " WHERE " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " = ?";
 
         Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});
 
@@ -151,7 +153,7 @@ public class WorkoutExercisesTable {
             ArrayList<Integer> workoutExerciseIds = new ArrayList<>();
 
             while(c.moveToNext()){
-                workoutExerciseIds.add(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_EXERCISE_ID)));
+                workoutExerciseIds.add(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry._ID)));
             }
 
             return workoutExerciseIds;

@@ -10,6 +10,8 @@ public class ExerciseLogModel {
     private double rpe;
     private double restDuration;
     private String tempo;
+    private String date;
+
 
     public ExerciseLogModel() {
     }
@@ -85,4 +87,8 @@ public class ExerciseLogModel {
     public void setTempo(String tempo) {
         this.tempo = tempo;
     }
+
+    public String getDate() { return date; }
+
+    public void setDate(String date) { this.date = date; }
 }

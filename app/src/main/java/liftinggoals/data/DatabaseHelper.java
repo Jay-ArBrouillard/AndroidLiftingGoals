@@ -18,7 +18,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 43;
+    public static final int DATABASE_VERSION = 46;
 
     public SQLiteDatabase myDB;
 
@@ -287,7 +287,12 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
         for (Integer id : ids)
         {
-            results.addAll(getExercisesLogsByWorkoutExerciseId(id));
+            List<ExerciseLogModel> temp = getExercisesLogsByWorkoutExerciseId(id);
+
+            if (temp != null && temp.size() > 0)
+            {
+                results.addAll(temp);
+            }
         }
 
         return results;

@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -27,8 +28,13 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import liftinggoals.adapters.ProgressExerciseAdapter;
 import liftinggoals.classes.ExerciseLogModel;
@@ -60,19 +66,27 @@ public class ProgressGraphActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
         db.openDB();
 
-        ArrayList<ProgressExerciseModel> list = new ArrayList<>();
 
-        exerciseLogModels = (ArrayList<ExerciseLogModel>) db.getExercisesLogsByExerciseId(exerciseId);
+        List<ExerciseLogModel> temp = db.getExercisesLogsByExerciseId(exerciseId);
+        if (temp == null || temp.size() == 0)
+        {
+            exerciseLogModels = new ArrayList<>();
+        }
+        else
+        {
+            exerciseLogModels = (ArrayList<ExerciseLogModel>) db.getExercisesLogsByExerciseId(exerciseId);
+        }
+
         ArrayList<ProgressExerciseModel> exerciseModels = new ArrayList<>();
         for (int i = 0; i < exerciseLogModels.size(); i++)
         {
             ProgressExerciseModel newItem = new ProgressExerciseModel();
-            String iValue = Integer.toString(i+1) + ". ";
+            String iValue = (i+1) + ". ";
             newItem.setIndex(iValue);
             newItem.setExerciseName(exerciseName);
             StringBuilder specsBuilder = new StringBuilder();
             newItem.setSpecs(processString(exerciseLogModels.get(i), specsBuilder));
-            newItem.setTime("Test time");
+            newItem.setTime(formatDateTime(this, exerciseLogModels.get(i).getDate()));
 
             exerciseModels.add(newItem);
         }
@@ -93,6 +107,35 @@ public class ProgressGraphActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_progress_graph_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+    }
+
+    public static String formatDateTime(Context context, String timeToFormat) {
+
+        String finalDateTime = "";
+
+        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date date = null;
+        if (timeToFormat != null) {
+            try {
+                date = iso8601Format.parse(timeToFormat);
+            } catch (ParseException e) {
+                date = null;
+            }
+
+            if (date != null) {
+                long when = date.getTime();
+                int flags = 0;
+                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
+                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
+                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
+                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
+
+                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
+                        when + TimeZone.getDefault().getOffset(when), flags);
+            }
+        }
+        return finalDateTime;
     }
 
     private void calculateGeneralStatistics()
@@ -148,7 +191,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
         stringBuilder.append(set);
         stringBuilder.append(reps);
 
-        if (rpe != -1 || rpe != 0)
+        if (rpe != -1 && rpe != 0)
         {
             stringBuilder.append(" (").append(rpe).append(")");
         }

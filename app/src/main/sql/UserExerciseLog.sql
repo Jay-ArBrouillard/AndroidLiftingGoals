@@ -8,6 +8,7 @@ CREATE TABLE UserExerciseLog (
 	rating_perceived_exertion double DEFAULT NULL,
 	rest_duration double DEFAULT '0',
 	tempo varchar(50) DEFAULT NULL,
+	date_performed datetime NOT NULL,
 	PRIMARY KEY (user_exercise_log_id),
 	FOREIGN KEY (user_routine_id) REFERENCES UserRoutines(user_routine_id),
 	FOREIGN KEY (workout_exercise_id) REFERENCES WorkoutExercises(workout_exercise_id)

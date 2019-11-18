@@ -22,7 +22,8 @@ public class ExerciseLogTable {
             ExerciseLogEntry.COLUMN_INTENSITY + " REAL, " +
             ExerciseLogEntry.COLUMN_RPE + " REAL, " +
             ExerciseLogEntry.COLUMN_REST_DURATION + " REAL, " +
-            ExerciseLogEntry.COLUMN_TEMPO + " TEXT" +
+            ExerciseLogEntry.COLUMN_TEMPO + " TEXT, " +
+            ExerciseLogEntry.COLUMN_DATE_PERFORMED + " TEXT" +
             ");";
     public static final String SQL_DROP_EXERCISE_LOG_TABLE = "DROP TABLE IF EXISTS " + ExerciseLogEntry.TABLE_NAME;
 
@@ -36,6 +37,7 @@ public class ExerciseLogTable {
         public static final String COLUMN_RPE = "rating_perceived_exertion";
         public static final String COLUMN_REST_DURATION = "rest_duration";
         public static final String COLUMN_TEMPO = "tempo";
+        public static final String COLUMN_DATE_PERFORMED = "date_performed";
     }
     public static long insert(SQLiteDatabase myDB, ExerciseLogModel entity)
     {
@@ -47,6 +49,7 @@ public class ExerciseLogTable {
         //values.put(ExerciseLogEntry.COLUMN_RPE, entity.getRpe());
         //values.put(ExerciseLogEntry.COLUMN_REST_DURATION, entity.getRestDuration());
         //values.put(ExerciseLogEntry.COLUMN_TEMPO, entity.getTempo());
+        values.put(ExerciseLogEntry.COLUMN_DATE_PERFORMED, entity.getDate());
 
         return myDB.insert(ExerciseLogEntry.TABLE_NAME, null, values);
     }
@@ -90,6 +93,7 @@ public class ExerciseLogTable {
                 exerciseLogModel.setRpe(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_RPE)));
                 exerciseLogModel.setRestDuration(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REST_DURATION)));
                 exerciseLogModel.setTempo(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_TEMPO)));
+                exerciseLogModel.setDate(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_DATE_PERFORMED)));
                 exercises.add(exerciseLogModel);
             }
 
@@ -124,6 +128,7 @@ public class ExerciseLogTable {
                 exerciseLogModel.setRpe(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_RPE)));
                 exerciseLogModel.setRestDuration(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REST_DURATION)));
                 exerciseLogModel.setTempo(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_TEMPO)));
+                exerciseLogModel.setDate(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_DATE_PERFORMED)));
                 exercises.add(exerciseLogModel);
             }
 

@@ -62,6 +62,10 @@ public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.Exerci
 
     public ProgressAdapter(ArrayList<ExerciseModel> exerciseItems)
     {
+        if (exerciseItems == null)
+        {
+            exerciseItems = new ArrayList<>();
+        }
         this.exerciseItems = exerciseItems;
     }
 

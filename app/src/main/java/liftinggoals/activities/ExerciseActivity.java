@@ -28,8 +28,12 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.TimeZone;
 
 import liftinggoals.classes.ExerciseLogModel;
 import liftinggoals.classes.ExerciseModel;
@@ -70,6 +74,8 @@ public class ExerciseActivity extends AppCompatActivity {
         logButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                logButton.setEnabled(false);    //Prevent double button click
+
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
                 exerciseLogModel.setWorkoutExeriseId(exerciseList.get(exerciseSpinner.getSelectedItemPosition()).getWorkoutExerciseId());
                 TextView set = findViewById(R.id.exercise_activity_set_value);
@@ -77,13 +83,19 @@ public class ExerciseActivity extends AppCompatActivity {
                 EditText weight = findViewById(R.id.exercise_activity_weight_value);
 
                 try {
-                    int setInteger = Integer.parseInt(set.getText().toString());
-                    exerciseLogModel.setSetPerformed(setInteger);
+                    int index = Integer.parseInt(set.getText().toString());
+                    exerciseLogModel.setSetPerformed(index);
                     exerciseLogModel.setRepsPerformed(Integer.parseInt(reps.getText().toString().trim()));
                     exerciseLogModel.setIntensity(Double.parseDouble(weight.getText().toString().trim()));
 
-                    setInteger++;
-                    set.setText(Integer.toString(setInteger));
+                    TimeZone tz = TimeZone.getTimeZone("UTC");
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+                    df.setTimeZone(tz);
+                    String nowAsISO = df.format(new Date());
+                    exerciseLogModel.setDate(nowAsISO);
+
+                    index++;
+                    set.setText(Integer.toString(index));
 
                     db.insertExerciseLog(exerciseLogModel);
                     buildLineGraph(exerciseList.get(exerciseSpinner.getSelectedItemPosition()));
@@ -94,6 +106,7 @@ public class ExerciseActivity extends AppCompatActivity {
                 {
                     Toast.makeText(getApplicationContext(), "Type in a valid value for weight and reps", Toast.LENGTH_LONG).show();
                 }
+                logButton.setEnabled(true);    //Prevent double button click
             }
         });
 
@@ -124,10 +137,6 @@ public class ExerciseActivity extends AppCompatActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
-    private void logButtonEvent()
-    {
-
-    }
 
     private String processString(WorkoutExerciseModel e, StringBuilder stringBuilder)
     {

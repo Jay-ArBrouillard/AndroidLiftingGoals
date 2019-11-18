@@ -3,14 +3,18 @@ package liftinggoals.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -38,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private DatabaseHelper databaseHelper;
+    private CheckBox rememberMe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,23 @@ public class LoginActivity extends AppCompatActivity {
         registerButton = findViewById(R.id.register_button);
         username = findViewById(R.id.username_edit_text);
         password = findViewById(R.id.password_edit_text);
+
+        //Remember me
+        rememberMe = findViewById(R.id.login_activity_checkbox);
+        SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
+        String savedUser = sp.getString("usernameSaved", null);
+        String savedPass = sp.getString("passwordSaved", null);
+        if (savedUser != null && savedPass != null)
+        {
+            username.setText(savedUser);
+            password.setText(savedPass);
+            rememberMe.setChecked(true);
+        }
+        else
+        {
+            rememberMe.setChecked(false);
+        }
+
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
@@ -120,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                             {
                                 loadToast.success();
                                 Toast.makeText(getApplicationContext(), "Successful login: " + userNameInput, Toast.LENGTH_LONG).show();
+
                                 Intent startMainActivity = new Intent(LoginActivity.this, RoutineActivity.class);
                                 startMainActivity.putExtra("username", userNameInput);
                                 if (status.equals("firstLogin"))
@@ -134,6 +157,22 @@ public class LoginActivity extends AppCompatActivity {
                                     Log.d("LoginActivity", "False");
 
                                 }
+
+                                //Remember me
+                                SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
+                                if (rememberMe.isChecked())
+                                {
+                                    SharedPreferences.Editor editor = sp.edit();
+                                    editor.putString("usernameSaved", userNameInput);
+                                    editor.putString("passwordSaved", passwordInput);
+                                    editor.commit();
+                                }
+                                else
+                                {
+                                    sp.edit().clear();
+                                }
+
+
                                 startActivity(startMainActivity);
                                 finish();   //Prevent user from pressing back button and going to login page
                             }
