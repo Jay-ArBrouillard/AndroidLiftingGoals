@@ -136,6 +136,28 @@ public class WorkoutExercisesTable {
         }
     }
 
+    public static List<Integer> getAllWorkoutExerciseIdsByExerciseId(SQLiteDatabase myDB, int exerciseId)
+    {
+        String query = "SELECT " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " FROM " + WorkoutExercisesEntry.TABLE_NAME + " WHERE " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<Integer> workoutExerciseIds = new ArrayList<>();
+
+            while(c.moveToNext()){
+                workoutExerciseIds.add(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_EXERCISE_ID)));
+            }
+
+            return workoutExerciseIds;
+        }
+    }
+
     public static List<WorkoutExerciseModel> getAllWorkoutExercises(SQLiteDatabase myDB)
     {
         String query = "SELECT * FROM " + WorkoutExercisesEntry.TABLE_NAME;

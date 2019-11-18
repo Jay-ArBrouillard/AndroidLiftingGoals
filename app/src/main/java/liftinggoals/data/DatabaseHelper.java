@@ -3,6 +3,8 @@ package liftinggoals.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import liftinggoals.classes.ExerciseLogModel;
@@ -193,6 +195,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return WorkoutExercisesTable.getAllWorkoutExercisesByWorkoutId(myDB, workoutId);
     }
 
+    public List<Integer> getAllWorkoutExerciseIdsByExerciseId(int exerciseId)
+    {
+        return WorkoutExercisesTable.getAllWorkoutExerciseIdsByExerciseId(myDB, exerciseId);
+    }
+
     public List<WorkoutExerciseModel> getAllWorkoutExercises()
     {
         return WorkoutExercisesTable.getAllWorkoutExercises(myDB);
@@ -270,6 +277,20 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public List<ExerciseLogModel> getExercisesLogsByWorkoutExerciseId(int workoutExerciseId)
     {
         return ExerciseLogTable.getExercisesLogsByWorkoutExerciseId(myDB, workoutExerciseId);
+    }
+
+    public List<ExerciseLogModel> getExercisesLogsByExerciseId(int exerciseId)
+    {
+        List<ExerciseLogModel> results = new ArrayList<>();
+
+        List<Integer> ids = getAllWorkoutExerciseIdsByExerciseId(exerciseId);
+
+        for (Integer id : ids)
+        {
+            results.addAll(getExercisesLogsByWorkoutExerciseId(id));
+        }
+
+        return results;
     }
 
     public List<ExerciseLogModel> getAllExerciseLogs()

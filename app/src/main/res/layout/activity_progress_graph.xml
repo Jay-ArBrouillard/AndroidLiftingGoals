@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="liftinggoals.activities.ProgressGraphActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/activity_progress_graph_bottom_navigation">
+
+        <TextView
+            android:id="@+id/activity_progress_graph_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exercise Name"
+            android:textColor="@android:color/white"
+            android:background="@android:color/black"
+            android:paddingLeft="10dp"
+            android:textSize="40sp" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/activity_progress_graph_line_chart"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@android:color/black"
+            android:layout_below="@+id/activity_progress_graph_title">
+        </com.github.mikephil.charting.charts.LineChart>
+
+        <LinearLayout
+            android:id="@+id/activity_progress_graph_general_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:background="@android:color/black"
+            android:weightSum="5.5"
+            android:layout_below="@+id/activity_progress_graph_line_chart">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_volume_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="0 lb"/>
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_volume_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="Volume"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_estimated_1rm_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="0 lb"/>
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_estimated_1rm_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="Estimated 1RM"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_1rm_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="0 lb"/>
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_1rm_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="MAX WEIGHT"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:textSize="15dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_sets_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="0"/>
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_sets_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="SETS"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_reps_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="0"/>
+
+                <TextView
+                    android:id="@+id/activity_progress_graph_reps_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="REPS"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:textSize="15dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/activity_progress_graph_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_marginBottom="4dp"
+            android:scrollbars="vertical"
+            android:layout_below="@+id/activity_progress_graph_general_stats">
+        </androidx.recyclerview.widget.RecyclerView>
+
+
+
+    </RelativeLayout>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/activity_progress_graph_bottom_navigation">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rep Records"
+            android:background="@android:color/darker_gray"
+            android:textColor="@android:color/white">
+        </TextView>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/activity_progress_graph_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="4dp"
+        app:itemIconTint="@color/colorPrimary"
+        app:itemTextColor="@color/colorPrimary"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_navigation" />
+
+</RelativeLayout>

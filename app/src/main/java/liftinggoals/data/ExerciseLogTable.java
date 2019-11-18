@@ -97,6 +97,9 @@ public class ExerciseLogTable {
         }
     }
 
+
+
+
     public static List<ExerciseLogModel> getAllExercisesLogs(SQLiteDatabase myDB)
     {
         String query = "SELECT * FROM " + ExerciseLogEntry.TABLE_NAME;

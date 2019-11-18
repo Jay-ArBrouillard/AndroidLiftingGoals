@@ -15,23 +15,26 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
-import liftinggoals.adapters.ExerciseAdapter;
+import liftinggoals.adapters.ProgressAdapter;
 import liftinggoals.adapters.VolumeAdapter;
+import liftinggoals.classes.ExerciseLogModel;
 import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.ProgressExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 import liftinggoals.classes.VolumeGroupModel;
 
 public class ProgressActivity extends AppCompatActivity {
-    public ArrayList<VolumeGroupModel> volumeGroups;
+    private ArrayList<VolumeGroupModel> volumeGroups;
     private RecyclerView volumeRecyclerView;
     private RecyclerView.Adapter volumeAdapter;
     private RecyclerView.LayoutManager volumeLayoutManager;
-    public ArrayList<ExerciseModel> exercisesList;
+    private ArrayList<ExerciseModel> exercisesList;
     private RecyclerView exerciseRecyclerView;
-    private RecyclerView.Adapter exerciseAdapter;
+    private ProgressAdapter exerciseAdapter;
     private RecyclerView.LayoutManager exerciseLayoutManager;
     private SearchView search;
+    private DatabaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +42,9 @@ public class ProgressActivity extends AppCompatActivity {
 
         volumeGroups = new ArrayList<>();
         exercisesList = new ArrayList<>();
+
+        db = new DatabaseHelper(this);
+        db.openDB();
 
         initializeRecyclerView();
 
@@ -57,7 +63,8 @@ public class ProgressActivity extends AppCompatActivity {
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Chest"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Hamstrings"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Legs"));
-        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Quads"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Quadriceps"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Trapezius"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Triceps"));
 
         volumeLayoutManager = new LinearLayoutManager(this);
@@ -74,12 +81,24 @@ public class ProgressActivity extends AppCompatActivity {
         exercisesList = (ArrayList<ExerciseModel>) db.getAllExercises();
 
         exerciseLayoutManager = new LinearLayoutManager(this);
-        exerciseAdapter = new ExerciseAdapter(exercisesList);
+        exerciseAdapter = new ProgressAdapter(exercisesList);
         exerciseRecyclerView.setLayoutManager(exerciseLayoutManager);
         exerciseRecyclerView.setAdapter(exerciseAdapter);
 
+        exerciseAdapter.setOnItemClickListener(new ProgressAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(ProgressActivity.this, ProgressGraphActivity.class);
+                intent.putExtra("exercise_id", exercisesList.get(position).getExerciseId());
+                intent.putExtra("exercise_name", exercisesList.get(position).getExerciseName());
+                startActivity(intent);
+            }
+        });
+
         db.closeDB();
     }
+
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
