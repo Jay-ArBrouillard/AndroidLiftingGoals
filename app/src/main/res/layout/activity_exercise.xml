@@ -47,7 +47,7 @@
             android:id="@+id/line_graph"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="200dp"
+            android:minHeight="300dp"
             android:layout_weight="4"
             android:layout_below="@+id/activity_exercise_top_bar" />
 
@@ -61,7 +61,7 @@
             android:layout_below="@id/line_graph">
 
             <Spinner
-                android:id="@+id/exercise_selection"
+                android:id="@+id/exercise_activity_spinner"
                 android:layout_width="0dp"
                 android:layout_height="45dp"
                 android:layout_weight="7" />

@@ -66,11 +66,11 @@ public class ExerciseLogTable {
         return myDB.delete(ExerciseLogEntry.TABLE_NAME, where, null);
     }
 
-    public static ExerciseModel getExercise(SQLiteDatabase myDB, int exerciseId)
+    public static List<ExerciseLogModel> getExercisesLogsByWorkoutExerciseId(SQLiteDatabase myDB, int id)
     {
-        String query = "SELECT * FROM " + ExerciseLogEntry.TABLE_NAME + " WHERE " + ExerciseLogEntry._ID  + " = ?";
+        String query = "SELECT * FROM " + ExerciseLogEntry.TABLE_NAME + " WHERE " + ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(id)});
 
         if (c.getCount() == 0)
         {
@@ -78,14 +78,22 @@ public class ExerciseLogTable {
         }
         else
         {
-            ExerciseModel exerciseModel = new ExerciseModel();
+            ArrayList<ExerciseLogModel> exercises = new ArrayList<>();
 
             while(c.moveToNext()){
-                exerciseModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry._ID)));
-                //exerciseModel.setExerciseName(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_EXERCISE_NAME)));
+                ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
+                exerciseLogModel.setUserExerciseLogId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry._ID)));
+                exerciseLogModel.setWorkoutExeriseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID)));
+                exerciseLogModel.setSetPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_SET_PERFORMED)));
+                exerciseLogModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REPS_PERFORMED)));
+                exerciseLogModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_INTENSITY)));
+                exerciseLogModel.setRpe(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_RPE)));
+                exerciseLogModel.setRestDuration(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REST_DURATION)));
+                exerciseLogModel.setTempo(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_TEMPO)));
+                exercises.add(exerciseLogModel);
             }
 
-            return exerciseModel;
+            return exercises;
         }
     }
 

@@ -16,7 +16,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 41;
+    public static final int DATABASE_VERSION = 43;
 
     public SQLiteDatabase myDB;
 
@@ -265,6 +265,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public long insertExerciseLog(ExerciseLogModel exerciseLogModel)
     {
         return ExerciseLogTable.insert(myDB, exerciseLogModel);
+    }
+
+    public List<ExerciseLogModel> getExercisesLogsByWorkoutExerciseId(int workoutExerciseId)
+    {
+        return ExerciseLogTable.getExercisesLogsByWorkoutExerciseId(myDB, workoutExerciseId);
     }
 
     public List<ExerciseLogModel> getAllExerciseLogs()
