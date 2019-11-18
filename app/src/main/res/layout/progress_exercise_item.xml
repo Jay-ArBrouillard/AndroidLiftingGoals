@@ -7,7 +7,7 @@
     android:layout_marginTop="0.1dp"
     android:layout_marginBottom="0.1dp"
     android:background="@android:color/white"
-    app:cardCornerRadius="4dp">
+    app:cardElevation="4dp">
 
     <FrameLayout
         android:background="@android:color/black"

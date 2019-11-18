@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/activity_progress_graph_bottom_navigation">
+        android:layout_above="@+id/activity_progress_graph_rep_records_textview">
 
         <TextView
             android:id="@+id/activity_progress_graph_title"
@@ -185,20 +185,16 @@
 
     </RelativeLayout>
 
-    <androidx.cardview.widget.CardView
+    <TextView
+        android:id="@+id/activity_progress_graph_rep_records_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Rep Records"
+        android:textSize="20dp"
+        android:background="@android:color/darker_gray"
+        android:textColor="@android:color/white"
         android:layout_above="@+id/activity_progress_graph_bottom_navigation">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Rep Records"
-            android:background="@android:color/darker_gray"
-            android:textColor="@android:color/white">
-        </TextView>
-
-    </androidx.cardview.widget.CardView>
+    </TextView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/activity_progress_graph_bottom_navigation"
