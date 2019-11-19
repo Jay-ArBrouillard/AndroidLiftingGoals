@@ -19,8 +19,8 @@ public class RecordsTable {
             RecordEntry.COLUMN_USER_ID + " INTEGER NOT NULL, " +
             RecordEntry.COLUMN_EXERCISE_ID + " INTEGER NOT NULL, " +
             RecordEntry.COLUMN_INTENSITY + " REAL DEFAULT 0, " +
-            RecordEntry.COLUMN_REPS_PERFORMED + " INTEGER DEFAULT 0" +
-
+            RecordEntry.COLUMN_REPS_PERFORMED + " INTEGER DEFAULT 0, " +
+            RecordEntry.COLUMN_DATE_PERFORMED + " TEXT NOT NULL" +
             ");";
     public static final String SQL_DROP_RECORDS_TABLE = "DROP TABLE IF EXISTS " + RecordEntry.TABLE_NAME;
 
@@ -32,28 +32,31 @@ public class RecordsTable {
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
         public static final String COLUMN_INTENSITY = "intensity";
         public static final String COLUMN_REPS_PERFORMED = "reps_performed";
+        public static final String COLUMN_DATE_PERFORMED = "date_performed";
     }
 
-    public static long insert(SQLiteDatabase myDB, int userId, int exercise_id, double intensity, int reps)
+    public static long insert(SQLiteDatabase myDB, int userId, int exercise_id, double intensity, int reps, String date)
     {
         ContentValues values = new ContentValues();
         values.put(RecordEntry.COLUMN_USER_ID, userId);
         values.put(RecordEntry.COLUMN_EXERCISE_ID, exercise_id);
         values.put(RecordEntry.COLUMN_INTENSITY, intensity);
         values.put(RecordEntry.COLUMN_REPS_PERFORMED, reps);
+        values.put(RecordEntry.COLUMN_DATE_PERFORMED, date);
 
         return myDB.insert(RecordEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int recordId, int userId, int exercise_id, double intensity, int reps)
+    public static long update(SQLiteDatabase myDB, int userId, int exercise_id, double intensity, int reps, String date)
     {
         ContentValues values = new ContentValues();
         values.put(RecordEntry.COLUMN_USER_ID, userId);
         values.put(RecordEntry.COLUMN_EXERCISE_ID, exercise_id);
         values.put(RecordEntry.COLUMN_INTENSITY, intensity);
         values.put(RecordEntry.COLUMN_REPS_PERFORMED, reps);
+        values.put(RecordEntry.COLUMN_DATE_PERFORMED, date);
 
-        return myDB.update(RecordEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(recordId)});
+        return myDB.update(RecordEntry.TABLE_NAME, values, "reps_performed = ?", new String[] {Integer.toString(reps)});
     }
 
     public static long delete(SQLiteDatabase myDB, int id)
@@ -81,11 +84,41 @@ public class RecordsTable {
                 recordModel.setRecordId(c.getInt(c.getColumnIndexOrThrow(RecordEntry._ID)));
                 recordModel.setUserId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_USER_ID)));
                 recordModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_EXERCISE_ID)));
-                recordModel.setIntensity(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_INTENSITY)));
+                recordModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(RecordEntry.COLUMN_INTENSITY)));
                 recordModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_REPS_PERFORMED)));
+                recordModel.setDate(c.getString(c.getColumnIndexOrThrow(RecordEntry.COLUMN_DATE_PERFORMED)));
             }
 
             return recordModel;
+        }
+    }
+
+    public static List<RecordModel> getRecordsByExerciseId(SQLiteDatabase myDB, int exerciseId)
+    {
+        String query = "SELECT * FROM " + RecordEntry.TABLE_NAME + " WHERE  " + RecordEntry.COLUMN_EXERCISE_ID  + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<RecordModel> records = new ArrayList<>();
+
+            while(c.moveToNext()){
+                RecordModel recordModel = new RecordModel();
+                recordModel.setRecordId(c.getInt(c.getColumnIndexOrThrow(RecordEntry._ID)));
+                recordModel.setUserId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_USER_ID)));
+                recordModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_EXERCISE_ID)));
+                recordModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(RecordEntry.COLUMN_INTENSITY)));
+                recordModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_REPS_PERFORMED)));
+                recordModel.setDate(c.getString(c.getColumnIndexOrThrow(RecordEntry.COLUMN_DATE_PERFORMED)));
+                records.add(recordModel);
+            }
+
+            return records;
         }
     }
 
@@ -108,8 +141,9 @@ public class RecordsTable {
                 recordModel.setRecordId(c.getInt(c.getColumnIndexOrThrow(RecordEntry._ID)));
                 recordModel.setUserId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_USER_ID)));
                 recordModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_EXERCISE_ID)));
-                recordModel.setIntensity(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_INTENSITY)));
+                recordModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(RecordEntry.COLUMN_INTENSITY)));
                 recordModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_REPS_PERFORMED)));
+                recordModel.setDate(c.getString(c.getColumnIndexOrThrow(RecordEntry.COLUMN_DATE_PERFORMED)));
                 records.add(recordModel);
             }
 

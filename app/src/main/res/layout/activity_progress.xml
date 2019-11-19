@@ -43,20 +43,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/routine_fragment_create_a_workout"
+                        android:id="@+id/activity_progress_overall_cardview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/routine_fragment_search"
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="50dp"
+                        android:layout_marginBottom="30dp"
                         android:background="@android:color/black"
+                        android:clickable="true"
                         app:cardCornerRadius="4dp"
                         app:cardElevation="10dp"
                         app:contentPaddingBottom="10dp"
                         app:contentPaddingTop="10dp">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

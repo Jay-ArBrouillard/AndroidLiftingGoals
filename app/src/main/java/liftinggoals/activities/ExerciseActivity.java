@@ -29,6 +29,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import java.util.TimeZone;
 
 import liftinggoals.classes.ExerciseLogModel;
 import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.RecordModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 
@@ -79,27 +81,32 @@ public class ExerciseActivity extends AppCompatActivity {
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
                 exerciseLogModel.setWorkoutExeriseId(exerciseList.get(exerciseSpinner.getSelectedItemPosition()).getWorkoutExerciseId());
                 TextView set = findViewById(R.id.exercise_activity_set_value);
-                EditText reps = findViewById(R.id.exercise_activity_reps_value);
-                EditText weight = findViewById(R.id.exercise_activity_weight_value);
+                EditText repsEditText = findViewById(R.id.exercise_activity_reps_value);
+                EditText weightEditText = findViewById(R.id.exercise_activity_weight_value);
 
                 try {
+                    int selectedIndex = exerciseSpinner.getSelectedItemPosition();
                     int index = Integer.parseInt(set.getText().toString());
-                    exerciseLogModel.setSetPerformed(index);
-                    exerciseLogModel.setRepsPerformed(Integer.parseInt(reps.getText().toString().trim()));
-                    exerciseLogModel.setIntensity(Double.parseDouble(weight.getText().toString().trim()));
+                    int reps = Integer.parseInt(repsEditText.getText().toString().trim());
+                    double weight = Double.parseDouble(weightEditText.getText().toString().trim());
+                    int exerciseId = exerciseList.get(selectedIndex).getExerciseId();
 
-                    TimeZone tz = TimeZone.getTimeZone("UTC");
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+                    exerciseLogModel.setSetPerformed(index);
+                    exerciseLogModel.setRepsPerformed(reps);
+                    exerciseLogModel.setIntensity(weight);
+
+                    TimeZone tz = TimeZone.getDefault();
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
                     df.setTimeZone(tz);
                     String nowAsISO = df.format(new Date());
                     exerciseLogModel.setDate(nowAsISO);
 
                     index++;
                     set.setText(Integer.toString(index));
-
                     db.insertExerciseLog(exerciseLogModel);
-                    buildLineGraph(exerciseList.get(exerciseSpinner.getSelectedItemPosition()));
+                    processRecords(-1, exerciseId, weight, reps, nowAsISO); //Change userId
 
+                    buildLineGraph(exerciseList.get(selectedIndex)); //Do this last
                     //TODO insert in  Remote database
                 }
                 catch (NumberFormatException e)
@@ -137,6 +144,58 @@ public class ExerciseActivity extends AppCompatActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
+    private void processRecords(int userId, int exerciseId, double weight, int reps, String date)
+    {
+        ArrayList<RecordModel> existing = (ArrayList<RecordModel>) db.getAllRecords();
+
+        if (existing == null)
+        {
+            //First Record
+            Toast.makeText(getApplicationContext(), "You logged your first weight: " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
+            db.insertRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
+            return;
+        }
+
+        boolean foundRep = false;
+        for (RecordModel record : existing)
+        {
+            if (record.getRepsPerformed() == reps)
+            {
+                foundRep = true;
+            }
+
+            if (record.getRepsPerformed() == reps && record.getIntensity() < weight)
+            {
+                //New Record
+                Toast.makeText(getApplicationContext(), "Congrats on the PR! " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
+                db.updateRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
+            }
+        }
+
+        if (!foundRep)
+        {
+            //New Record
+            Toast.makeText(getApplicationContext(), "You logged your first weight: " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
+            db.insertRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
+        }
+    }
+
+    public String formatDateTime(String timeToFormat)
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        try {
+            Date dt = formatter.parse(timeToFormat);
+            SimpleDateFormat sd2 = new SimpleDateFormat("EEEE-dd, MMMM, yyyy: hh:mm a");
+            String newDate = sd2.format(dt);
+
+            return newDate;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "No Date Data";
+    }
 
     private String processString(WorkoutExerciseModel e, StringBuilder stringBuilder)
     {

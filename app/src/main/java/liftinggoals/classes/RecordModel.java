@@ -6,6 +6,8 @@ public class RecordModel {
     private int exerciseId;
     private double intensity;
     private int repsPerformed;
+    //For RepRecord
+    private String date;
 
     public RecordModel() {
     }
@@ -48,5 +50,13 @@ public class RecordModel {
 
     public void setRepsPerformed(int repsPerformed) {
         this.repsPerformed = repsPerformed;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

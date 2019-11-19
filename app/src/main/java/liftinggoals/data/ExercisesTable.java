@@ -72,6 +72,30 @@ public class ExercisesTable {
         }
     }
 
+
+    public static ExerciseModel getExerciseByExerciseName(SQLiteDatabase myDB, String exerciseName)
+    {
+        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry.COLUMN_EXERCISE_NAME  + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {exerciseName});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            ExerciseModel exerciseModel = new ExerciseModel();
+
+            while(c.moveToNext()){
+                exerciseModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry._ID)));
+                exerciseModel.setExerciseName(c.getString(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_EXERCISE_NAME)));
+            }
+
+            return exerciseModel;
+        }
+    }
+
     public static List<ExerciseModel> getAllExercises(SQLiteDatabase myDB)
     {
         String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME;

@@ -16,6 +16,16 @@ import liftinggoals.classes.ProgressExerciseModel;
 
 public class ProgressExerciseAdapter extends RecyclerView.Adapter<ProgressExerciseAdapter.ProgressExerciseViewHolder> {
     private ArrayList<ProgressExerciseModel> progressExerciseModels;
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener)
+    {
+        this.listener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
 
     public static class ProgressExerciseViewHolder extends RecyclerView.ViewHolder {
         public TextView index;
@@ -23,12 +33,26 @@ public class ProgressExerciseAdapter extends RecyclerView.Adapter<ProgressExerci
         public TextView specs;
         public TextView time;
 
-        public ProgressExerciseViewHolder(@NonNull View itemView) {
+        public ProgressExerciseViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             index = itemView.findViewById(R.id.activity_progress_exercise_index);
             exerciseName = itemView.findViewById(R.id.activity_progress_exercise_name);
             specs = itemView.findViewById(R.id.activity_progress_exercise_reps_sets);
             time = itemView.findViewById(R.id.activity_progress_exercise_time);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null)
+                    {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION)
+                        {
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -41,7 +65,7 @@ public class ProgressExerciseAdapter extends RecyclerView.Adapter<ProgressExerci
     @Override
     public ProgressExerciseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.progress_exercise_item, parent, false);
-        ProgressExerciseViewHolder pevh = new ProgressExerciseViewHolder(v);
+        ProgressExerciseViewHolder pevh = new ProgressExerciseViewHolder(v, listener);
         return pevh;
     }
 

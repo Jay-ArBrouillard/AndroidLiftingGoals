@@ -18,7 +18,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 46;
+    public static final int DATABASE_VERSION = 56;
 
     public SQLiteDatabase myDB;
 
@@ -36,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(WorkoutExercisesTable.SQL_CREATE_WORKOUT_EXERCISES_TABLE);
         db.execSQL(ExercisesTable.SQL_CREATE_EXERCISE_TABLE);
         db.execSQL(ExerciseLogTable.SQL_CREATE_EXERCISE_LOG_TABLE);
+        db.execSQL(RecordsTable.SQL_CREATE_RECORDS_TABLE);
     }
 
     @Override
@@ -47,6 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(WorkoutExercisesTable.SQL_DROP_WORKOUT_EXERCISES_TABLE);
         db.execSQL(ExercisesTable.SQL_DROP_EXERCISE_TABLE);
         db.execSQL(ExerciseLogTable.SQL_DROP_EXERCISE_LOG_TABLE);
+        db.execSQL(RecordsTable.SQL_DROP_RECORDS_TABLE);
         onCreate(db);
     }
 
@@ -224,6 +226,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return ExercisesTable.delete(myDB, exerciseName);
     }
 
+    public ExerciseModel getExerciseByExerciseName(String exerciseName)
+    {
+        return ExercisesTable.getExerciseByExerciseName(myDB, exerciseName);
+    }
+
 
     public ExerciseModel getExercise(int exerciseId)
     {
@@ -240,14 +247,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
     ////////////////////////////RECORD METHODS /////////////////////////////////////////////////////
 
 
-    public long insertRecord(int userId, int exercise_id, double intensity, int reps)
+    public long insertRecord(int userId, int exercise_id, double intensity, int reps, String date)
     {
-        return RecordsTable.insert(myDB, userId, exercise_id, intensity, reps);
+        return RecordsTable.insert(myDB, userId, exercise_id, intensity, reps, date);
     }
 
-    public long updateRecord(int recordId, int userId, int exercise_id, double intensity, int reps)
+    public long updateRecord(int userId, int exercise_id, double intensity, int reps, String date)
     {
-        return RecordsTable.update(myDB, recordId, userId, exercise_id, intensity, reps);
+        return RecordsTable.update(myDB, userId, exercise_id, intensity, reps, date);
     }
 
     public long deleteRecord(int recordId)
@@ -258,6 +265,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public RecordModel getRecord(int recordId)
     {
         return RecordsTable.getRecord(myDB, recordId);
+    }
+
+    public List<RecordModel> getRecordsByExerciseId(int exerciseId)
+    {
+        return RecordsTable.getRecordsByExerciseId(myDB, exerciseId);
     }
 
     public List<RecordModel> getAllRecords()

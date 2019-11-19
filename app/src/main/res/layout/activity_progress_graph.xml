@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     tools:context="liftinggoals.activities.ProgressGraphActivity">
 
     <RelativeLayout
@@ -181,20 +182,7 @@
             android:layout_below="@+id/activity_progress_graph_general_stats">
         </androidx.recyclerview.widget.RecyclerView>
 
-
-
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/activity_progress_graph_rep_records_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Rep Records"
-        android:textSize="20dp"
-        android:background="@android:color/darker_gray"
-        android:textColor="@android:color/white"
-        android:layout_above="@+id/activity_progress_graph_bottom_navigation">
-    </TextView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/activity_progress_graph_bottom_navigation"
@@ -202,6 +190,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="4dp"
+        android:background="@android:color/white"
         app:itemIconTint="@color/colorPrimary"
         app:itemTextColor="@color/colorPrimary"
         app:labelVisibilityMode="labeled"

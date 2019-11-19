@@ -6,12 +6,10 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -34,31 +32,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import liftinggoals.adapters.ProgressExerciseAdapter;
 import liftinggoals.classes.ExerciseLogModel;
-import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.ProgressExerciseModel;
-import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class ProgressGraphActivity extends AppCompatActivity {
     private DatabaseHelper db;
     private int exerciseId;
     private String exerciseName;
+    private boolean showAllData;
     private RecyclerView progressRecyclerView;
-    private RecyclerView.Adapter progressAdapter;
+    private ProgressExerciseAdapter progressAdapter;
     private RecyclerView.LayoutManager progressLayoutManager;
     private ArrayList<ExerciseLogModel> exerciseLogModels;
     private LineChart lineChart;
     private ArrayList<Entry> entries = new ArrayList<>();
+    private TextView repRecords;
+    private ArrayList<ProgressExerciseModel> progressExerciseModels;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_graph);
+        showAllData = getIntent().getBooleanExtra("overall", false);
         exerciseId = getIntent().getIntExtra("exercise_id", -1);
         exerciseName = getIntent().getStringExtra("exercise_name");
         ((TextView)(findViewById(R.id.activity_progress_graph_title))).setText(exerciseName);
@@ -66,76 +64,117 @@ public class ProgressGraphActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
         db.openDB();
 
+        initializeRecyclerView();
+        calculateGeneralStatistics();
 
-        List<ExerciseLogModel> temp = db.getExercisesLogsByExerciseId(exerciseId);
-        if (temp == null || temp.size() == 0)
+        repRecords = findViewById(R.id.activity_progress_graph_rep_records_textview);
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.activity_progress_graph_bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+    }
+
+    private void initializeRecyclerView()
+    {
+        setRecyclerViewData();
+        progressRecyclerView = findViewById(R.id.activity_progress_graph_recycler_view);
+        progressRecyclerView.setHasFixedSize(true);
+        progressLayoutManager = new LinearLayoutManager(this);
+        progressAdapter = new ProgressExerciseAdapter(progressExerciseModels);
+
+        progressAdapter.setOnItemClickListener(new ProgressExerciseAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(ProgressGraphActivity.this, RepRecordActivity.class);
+                String exerciseName = progressExerciseModels.get(position).getExerciseName();
+                intent.putExtra("exercise_id", db.getExerciseByExerciseName(exerciseName).getExerciseId());
+                intent.putExtra("exercise_name", exerciseName);
+                startActivity(intent);
+            }
+        });
+
+        progressRecyclerView.setLayoutManager(progressLayoutManager);
+        progressRecyclerView.setAdapter(progressAdapter);
+
+        if (progressExerciseModels.size() > 1)
         {
-            exerciseLogModels = new ArrayList<>();
+            buildLineGraph();
+        }
+    }
+
+    private void setRecyclerViewData()
+    {
+        List<ExerciseLogModel> temp = exerciseLogModels = new ArrayList<>();
+        if (showAllData)
+        {
+            temp = db.getAllExerciseLogs();
+
+            if (temp != null && temp.size() > 0)
+            {
+                exerciseLogModels = (ArrayList<ExerciseLogModel>) temp;
+            }
         }
         else
         {
-            exerciseLogModels = (ArrayList<ExerciseLogModel>) db.getExercisesLogsByExerciseId(exerciseId);
+            temp = db.getExercisesLogsByExerciseId(exerciseId);
+
+            if (temp != null && temp.size() > 0)
+            {
+                exerciseLogModels = (ArrayList<ExerciseLogModel>) temp;
+            }
         }
 
-        ArrayList<ProgressExerciseModel> exerciseModels = new ArrayList<>();
+        progressExerciseModels = new ArrayList<>(); //List to go in recyclerview
         for (int i = 0; i < exerciseLogModels.size(); i++)
         {
+            String exerciseName = null;
+            if (showAllData)
+            {
+                exerciseName = db.getExercise(db.getWorkoutExercise(exerciseLogModels.get(i).getWorkoutExeriseId()).getExerciseId()).getExerciseName();
+            }
+            else
+            {
+                exerciseName = this.exerciseName;
+            }
+
             ProgressExerciseModel newItem = new ProgressExerciseModel();
             String iValue = (i+1) + ". ";
             newItem.setIndex(iValue);
             newItem.setExerciseName(exerciseName);
             StringBuilder specsBuilder = new StringBuilder();
             newItem.setSpecs(processString(exerciseLogModels.get(i), specsBuilder));
-            newItem.setTime(formatDateTime(this, exerciseLogModels.get(i).getDate()));
+            newItem.setTime(formatDateTime(exerciseLogModels.get(i).getDate()));
 
-            exerciseModels.add(newItem);
+            progressExerciseModels.add(newItem);
         }
 
-        progressRecyclerView = findViewById(R.id.activity_progress_graph_recycler_view);
-        progressRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
-        progressRecyclerView.setHasFixedSize(true);
-
-
-        progressLayoutManager = new LinearLayoutManager(this);
-        progressAdapter = new ProgressExerciseAdapter(exerciseModels);
-
-        progressRecyclerView.setLayoutManager(progressLayoutManager);
-        progressRecyclerView.setAdapter(progressAdapter);
-
-        calculateGeneralStatistics();
-        buildLineGraph();
-
-        BottomNavigationView bottomNavigation = findViewById(R.id.activity_progress_graph_bottom_navigation);
-        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+        if (progressExerciseModels.size() == 0)
+        {
+            ProgressExerciseModel emptyMessage = new ProgressExerciseModel();
+            emptyMessage.setIndex("");
+            emptyMessage.setTime("");
+            emptyMessage.setSpecs("");
+            emptyMessage.setExerciseName("In order to see data here please log sets for " + exerciseName + " under Routines");
+            progressExerciseModels.add(emptyMessage);
+        }
     }
 
-    public static String formatDateTime(Context context, String timeToFormat) {
 
-        String finalDateTime = "";
+    public String formatDateTime(String timeToFormat)
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Date date = null;
-        if (timeToFormat != null) {
-            try {
-                date = iso8601Format.parse(timeToFormat);
-            } catch (ParseException e) {
-                date = null;
-            }
+        try {
+            Date dt = formatter.parse(timeToFormat);
+            SimpleDateFormat sd2 = new SimpleDateFormat("MMMM, dd, hh:mm a");
+            String newDate = sd2.format(dt);
 
-            if (date != null) {
-                long when = date.getTime();
-                int flags = 0;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
-                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
-
-                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
-                        when + TimeZone.getDefault().getOffset(when), flags);
-            }
+            return newDate;
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return finalDateTime;
+
+        return "No Date Data";
     }
 
     private void calculateGeneralStatistics()
@@ -181,14 +220,12 @@ public class ProgressGraphActivity extends AppCompatActivity {
 
     private String processString(ExerciseLogModel e, StringBuilder stringBuilder)
     {
-        int set = e.getSetPerformed();
         int reps = e.getRepsPerformed();
         double weight = e.getIntensity();
         double rpe = e.getRpe();
 
         stringBuilder.append(weight).append(" LB");
         stringBuilder.append(" x ");
-        stringBuilder.append(set);
         stringBuilder.append(reps);
 
         if (rpe != -1 && rpe != 0)
