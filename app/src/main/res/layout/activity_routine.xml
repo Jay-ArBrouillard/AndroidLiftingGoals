@@ -13,7 +13,7 @@
         android:background="@android:color/black"
         android:layout_above="@id/activity_routines_bottom_navigation">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/routine_fragment_top_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,30 +24,34 @@
                 android:id="@+id/fetch_remote_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Fetch"
+                android:layout_alignTop="@+id/routine_fragment_top_bar"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/darker_gray"
+                android:text="Fetch Default"
                 android:textColor="@android:color/white"
-                android:textSize="20dp" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Edit"
                 android:textSize="20dp"
-                android:textColor="@android:color/white"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_weight="2"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/add_routine"
+                android:id="@+id/routine_activity_commit_changes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:paddingTop="10dp"
                 android:paddingRight="10dp"
-                android:src="@drawable/ic_add_white_48dp"
-                android:layout_weight="1"/>
+                android:src="@drawable/ic_checked_neutral_48dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/routine_fragment_title"
@@ -77,7 +81,7 @@
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/routine_fragment_create_a_workout"
+            android:id="@+id/activity_routine_create_a_workout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -104,20 +108,20 @@
                     android:id="@+id/title_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Create a workout"
+                    android:layout_toRightOf="@+id/new_icon"
+                    android:text="Create a routine"
                     android:textColor="@android:color/black"
-                    android:textSize="20dp"
-                    android:layout_toRightOf="@+id/new_icon"/>
+                    android:textSize="20dp" />
 
                 <TextView
                     android:id="@+id/description_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Start a new improvised workout"
-                    android:textSize="15dp"
-                    android:textColor="@android:color/darker_gray"
                     android:layout_below="@id/title_text_view"
-                    android:layout_toRightOf="@+id/new_icon"/>
+                    android:layout_toRightOf="@+id/new_icon"
+                    android:text="Start an empty routine"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="15dp" />
 
             </RelativeLayout>
 
@@ -129,7 +133,7 @@
             android:layout_height="match_parent"
             android:padding="10dp"
             android:background="@android:color/black"
-            android:layout_below="@+id/routine_fragment_create_a_workout"/>
+            android:layout_below="@+id/activity_routine_create_a_workout"/>
 
     </RelativeLayout>
 

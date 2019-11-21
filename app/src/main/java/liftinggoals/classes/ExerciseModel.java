@@ -10,6 +10,12 @@ public class ExerciseModel implements Parcelable {
     public ExerciseModel() {
     }
 
+    public ExerciseModel(int exerciseId, String exerciseName)
+    {
+        this.exerciseId = exerciseId;
+        this.exerciseName = exerciseName;
+    }
+
     public ExerciseModel(String exerciseName) {
         this.exerciseName = exerciseName;
     }
@@ -56,5 +62,10 @@ public class ExerciseModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(exerciseId);
         dest.writeString(exerciseName);
+    }
+
+    public String toString()
+    {
+        return exerciseName;
     }
 }

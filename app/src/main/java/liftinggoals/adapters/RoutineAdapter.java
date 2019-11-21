@@ -1,5 +1,8 @@
 package liftinggoals.adapters;
 
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import liftinggoals.classes.RoutineModel;
+import liftinggoals.data.DatabaseHelper;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineViewHolder> implements Filterable {
     private ArrayList<RoutineModel> routineList;
@@ -25,6 +29,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     private OnItemClickListener listener;
     private int removedPosition = 0;
     private RoutineModel removedItem;
+    private DatabaseHelper db;
 
     public RoutineAdapter (ArrayList<RoutineModel> routineList) {
         this.routineList = routineList;

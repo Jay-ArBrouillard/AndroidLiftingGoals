@@ -17,7 +17,6 @@ $arr = array();
 $routinesResult = $stmt->get_result();
 if (mysqli_num_rows($routinesResult) > 0)   //1 row
 {
-
     while ($row1 = mysqli_fetch_object($routinesResult))    // fetch all rows
     {
         array_push($arr, $row1);

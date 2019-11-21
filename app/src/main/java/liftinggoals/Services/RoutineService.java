@@ -126,6 +126,7 @@ public class RoutineService extends IntentService {
                                             String strMinReps = exerciseObj.getString("minimum_reps");
                                             String strMaxSets = exerciseObj.getString("maximum_sets");
                                             String strMaxReps = exerciseObj.getString("maximum_reps");
+                                            String strIntensity = exerciseObj.getString("intensity");
                                             //Quick null fix
                                             if (strMinSets == "null")
                                                 strMinSets = "-1";
@@ -135,16 +136,19 @@ public class RoutineService extends IntentService {
                                                 strMaxSets = "-1";
                                             if (strMaxReps == "null")
                                                 strMaxReps = "-1";
+                                            if (strIntensity == "null")
+                                                strIntensity = "-1";
                                             //Fix later
                                             workoutExerciseModel.setMinimumReps(Integer.parseInt(strMinSets));
                                             workoutExerciseModel.setMinimumReps(Integer.parseInt(strMinReps));
                                             workoutExerciseModel.setMaximumSets(Integer.parseInt(strMaxSets));
                                             workoutExerciseModel.setMaximumReps(Integer.parseInt(strMaxReps));
+                                            workoutExerciseModel.setIntensity(Double.parseDouble(strIntensity));
 
                                             if (db.getWorkoutExercise(exerciseObj.getInt("workout_exercise_id")) == null)
                                             {
                                                 db.insertWorkoutExercise(workoutId, exerciseObj.getInt("exercise_id"),
-                                                        Integer.parseInt(strMinSets), Integer.parseInt(strMinReps), Integer.parseInt(strMaxSets), Integer.parseInt(strMaxReps));
+                                                        Integer.parseInt(strMinSets), Integer.parseInt(strMinReps), Integer.parseInt(strMaxSets), Integer.parseInt(strMaxReps), Double.parseDouble(strIntensity));
                                             }
 
                                         }

@@ -12,6 +12,7 @@ public class WorkoutExerciseModel implements Parcelable {
     private int minimumReps;
     private int maximumSets;
     private int maximumReps;
+    private double intensity;
     private ExerciseModel exercise;
     private ImageView imageView;
 
@@ -113,6 +114,14 @@ public class WorkoutExerciseModel implements Parcelable {
 
     public void setImageView(ImageView imageView) {
         this.imageView = imageView;
+    }
+
+    public double getIntensity() {
+        return intensity;
+    }
+
+    public void setIntensity(double intensity) {
+        this.intensity = intensity;
     }
 
     @Override

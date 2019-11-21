@@ -22,6 +22,9 @@ if (mysqli_num_rows($result) == 1)  //username exists
     if ($row->password == $password)  //Password matches
     {
       $arr[] = $row;
+      //Add user id
+      array_push($arr, array('UserId'=>$row->user_id));
+
       //check if its the first login
       if ($row->last_login == null)  //First Login
       {

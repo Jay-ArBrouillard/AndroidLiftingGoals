@@ -10,11 +10,13 @@ import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,10 +38,11 @@ import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.DefaultRoutineDialog;
+import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class RoutineActivity extends AppCompatActivity {
-    public ArrayList<RoutineModel> routineModels;// = new ArrayList<>();
+    private ArrayList<RoutineModel> routineModels;
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -47,20 +50,25 @@ public class RoutineActivity extends AppCompatActivity {
     private DatabaseHelper db;
     private ResponseReceiver myReceiver;
     private String username;
+    private int userId;
     private boolean isFirstLogin;
     private Button fetchButton;
     private LoadToast loadToast;
+    private CardView createRoutine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routine);
         routineModels = new ArrayList<>();
+
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
+        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));//only do this once
+
+        userId = getIntent().getIntExtra("userId", -1);
         username = getIntent().getStringExtra("username");
         isFirstLogin = getIntent().getBooleanExtra("firstLogin", false);
         loadToast = new LoadToast(this);
-
 
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
@@ -93,6 +101,20 @@ public class RoutineActivity extends AppCompatActivity {
             intent.putExtra("username", username);
             startService(intent);
         }
+
+        final ImageView commitChangesImage = findViewById(R.id.routine_activity_commit_changes);
+
+        createRoutine = findViewById(R.id.activity_routine_create_a_workout);
+        createRoutine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.insertRoutine(userId, "Untitled Routine", "Description", 0);
+                routineModels.add(new RoutineModel(userId, "Untitled Routine", "Empty Description"));
+                adapter.notifyItemInserted(routineModels.size()-1);
+                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
+            }
+        });
+
     }
 
     private void setReceiver() {
@@ -152,9 +174,7 @@ public class RoutineActivity extends AppCompatActivity {
 
     private void initializeRecyclerView() {
         populateRoutines();
-
         recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
         layoutManager = new LinearLayoutManager(this);
         adapter = new RoutineAdapter(routineModels);
@@ -164,15 +184,18 @@ public class RoutineActivity extends AppCompatActivity {
             public void onItemClick(int position)
             {
                 Intent selectWorkFromRoutine = new Intent(RoutineActivity.this, WorkoutActivity.class);
-                selectWorkFromRoutine.putParcelableArrayListExtra("workout_item", routineModels.get(position).getWorkouts());
-                selectWorkFromRoutine.putExtra("routine_name", routineModels.get(position).getRoutineName());
+                selectWorkFromRoutine.putParcelableArrayListExtra("routine_models", routineModels);
+                SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+                sp.edit().putInt("selected_routine_index", position).commit();
                 startActivity(selectWorkFromRoutine);
             }
 
             @Override
             public void onItemEdit(int position) {
                 Intent editRoutineActivity = new Intent(RoutineActivity.this, RoutinesEditActivity.class);
-                editRoutineActivity.putExtra("routine_name", routineModels.get(position).getRoutineName());
+                editRoutineActivity.putParcelableArrayListExtra("routine_models", routineModels);
+                SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+                sp.edit().putInt("selected_routine_index", position).commit();
                 startActivity(editRoutineActivity);
             }
 
@@ -184,44 +207,7 @@ public class RoutineActivity extends AppCompatActivity {
 
     private void populateRoutines()
     {
-        routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
-        if (routineModels == null) routineModels = new ArrayList<>();
-        for (int i = 0; i < routineModels.size(); i++)
-        {
-            ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>();
-            int routineId = routineModels.get(i).getRoutineId();
-
-            ArrayList<RoutineWorkoutModel> routineWorkoutList = (ArrayList<RoutineWorkoutModel>) db.getRoutineWorkoutsByRoutineId(routineId);
-            if (routineWorkoutList == null) routineWorkoutList = new ArrayList<>();
-
-            WorkoutModel workout = null;
-            for (int j = 0; j < routineWorkoutList.size(); j++)
-            {
-                int workoutId = routineWorkoutList.get(j).getWorkoutId();
-                workout = db.getWorkout(workoutId);
-                listOfWorkouts.add(workout);
-                ArrayList<WorkoutExerciseModel> workoutExerciseList = (ArrayList<WorkoutExerciseModel>) db.getAllWorkoutExercisesByWorkoutId(workoutId);
-                if (workoutExerciseList == null) workoutExerciseList = new ArrayList<>();
-
-                for (int k = 0; k < workoutExerciseList.size(); k++)
-                {
-                    int exerciseId = workoutExerciseList.get(k).getExerciseId();
-                    ExerciseModel exerciseModel = db.getExercise(exerciseId);
-                    workoutExerciseList.get(k).setExercise(exerciseModel);
-                }
-
-                listOfWorkouts.get(j).setExercises(workoutExerciseList);
-
-                for (WorkoutExerciseModel m : workoutExerciseList)
-                {
-                    System.out.println(m.getExercise().getExerciseName());
-                }
-
-            }
-
-            routineModels.get(i).setWorkouts(listOfWorkouts);
-        }
-
+        routineModels =  RoutineModelHelper.populateRoutineModels(this);
     }
 
     // Print Helper
@@ -314,6 +300,7 @@ public class RoutineActivity extends AppCompatActivity {
     protected void onStart() {
         setReceiver();
         super.onStart();
+        initializeRecyclerView();
     }
 
     @Override

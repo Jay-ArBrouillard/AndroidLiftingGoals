@@ -64,7 +64,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
+            <!--<androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -85,7 +85,7 @@
                     android:layout_gravity="right"
                     android:checked="true" />
 
-            </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView> -->
 
 
             <androidx.cardview.widget.CardView
@@ -96,10 +96,11 @@
                 android:layout_marginBottom="40dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/settings_activity_export_data"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
-                    android:text="Import, export &amp; manage data"
+                    android:text="export data to CSV"
                     android:textColor="@android:color/black"
                     android:textSize="20dp" />
 

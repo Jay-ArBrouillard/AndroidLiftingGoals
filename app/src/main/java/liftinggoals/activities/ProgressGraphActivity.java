@@ -67,8 +67,6 @@ public class ProgressGraphActivity extends AppCompatActivity {
         initializeRecyclerView();
         calculateGeneralStatistics();
 
-        repRecords = findViewById(R.id.activity_progress_graph_rep_records_textview);
-
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_progress_graph_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
     }

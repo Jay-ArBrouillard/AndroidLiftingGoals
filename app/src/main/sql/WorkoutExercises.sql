@@ -6,6 +6,7 @@ CREATE TABLE WorkoutExercises (
 	minimum_reps int DEFAULT NULL,
 	maximum_sets int DEFAULT NULL,
 	maximum_reps int DEFAULT NULL,
+	intensity double DEFAULT NULL,
 	PRIMARY KEY (workout_exercise_id),
 	FOREIGN KEY (workout_id) REFERENCES Workouts(workout_id),
 	FOREIGN KEY (exercise_id) REFERENCES Exercises(exercise_id)

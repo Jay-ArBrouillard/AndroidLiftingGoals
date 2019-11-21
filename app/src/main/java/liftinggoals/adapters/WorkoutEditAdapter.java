@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,16 @@ import liftinggoals.classes.WorkoutExerciseModel;
 
 public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.WorkoutEditViewHolder> {
     private ArrayList<WorkoutExerciseModel> workoutExerciseItems;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener)
+    {
+        this.listener = listener;
+    }
 
     public static class WorkoutEditViewHolder extends RecyclerView.ViewHolder {
         public TextView letter;
@@ -28,7 +39,7 @@ public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.
         public TextView intensity;
         public ImageView imageResource;
 
-        public WorkoutEditViewHolder(@NonNull View itemView) {
+        public WorkoutEditViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             letter = itemView.findViewById(R.id.workout_edit_item_letter);
             sets = itemView.findViewById(R.id.workout_edit_item_sets);
@@ -36,6 +47,20 @@ public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.
             exerciseName = itemView.findViewById(R.id.workout_edit_item_exercise_name);
             intensity = itemView.findViewById(R.id.workout_edit_item_reps_intensity_value);
             imageResource = itemView.findViewById(R.id.workout_edit_item_right_arrow);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null)
+                    {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION)
+                        {
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -48,7 +73,7 @@ public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.
     @Override
     public WorkoutEditViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.workout_edit_item, parent, false);
-        WorkoutEditViewHolder wevh = new WorkoutEditViewHolder(v);
+        WorkoutEditViewHolder wevh = new WorkoutEditViewHolder(v, listener);
         return wevh;
     }
 
@@ -58,12 +83,18 @@ public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.
         String letter = getLetterForNumber(position);
         String sets = handleSets(currentItem);
         String reps = handleReps(currentItem);
+        String strIntensity = String.valueOf(currentItem.getIntensity());
+        if (strIntensity.equals("-1.0"))
+        {
+            strIntensity = "0";
+        }
 
         holder.letter.setText(letter+".");
         holder.sets.setText(sets);
         holder.reps.setText(reps);
         holder.exerciseName.setText(currentItem.getExercise().getExerciseName());
         holder.imageResource.setImageResource(R.drawable.ic_keyboard_arrow_right_white_24dp);
+        holder.intensity.setText(strIntensity);
     }
 
     @Override
@@ -76,10 +107,6 @@ public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.
         StringBuilder stringBuilder = new StringBuilder();
         int minSets = item.getMinimumSets();
         int maxSets = item.getMaximumSets();
-
-        System.out.println("minSets: " + minSets);
-        System.out.println("maxSets: " + maxSets);
-
 
         if (minSets == -1 && maxSets == -1) stringBuilder.append("");
         else if (minSets == -1 && maxSets != -1) stringBuilder.append(maxSets).append(" Sets");
@@ -95,9 +122,9 @@ public class WorkoutEditAdapter extends RecyclerView.Adapter<WorkoutEditAdapter.
         int minReps = item.getMinimumReps();
         int maxReps = item.getMaximumReps();
         if (minReps == -1 && maxReps == -1) stringBuilder.append("");
-        else if (minReps == -1 && maxReps != -1) stringBuilder.append(maxReps).append(" Sets");
-        else if (minReps != -1 && maxReps == -1) stringBuilder.append(minReps).append("+ Sets");
-        else stringBuilder.append(minReps).append("-").append(maxReps).append(" Sets");
+        else if (minReps == -1 && maxReps != -1) stringBuilder.append(maxReps);
+        else if (minReps != -1 && maxReps == -1) stringBuilder.append(minReps).append("+");
+        else stringBuilder.append(minReps).append("-").append(maxReps);
 
         return stringBuilder.toString();
     }

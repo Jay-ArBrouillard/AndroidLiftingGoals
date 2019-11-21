@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import java.util.TimeZone;
 import liftinggoals.classes.ExerciseLogModel;
 import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RecordModel;
+import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 
@@ -46,40 +48,58 @@ public class ExerciseActivity extends AppCompatActivity {
     private LineChart lineChart;
     private Button doneButton;
     private Button logButton;
-    private ArrayList<WorkoutExerciseModel> exerciseList;
+    private ArrayList<WorkoutExerciseModel> workoutExerciseModels;
     private DatabaseHelper db;
     private ArrayList<Entry> entries = new ArrayList<>();
     private Spinner spinner;
+    private int selectedRoutineIndex;
+    private int selectedWorkoutIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
-        exerciseList = getIntent().getExtras().getParcelableArrayList("exercise_list");
+        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("routine_models");
         final Spinner exerciseSpinner = findViewById(R.id.exercise_activity_spinner);
+
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
+        selectedWorkoutIndex = sp.getInt("selected_workout_index", -1);
+        System.out.println("Inside ExerciseActivity- selectedWorkoutIndex: " + selectedWorkoutIndex);
+
         db = new DatabaseHelper(this);
         db.openDB();
 
-
-        buildLineGraph(exerciseList.get(0));
-
         doneButton = findViewById(R.id.activity_exercise_done_button);
+        logButton = findViewById(R.id.exercise_activity_log_button);
+
+        if (workoutExerciseModels.size() > 0)
+        {
+            buildLineGraph(workoutExerciseModels.get(0));
+            logButton.setEnabled(true);
+        }
+        else
+        {
+            logButton.setEnabled(false);
+            Toast.makeText(getApplicationContext(), "Oh no you can't log any exercises until you add some on the Workouts Page", Toast.LENGTH_LONG).show();
+        }
+
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
-        logButton = findViewById(R.id.exercise_activity_log_button);
         logButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logButton.setEnabled(false);    //Prevent double button click
 
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
-                exerciseLogModel.setWorkoutExeriseId(exerciseList.get(exerciseSpinner.getSelectedItemPosition()).getWorkoutExerciseId());
+                exerciseLogModel.setWorkoutExeriseId(workoutExerciseModels.get(exerciseSpinner.getSelectedItemPosition()).getWorkoutExerciseId());
                 TextView set = findViewById(R.id.exercise_activity_set_value);
                 EditText repsEditText = findViewById(R.id.exercise_activity_reps_value);
                 EditText weightEditText = findViewById(R.id.exercise_activity_weight_value);
@@ -89,7 +109,7 @@ public class ExerciseActivity extends AppCompatActivity {
                     int index = Integer.parseInt(set.getText().toString());
                     int reps = Integer.parseInt(repsEditText.getText().toString().trim());
                     double weight = Double.parseDouble(weightEditText.getText().toString().trim());
-                    int exerciseId = exerciseList.get(selectedIndex).getExerciseId();
+                    int exerciseId = workoutExerciseModels.get(selectedIndex).getExerciseId();
 
                     exerciseLogModel.setSetPerformed(index);
                     exerciseLogModel.setRepsPerformed(reps);
@@ -106,8 +126,7 @@ public class ExerciseActivity extends AppCompatActivity {
                     db.insertExerciseLog(exerciseLogModel);
                     processRecords(-1, exerciseId, weight, reps, nowAsISO); //Change userId
 
-                    buildLineGraph(exerciseList.get(selectedIndex)); //Do this last
-                    //TODO insert in  Remote database
+                    buildLineGraph(workoutExerciseModels.get(selectedIndex)); //Do this last
                 }
                 catch (NumberFormatException e)
                 {
@@ -118,7 +137,7 @@ public class ExerciseActivity extends AppCompatActivity {
         });
 
         ArrayList<String> exerciseNames = new ArrayList<>();
-        for (WorkoutExerciseModel e : exerciseList)
+        for (WorkoutExerciseModel e : workoutExerciseModels)
         {
             exerciseNames.add(processString(e, new StringBuilder()));
         }
@@ -130,7 +149,7 @@ public class ExerciseActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                WorkoutExerciseModel selected =  exerciseList.get(position);
+                WorkoutExerciseModel selected = workoutExerciseModels.get(position);
                 buildLineGraph(selected);
             }
 

@@ -73,7 +73,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
         WorkoutModel currentItem = workoutList.get(position);
 
         holder.workoutName.setText(currentItem.getWorkoutName());
-        holder.lastPerformed.setText("Last performed: " + currentItem.getEstimatedDuration());   //Fix Later
+        holder.numExercises.setText(Integer.toString(currentItem.getNumberExercises()));
     }
 
     @Override
@@ -124,14 +124,14 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
         public ImageView dumbbellIcon;
         public ImageView editIcon;
         public TextView workoutName;
-        public TextView lastPerformed;
+        public TextView numExercises;
 
         public WorkoutViewHolder(@NonNull View itemView, final WorkoutAdapter.OnItemClickListener listener) {
             super(itemView);
             dumbbellIcon = itemView.findViewById(R.id.dumbbell_icon);
             editIcon = itemView.findViewById(R.id.edit_icon);
             workoutName = itemView.findViewById(R.id.title_text_view);
-            lastPerformed = itemView.findViewById(R.id.description_text_view);
+            numExercises = itemView.findViewById(R.id.description_text_view);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

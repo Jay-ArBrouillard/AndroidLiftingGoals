@@ -25,14 +25,27 @@
             android:textSize="20dp"
             android:layout_toRightOf="@+id/dumbbell_icon"/>
 
-        <TextView
-            android:id="@+id/description_text_view"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/workout_item_description"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
-            android:textColor="@android:color/darker_gray"
+            android:orientation="horizontal"
             android:layout_below="@id/title_text_view"
-            android:layout_toRightOf="@+id/dumbbell_icon"/>
+            android:layout_toRightOf="@+id/dumbbell_icon">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Num exercise(s): "/>
+
+            <TextView
+                android:id="@+id/description_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+
 
         <ImageView
             android:id="@+id/edit_icon"

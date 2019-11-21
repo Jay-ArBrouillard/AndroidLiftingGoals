@@ -12,35 +12,13 @@
         android:orientation="vertical"
         android:weightSum="10">
         <!-- row 1 -->
-        <LinearLayout
-            android:id="@+id/activity_exercise_top_bar"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:weightSum="4">
-            <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/ic_settings_black_24dp"/>
-            <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/ic_computer_black_24dp"/>
-            <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/ic_note_black_24dp"/>
-            <Button
-                android:id="@+id/activity_exercise_done_button"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Done"/>
 
-        </LinearLayout>
+        <Button
+            android:id="@+id/activity_exercise_done_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:text="Done"/>
 
         <!-- row 2 -->
         <com.github.mikephil.charting.charts.LineChart
@@ -49,7 +27,7 @@
             android:layout_height="wrap_content"
             android:minHeight="300dp"
             android:layout_weight="4"
-            android:layout_below="@+id/activity_exercise_top_bar" />
+            android:layout_below="@+id/activity_exercise_done_button" />
 
         <!-- row 3 -->
         <LinearLayout

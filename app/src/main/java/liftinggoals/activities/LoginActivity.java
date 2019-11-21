@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //Remember me
         rememberMe = findViewById(R.id.login_activity_checkbox);
-        SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", Context.MODE_PRIVATE);
         String savedUser = sp.getString("usernameSaved", null);
         String savedPass = sp.getString("passwordSaved", null);
         if (savedUser != null && savedPass != null)
@@ -120,16 +120,26 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             JSONObject jso1 = response.getJSONObject(0);
                             String status = null;
+                            String userId = null;
 
-                            if (response.length() == 2)
+                            if (response.length() == 1)
+                            {
+                                status = jso1.getString("Status");
+                            }
+                            else if (response.length() == 2)
                             {
                                 JSONObject jso2 = response.getJSONObject(1);
                                 status = jso2.getString("Status");
                             }
-                            else
+                            else if (response.length() == 3)
                             {
-                                status = jso1.getString("Status");
+                                JSONObject jso2 = response.getJSONObject(1);
+                                JSONObject jso3 = response.getJSONObject(2);
+                                userId = jso2.getString("UserId");
+                                status = jso3.getString("Status");
                             }
+
+
 
                             if (status.equals("UserNonExisting")) {
                                 loadToast.error();
@@ -158,11 +168,14 @@ public class LoginActivity extends AppCompatActivity {
 
                                 }
 
+                                SharedPreferences sp = getSharedPreferences("lifting_goals", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sp.edit();
+                                editor.putInt("UserId", Integer.parseInt(userId));
+                                editor.commit();
+
                                 //Remember me
-                                SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
                                 if (rememberMe.isChecked())
                                 {
-                                    SharedPreferences.Editor editor = sp.edit();
                                     editor.putString("usernameSaved", userNameInput);
                                     editor.putString("passwordSaved", passwordInput);
                                     editor.commit();

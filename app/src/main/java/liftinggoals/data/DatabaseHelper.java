@@ -18,7 +18,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 56;
+    public static final int DATABASE_VERSION = 63;
 
     public SQLiteDatabase myDB;
 
@@ -145,10 +145,22 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return WorkoutsTable.insert(myDB, name, description, duration, exercises);
     }
 
+    public long updateWorkout(int workoutId, String name, double duration)
+    {
+        return WorkoutsTable.update(myDB, workoutId, name, duration);
+    }
+
+
     public long updateWorkout(int workoutId, String name, String description, double duration, int exercises)
     {
         return WorkoutsTable.update(myDB, workoutId, name, description, duration, exercises);
     }
+
+    public long updateWorkoutName(int workoutId, String name)
+    {
+        return WorkoutsTable.update(myDB, workoutId, name);
+    }
+
 
     public long deleteWorkout(int workoutId)
     {
@@ -171,15 +183,15 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
 
     public long insertWorkoutExercise(int workoutId, int exerciseId, int minimumSets,
-                                      int minimumReps, int maximumSets, int maximumReps)
+                                      int minimumReps, int maximumSets, int maximumReps, double intensity)
     {
-        return WorkoutExercisesTable.insert(myDB, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
+        return WorkoutExercisesTable.insert(myDB, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps, intensity);
     }
 
-    public long updateWorkoutExcercise(int workoutExerciseId ,int workoutId, int exerciseId, int minimumSets,
-                              int minimumReps, int maximumSets, int maximumReps)
+    public long updateWorkoutExcercise(int workoutExerciseId, int minimumSets,
+                              int minimumReps, int maximumSets, int maximumReps, double intensity)
     {
-        return WorkoutExercisesTable.update(myDB, workoutExerciseId, workoutId, exerciseId, minimumSets, minimumReps, maximumSets, maximumReps);
+        return WorkoutExercisesTable.update(myDB, workoutExerciseId, minimumSets, minimumReps, maximumSets, maximumReps, intensity);
     }
 
     public long deleteWorkoutExercise(int workoutExerciseId)
@@ -190,6 +202,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public WorkoutExerciseModel getWorkoutExercise(int workoutExerciseId)
     {
         return WorkoutExercisesTable.getWorkoutExercise(myDB, workoutExerciseId);
+    }
+
+    public WorkoutExerciseModel getWorkoutExerciseByWorkoutAndExerciseId(int workoutId, int exerciseId)
+    {
+        return WorkoutExercisesTable.getWorkoutExercise(myDB, workoutId, exerciseId);
     }
 
     public List<WorkoutExerciseModel> getAllWorkoutExercisesByWorkoutId(int workoutId)

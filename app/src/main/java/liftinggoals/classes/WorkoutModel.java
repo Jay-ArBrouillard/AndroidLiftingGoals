@@ -17,14 +17,26 @@ public class WorkoutModel implements Parcelable {
 
     public WorkoutModel()
     {
-
+        numberExercises = 0;
+        exercises = new ArrayList<>();
     }
 
-    public WorkoutModel(String workoutName, String description, double estimatedDuration) {
-
+    public WorkoutModel(String workoutName, String description, double estimatedDuration)
+    {
         this.workoutName = workoutName;
         this.description = description;
         this.estimatedDuration = estimatedDuration;
+        numberExercises = 0;
+        exercises = new ArrayList<>();
+    }
+
+    public WorkoutModel(String workoutName, String description, double estimatedDuration, int numberExercises)
+    {
+        this.workoutName = workoutName;
+        this.description = description;
+        this.estimatedDuration = estimatedDuration;
+        this.numberExercises = numberExercises;
+        exercises = new ArrayList<>();
     }
 
     protected WorkoutModel(Parcel in) {
@@ -47,6 +59,14 @@ public class WorkoutModel implements Parcelable {
             return new WorkoutModel[size];
         }
     };
+
+    public int getWorkoutId() {
+        return workoutId;
+    }
+
+    public void setWorkoutId(int workoutId) {
+        this.workoutId = workoutId;
+    }
 
     public String getWorkoutName() {
         return workoutName;
@@ -95,7 +115,6 @@ public class WorkoutModel implements Parcelable {
     public void setNumberExercises(int numberExercises) {
         this.numberExercises = numberExercises;
     }
-
 
     @Override
     public int describeContents() {

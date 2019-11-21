@@ -24,7 +24,8 @@ public class WorkoutExercisesTable {
             WorkoutExercisesEntry.COLUMN_MINIMUM_SETS + " INTEGER, " +
             WorkoutExercisesEntry.COLUMN_MINIMUM_REPS + " INTEGER, " +
             WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS + " INTEGER, " +
-            WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS + " INTEGER" +
+            WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS + " INTEGER, " +
+            WorkoutExercisesEntry.COLUMN_INTENSITY + " REAL" +
             ");";
     public static final String SQL_DROP_WORKOUT_EXERCISES_TABLE = "DROP TABLE IF EXISTS " + WorkoutExercisesEntry.TABLE_NAME;
 
@@ -38,9 +39,10 @@ public class WorkoutExercisesTable {
         public static final String COLUMN_MINIMUM_REPS = "minimum_reps";
         public static final String COLUMN_MAXIMUM_SETS = "maximum_sets";
         public static final String COLUMN_MAXIMUM_REPS = "maximum_reps";
+        public static final String COLUMN_INTENSITY = "intensity";
     }
     public static long insert(SQLiteDatabase myDB, int workoutId, int exerciseId,
-                              int minimumSets, int minimumReps, int maximumSets, int maximumReps)
+                              int minimumSets, int minimumReps, int maximumSets, int maximumReps, double intensity)
     {
         ContentValues values = new ContentValues();
         values.put(WorkoutExercisesEntry.COLUMN_WORKOUT_ID, workoutId);
@@ -49,16 +51,15 @@ public class WorkoutExercisesTable {
         values.put(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS, minimumReps);
         values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS, maximumSets);
         values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS, maximumReps);
+        values.put(WorkoutExercisesEntry.COLUMN_INTENSITY, intensity);
 
         return myDB.insert(WorkoutExercisesEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int workoutExerciseId, int workoutId, int exerciseId,
-                              int minimumSets, int minimumReps, int maximumSets, int maximumReps)
+    public static long update(SQLiteDatabase myDB, int workoutExerciseId, int minimumSets, int minimumReps, int maximumSets, int maximumReps, double intensity)
     {
         ContentValues values = new ContentValues();
-        values.put(WorkoutExercisesEntry.COLUMN_WORKOUT_ID, workoutId);
-        values.put(WorkoutExercisesEntry.COLUMN_EXERCISE_ID, exerciseId);
+        values.put(WorkoutExercisesEntry._ID, workoutExerciseId);
         if (minimumSets != -1)
             values.put(WorkoutExercisesEntry.COLUMN_MINIMUM_SETS, minimumSets);
         if (minimumReps != -1)
@@ -67,6 +68,8 @@ public class WorkoutExercisesTable {
             values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS, maximumSets);
         if (maximumReps != -1)
             values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS, maximumReps);
+        if (intensity != -1)
+            values.put(WorkoutExercisesEntry.COLUMN_INTENSITY, intensity);
 
         return myDB.update(WorkoutExercisesEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutExerciseId)});
     }
@@ -100,6 +103,36 @@ public class WorkoutExercisesTable {
                 workoutExerciseModel.setMinimumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS)));
                 workoutExerciseModel.setMaximumSets(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS)));
                 workoutExerciseModel.setMaximumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS)));
+                workoutExerciseModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_INTENSITY)));
+            }
+
+            return workoutExerciseModel;
+        }
+    }
+
+    public static WorkoutExerciseModel getWorkoutExercise(SQLiteDatabase myDB, int workoutId, int exerciseId)
+    {
+        String query = "SELECT * FROM " + WorkoutExercisesEntry.TABLE_NAME + " WHERE " + WorkoutExercisesEntry.COLUMN_WORKOUT_ID  + " = ? AND " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(workoutId), Integer.toString(exerciseId)});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
+
+            while(c.moveToNext()){
+                workoutExerciseModel.setWorkoutExerciseId(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry._ID)));
+                workoutExerciseModel.setWorkoutId(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_WORKOUT_ID)));
+                workoutExerciseModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_EXERCISE_ID)));
+                workoutExerciseModel.setMinimumSets(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MINIMUM_SETS)));
+                workoutExerciseModel.setMinimumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS)));
+                workoutExerciseModel.setMaximumSets(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS)));
+                workoutExerciseModel.setMaximumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS)));
+                workoutExerciseModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_INTENSITY)));
             }
 
             return workoutExerciseModel;
@@ -129,6 +162,7 @@ public class WorkoutExercisesTable {
                 workoutExerciseModel.setMinimumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS)));
                 workoutExerciseModel.setMaximumSets(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS)));
                 workoutExerciseModel.setMaximumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS)));
+                workoutExerciseModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_INTENSITY)));
                 workoutExercises.add(workoutExerciseModel);
             }
 
@@ -183,6 +217,7 @@ public class WorkoutExercisesTable {
                 workoutExerciseModel.setMinimumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS)));
                 workoutExerciseModel.setMaximumSets(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS)));
                 workoutExerciseModel.setMaximumReps(c.getInt(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS)));
+                workoutExerciseModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(WorkoutExercisesEntry.COLUMN_INTENSITY)));
                 workoutExercises.add(workoutExerciseModel);
             }
 

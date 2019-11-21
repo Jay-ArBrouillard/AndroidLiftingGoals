@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <EditText
+        android:id="@+id/workout_edit_dialog_min_sets"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Min Sets"/>
+
+    <EditText
+        android:id="@+id/workout_edit_dialog_max_sets"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Max Sets"
+        android:layout_below="@+id/workout_edit_dialog_min_sets" />
+
+    <EditText
+        android:id="@+id/workout_edit_dialog_min_reps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Min Reps"
+        android:layout_below="@+id/workout_edit_dialog_max_sets" />
+
+    <EditText
+        android:id="@+id/workout_edit_dialog_max_reps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Max Reps"
+        android:layout_below="@+id/workout_edit_dialog_min_reps" />
+
+    <EditText
+        android:id="@+id/workout_edit_dialog_intensity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Weight"
+        android:layout_below="@+id/workout_edit_dialog_max_reps" />
+
+</RelativeLayout>

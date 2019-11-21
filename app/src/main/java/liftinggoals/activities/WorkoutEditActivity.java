@@ -1,44 +1,200 @@
 package liftinggoals.activities;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.WindowManager;
-import android.widget.TextView;
-
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import liftinggoals.adapters.WorkoutEditAdapter;
+import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.data.DatabaseHelper;
+import liftinggoals.misc.CreateExerciseDialog;
+import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
+import liftinggoals.misc.WorkoutEditDialog;
 
-public class WorkoutEditActivity extends AppCompatActivity {
-    public ArrayList<WorkoutExerciseModel> workoutExerciseModels;
+public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEditDialog.WorkoutEditDialogListener, CreateExerciseDialog.CreateExerciseDialogListener {
+    private ArrayList<RoutineModel> routineModels;
+    private int selectedRoutineIndex;
+    private int selectedWorkoutIndex;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private WorkoutEditAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private String workoutName;
     private String duration;
+    private EditText workoutNameEditText;
+    private ImageView commitChangesButton;
+    private int imageViewSrcId = R.drawable.ic_checked_neutral_48dp;
+    private DatabaseHelper db;
+    private EditText durationEditText;
+    private Spinner addExerciseSpinner;
+    private ArrayList<ExerciseModel> spinnerExerciseModels;
+    private Button createExerciseButton;
+    private ArrayAdapter<ExerciseModel> exerciseAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_edit);
 
-        workoutName = getIntent().getExtras().getString("workout_name");
-        duration = Double.toString(getIntent().getExtras().getDouble("workout_duration"));
+        db = new DatabaseHelper(this);
+        db.openDB();
+
+        routineModels = getIntent().getExtras().getParcelableArrayList("routine_models");
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
+        selectedWorkoutIndex = sp.getInt("selected_workout_index", -1);
+        System.out.println("Inside workoutEditActivity- selectedWorkoutIndex: " + selectedWorkoutIndex);
+
+        workoutName = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutName();
+        duration = Double.toString(routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getEstimatedDuration());
+
+        //Find Views
+        durationEditText = findViewById(R.id.edit_routine_duration_text_view);
+        workoutNameEditText = findViewById(R.id.edit_routine_name_text_view);
+        addExerciseSpinner = findViewById(R.id.activity_workout_edit_add_exercise_button);
+        commitChangesButton = findViewById(R.id.workout_edit_activity_commit_changes);
+        recyclerView = findViewById(R.id.edit_routine_recycler_view);
+
+        commitChangesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (imageViewSrcId == R.drawable.ic_checked_red_48dp)
+                {
+                    String newWorkoutName = workoutNameEditText.getText().toString();
+                    String [] split = durationEditText.getText().toString().split(" ");
+                    db.updateWorkout(routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(0).getWorkoutExerciseId(),
+                            newWorkoutName, Double.valueOf(split[0].trim()));
+                    routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).setWorkoutName(newWorkoutName);
+
+                    commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                    imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                }
+            }
+        });
+
+        durationEditText.setText(duration + " minutes");
+        durationEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.equals(duration + " minutes"))
+                {
+                    commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                    imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                }
+            }
+        });
 
         ((TextView)findViewById(R.id.edit_routine_name_text_view)).setText(workoutName);
-        ((TextView)findViewById(R.id.edit_routine_duration_text_view)).setText(duration + " minutes");
+
+
+        workoutNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.equals(workoutName))
+                {
+                    commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                    imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                }
+            }
+        });
+
+        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
+
+        addExerciseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) { return;}
+
+                int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
+
+                WorkoutExerciseModel newWorkoutExercise = new WorkoutExerciseModel();
+                newWorkoutExercise.setWorkoutId(workoutId);
+                newWorkoutExercise.setExercise(spinnerExerciseModels.get(position));
+                newWorkoutExercise.setIntensity(0);
+                newWorkoutExercise.setMinimumSets(0);
+                newWorkoutExercise.setMinimumReps(0);
+                newWorkoutExercise.setMaximumSets(0);
+                newWorkoutExercise.setMaximumReps(0);
+
+                long insertResult = db.insertWorkoutExercise(workoutId, spinnerExerciseModels.get(position).getExerciseId(), 0,0,0,0,0);
+                routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().add(newWorkoutExercise);
+                initializeRecyclerView();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //do nothing
+            }
+        });
+
+        createExerciseButton = findViewById(R.id.activity_workout_edit_create_new_exercise);
+        createExerciseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCreateExerciseDialog();
+            }
+        });
+
+
+        List<ExerciseModel> exerciseNames = db.getAllExercises();
+        if (exerciseNames == null)
+        {
+            spinnerExerciseModels = new ArrayList<>();
+        }
+        else
+        {
+            spinnerExerciseModels = (ArrayList<ExerciseModel>)exerciseNames;
+        }
+
+        spinnerExerciseModels.add(0, new ExerciseModel());
+        exerciseAdapter = new ArrayAdapter<>(WorkoutEditActivity.this, android.R.layout.simple_list_item_1, spinnerExerciseModels);
+        exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        addExerciseSpinner.setAdapter(exerciseAdapter);
 
         initializeRecyclerView();
+
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_workout_edit_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
@@ -79,15 +235,53 @@ public class WorkoutEditActivity extends AppCompatActivity {
 
     private void initializeRecyclerView()
     {
-        recyclerView = findViewById(R.id.edit_routine_recycler_view);
-        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("exercise_list");
-        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
+        routineModels = RoutineModelHelper.populateRoutineModels(getApplicationContext());
         recyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this);
-        adapter = new WorkoutEditAdapter(workoutExerciseModels);
+        adapter = new WorkoutEditAdapter(routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+        adapter.setOnItemClickListener(new WorkoutEditAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                openExerciseDetails(position);
+            }
+        });
+    }
+
+    private void openCreateExerciseDialog()
+    {
+        CreateExerciseDialog exerciseDialog = new CreateExerciseDialog();
+        exerciseDialog.show(getSupportFragmentManager(), "createExerciseDialog");
+    }
+
+    private void openExerciseDetails(int position)
+    {
+        WorkoutEditDialog workoutEditDialog = new WorkoutEditDialog(position);
+        workoutEditDialog.show(getSupportFragmentManager(), "workoutEditDialog");
+    }
+
+    @Override
+    public void applyChanges(String name) {
+        long insertedPK = db.insertExercise(name);
+        spinnerExerciseModels.add(new ExerciseModel((int)insertedPK, name));
+        exerciseAdapter.notifyDataSetChanged();
+        addExerciseSpinner.postInvalidate();
+        addExerciseSpinner.setAdapter(exerciseAdapter);
+    }
+
+    @Override
+    public void applyChanges(int position, String minSets, String maxSets, String minReps, String maxReps, String weight) {
+        int exerciseId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(position).getExercise().getExerciseId();
+        int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
+        int workoutExerciseId = db.getWorkoutExerciseByWorkoutAndExerciseId(workoutId, exerciseId).getWorkoutExerciseId();
+        try {
+            long updateResult = db.updateWorkoutExcercise(workoutExerciseId, Integer.parseInt(minSets), Integer.parseInt(minReps), Integer.parseInt(maxSets), Integer.parseInt(maxReps), Double.parseDouble(weight));
+            initializeRecyclerView();
+        } catch (NumberFormatException e) {
+            Toast.makeText(getApplicationContext(), "Must enter an integer for Sets and Reps or number for intensity", Toast.LENGTH_LONG).show();
+        }
     }
 }

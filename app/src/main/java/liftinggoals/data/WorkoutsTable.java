@@ -53,6 +53,24 @@ public class WorkoutsTable {
         return myDB.update(WorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutId)});
     }
 
+    public static long update(SQLiteDatabase myDB, int workoutId, String name, double duration)
+    {
+        ContentValues values = new ContentValues();
+        values.put(WorkoutEntry.COLUMN_WORKOUT_NAME, name);
+        values.put(WorkoutEntry.COLUMN_DURATION, duration);
+        //values.put(WorkoutEntry.COLUMN_NUMBER_EXERCISES, exercises);
+
+        return myDB.update(WorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutId)});
+    }
+
+    public static long update(SQLiteDatabase myDB, int workoutId, String name)
+    {
+        ContentValues values = new ContentValues();
+        values.put(WorkoutEntry.COLUMN_WORKOUT_NAME, name);
+
+        return myDB.update(WorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutId)});
+    }
+
     public static long delete(SQLiteDatabase myDB, int id)
     {
         String where = WorkoutEntry._ID + " = " + id;
@@ -75,6 +93,7 @@ public class WorkoutsTable {
             WorkoutModel workoutModel = new WorkoutModel();
 
             while(c.moveToNext()){
+                workoutModel.setWorkoutId(c.getInt(c.getColumnIndexOrThrow(WorkoutEntry._ID)));
                 workoutModel.setWorkoutName(c.getString(c.getColumnIndexOrThrow(WorkoutEntry.COLUMN_WORKOUT_NAME)));
                 workoutModel.setDescription(c.getString(c.getColumnIndexOrThrow(WorkoutEntry.COLUMN_DESCRIPTION)));
                 workoutModel.setEstimatedDuration(c.getDouble(c.getColumnIndexOrThrow(WorkoutEntry.COLUMN_DURATION)));
@@ -101,6 +120,7 @@ public class WorkoutsTable {
 
             while(c.moveToNext()){
                 WorkoutModel workoutModel = new WorkoutModel();
+                workoutModel.setWorkoutId(c.getInt(c.getColumnIndexOrThrow(WorkoutEntry._ID)));
                 workoutModel.setWorkoutName(c.getString(c.getColumnIndexOrThrow(WorkoutEntry.COLUMN_WORKOUT_NAME)));
                 workoutModel.setDescription(c.getString(c.getColumnIndexOrThrow(WorkoutEntry.COLUMN_DESCRIPTION)));
                 workoutModel.setEstimatedDuration(c.getDouble(c.getColumnIndexOrThrow(WorkoutEntry.COLUMN_DURATION)));

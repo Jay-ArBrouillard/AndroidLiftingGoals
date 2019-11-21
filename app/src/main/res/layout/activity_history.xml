@@ -22,7 +22,7 @@
             android:textSize="40dp" />
 
 
-        <CalendarView
+        <!--<CalendarView
             android:id="@+id/history_calendar_view"
             android:layout_width="match_parent"
             android:layout_height="400dp"
@@ -32,13 +32,29 @@
             android:layout_marginRight="50dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/background_calendar" />
+        -->
+        <com.github.sundeepk.compactcalendarview.CompactCalendarView
+            android:id="@+id/compactcalendar_view"
+            android:layout_width="fill_parent"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:layout_height="250dp"
+            app:compactCalendarTargetHeight="250dp"
+            app:compactCalendarTextSize="12sp"
+            app:compactCalendarBackgroundColor="#ffe95451"
+            app:compactCalendarTextColor="#fff"
+            app:compactCalendarCurrentSelectedDayBackgroundColor="#E57373"
+            app:compactCalendarCurrentDayBackgroundColor="#B71C1C"
+            app:compactCalendarMultiEventIndicatorColor="#fff"
+            android:layout_below="@+id/history_fragment_title"
+            />
 
 
         <TextView
             android:id="@+id/history_fragment_workout_details"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_below="@+id/history_calendar_view"
+            android:layout_below="@+id/compactcalendar_view"
             android:paddingLeft="10dp"
             android:text="Workout Details"
             android:textColor="@android:color/white"
@@ -46,10 +62,12 @@
             android:textAlignment="center" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/history_fragment_recycler_view"
+            android:id="@+id/activity_history_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/history_fragment_workout_details"/>
+            android:layout_below="@+id/history_fragment_workout_details"
+            android:layout_marginTop="1dp"
+            android:scrollbars="vertical" />
     </RelativeLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

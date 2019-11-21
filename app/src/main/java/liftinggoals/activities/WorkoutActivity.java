@@ -1,15 +1,18 @@
 package liftinggoals.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,34 +22,61 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import liftinggoals.adapters.WorkoutAdapter;
 import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.RoutineModel;
+import liftinggoals.classes.RoutineWorkoutModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
+import liftinggoals.data.DatabaseHelper;
+import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
 public class WorkoutActivity extends AppCompatActivity {
-    private ArrayList<WorkoutModel> workoutsList;
+    private ArrayList<RoutineModel> routineModels;
+    private int selectedRoutineIndex;
     private RecyclerView recyclerView;
     private WorkoutAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private SearchView search;
+    private CardView createWorkout;
+    private DatabaseHelper db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
 
-        //Get info from Intent->Bundle
-        workoutsList = getIntent().getExtras().getParcelableArrayList("workout_item");
+        db = new DatabaseHelper(this);
+        db.openDB();
+
+        routineModels = getIntent().getExtras().getParcelableArrayList("routine_models");
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
+
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
-        title.setText(getIntent().getExtras().getString("routine_name"));
+        title.setText(routineModels.get(selectedRoutineIndex).getRoutineName());   //Set Workout Title
 
         recyclerView = findViewById(R.id.multiple_workout_recycler_view);
+        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4)); //only do this once
+
         initializeRecyclerView();
         initializeActionSearch();
         initializeSwipe();
 
+        createWorkout = findViewById(R.id.activity_workout_create_new_workout);
+        createWorkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long insertedPK = db.insertWorkout("Untitled Workout", "Empty Description", 0, 0);
+                db.insertRoutineWorkout(routineModels.get(selectedRoutineIndex).getRoutineId(), (int)insertedPK);
+                routineModels.get(selectedRoutineIndex).getWorkouts().add(new WorkoutModel("Untitled Workout", "Empty Description", 0, 0));
+                adapter.notifyDataSetChanged();
+                ((ImageView)findViewById(R.id.workout_activity_commit_button)).setImageResource(R.drawable.ic_checked_green_48dp);
+            }
+        });
+
+
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_workout_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
-
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -81,27 +111,30 @@ public class WorkoutActivity extends AppCompatActivity {
         }
     };
 
-    private void initializeRecyclerView() {
+    private void initializeRecyclerView()
+    {
         recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
-
         layoutManager = new LinearLayoutManager(this);
 
-        adapter = new WorkoutAdapter(workoutsList);
+        adapter = new WorkoutAdapter(routineModels.get(selectedRoutineIndex).getWorkouts());
         adapter.setOnItemClickListener(new WorkoutAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 Intent startExerciseActivity = new Intent(WorkoutActivity.this, ExerciseActivity.class);
-                startExerciseActivity.putParcelableArrayListExtra("exercise_list", workoutsList.get(position).getExercises());
+                startExerciseActivity.putParcelableArrayListExtra("routine_models", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getExercises());
+                SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+                sp.edit().putInt("selected_workout_index", position).commit();
+                System.out.println("selectedWorkoutIndex: " + position);
                 startActivity(startExerciseActivity);
             }
 
             @Override
             public void onItemEdit(int position) {
                 Intent editWorkoutActivity = new Intent(WorkoutActivity.this, WorkoutEditActivity.class);
-                editWorkoutActivity.putParcelableArrayListExtra("exercise_list", workoutsList.get(position).getExercises());
-                editWorkoutActivity.putExtra("workout_name", workoutsList.get(position).getWorkoutName());
-                editWorkoutActivity.putExtra("workout_duration", workoutsList.get(position).getEstimatedDuration());
+                editWorkoutActivity.putParcelableArrayListExtra("routine_models", routineModels);
+                SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+                sp.edit().putInt("selected_workout_index", position).commit();
+                System.out.println("selectedWorkoutIndex: " + position);
                 startActivity(editWorkoutActivity);
             }
 
@@ -149,5 +182,12 @@ public class WorkoutActivity extends AppCompatActivity {
                 adapter.delete(viewHolder, pos);
             }
         }).attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        routineModels = RoutineModelHelper.populateRoutineModels(getApplicationContext());
+        initializeRecyclerView();
     }
 }

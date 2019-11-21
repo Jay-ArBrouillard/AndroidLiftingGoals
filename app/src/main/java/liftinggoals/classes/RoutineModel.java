@@ -9,17 +9,25 @@ import java.util.Date;
 public class RoutineModel implements Parcelable {
     private int imageResource;
     private int routineId;
+    private int userId;
     private String routineName;
     private String description;
     private ArrayList<WorkoutModel> workouts;
 
     public RoutineModel() {
+
     }
 
     public RoutineModel(String routineName, String description, ArrayList<WorkoutModel> workouts) {
         this.routineName = routineName;
         this.description = description;
         this.workouts = workouts;
+    }
+
+    public RoutineModel(int userId, String routineName, String description) {
+        this.userId = userId;
+        this.routineName = routineName;
+        this.description = description;
     }
 
     protected RoutineModel(Parcel in) {
@@ -89,10 +97,10 @@ public class RoutineModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(imageResource);
         dest.writeInt(routineId);
         dest.writeString(routineName);
         dest.writeString(description);
-        //dest.write(lastPerformed);
         dest.writeTypedList(workouts);
     }
 }
