@@ -17,9 +17,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -139,8 +141,6 @@ public class LoginActivity extends AppCompatActivity {
                                 status = jso3.getString("Status");
                             }
 
-
-
                             if (status.equals("UserNonExisting")) {
                                 loadToast.error();
                                 Toast.makeText(getApplicationContext(), "The username you typed in doesn't exist", Toast.LENGTH_LONG).show();
@@ -158,14 +158,11 @@ public class LoginActivity extends AppCompatActivity {
                                 if (status.equals("firstLogin"))
                                 {
                                     startMainActivity.putExtra("firstLogin", true);
-                                    Log.d("LoginActivity", "True");
 
                                 }
                                 else
                                 {
                                     startMainActivity.putExtra("firstLogin", false);
-                                    Log.d("LoginActivity", "False");
-
                                 }
 
                                 SharedPreferences sp = getSharedPreferences("lifting_goals", Context.MODE_PRIVATE);
@@ -185,7 +182,6 @@ public class LoginActivity extends AppCompatActivity {
                                     sp.edit().clear();
                                 }
 
-
                                 startActivity(startMainActivity);
                                 finish();   //Prevent user from pressing back button and going to login page
                             }
@@ -197,6 +193,19 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse == null) {
+                    if (error.getClass().equals(NoConnectionError.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "No internet connection",
+                                Toast.LENGTH_LONG).show();
+
+                    } else if (error.getClass().equals(TimeoutError.class)) {
+                        Toast.makeText(getApplicationContext(),
+                                "Connectivity error. Try checking your internet and/or wifi",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
                 loadToast.error();
                 error.printStackTrace();
             }

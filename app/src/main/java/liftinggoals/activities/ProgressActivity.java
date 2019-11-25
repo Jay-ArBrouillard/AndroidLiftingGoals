@@ -96,6 +96,7 @@ public class ProgressActivity extends AppCompatActivity {
         volumeRecyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
         volumeRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
+
         //TODO database stuff with volumes groups so you can click on them in progress tab
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));
@@ -120,7 +121,9 @@ public class ProgressActivity extends AppCompatActivity {
         volumeAdapter.setOnItemClickListener(new VolumeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                System.out.println("Clicked Volume item: " + volumeGroups.get(position).getVolumeGroup());
+                Intent intent = new Intent(ProgressActivity.this, ProgressGraphActivity.class);
+                intent.putExtra("volume_group_name", volumeGroups.get(position).getVolumeGroup());
+                startActivity(intent);
             }
         });
 

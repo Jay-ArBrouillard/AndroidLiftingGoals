@@ -98,7 +98,7 @@ public class RoutineActivity extends AppCompatActivity {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //Quit the loadToast if it takes longer than 7 seconds
+                        //Quit the loadToast if it takes longer than 10 seconds
                         if (serviceError)
                         {
                             runOnUiThread(new Runnable() {
@@ -110,7 +110,7 @@ public class RoutineActivity extends AppCompatActivity {
                         }
                         timer.cancel();
                     }
-                }, 7 * 1000);
+                }, 10 * 1000);
             }
         });
 

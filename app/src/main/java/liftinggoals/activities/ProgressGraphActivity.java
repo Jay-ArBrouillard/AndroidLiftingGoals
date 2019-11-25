@@ -43,6 +43,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
     private int exerciseId;
     private String exerciseName;
     private boolean showAllData;
+    private String muscleGroup;
     private RecyclerView progressRecyclerView;
     private ProgressExerciseAdapter progressAdapter;
     private RecyclerView.LayoutManager progressLayoutManager;
@@ -58,6 +59,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
         showAllData = getIntent().getBooleanExtra("overall", false);
         exerciseId = getIntent().getIntExtra("exercise_id", -1);
         exerciseName = getIntent().getStringExtra("exercise_name");
+        muscleGroup = getIntent().getStringExtra("volume_group_name");
         ((TextView)(findViewById(R.id.activity_progress_graph_title))).setText(exerciseName);
 
         db = new DatabaseHelper(this);
@@ -110,6 +112,10 @@ public class ProgressGraphActivity extends AppCompatActivity {
                 exerciseLogModels = (ArrayList<ExerciseLogModel>) temp;
             }
         }
+        else if (muscleGroup != null)
+        {
+            //TODO
+        }
         else
         {
             temp = db.getExercisesLogsByExerciseId(exerciseId);
@@ -118,6 +124,11 @@ public class ProgressGraphActivity extends AppCompatActivity {
             {
                 exerciseLogModels = (ArrayList<ExerciseLogModel>) temp;
             }
+        }
+
+        if (exerciseLogModels == null)
+        {
+            exerciseLogModels = new ArrayList<>();
         }
 
         progressExerciseModels = new ArrayList<>(); //List to go in recyclerview
@@ -150,7 +161,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
             emptyMessage.setIndex("");
             emptyMessage.setTime("");
             emptyMessage.setSpecs("");
-            emptyMessage.setExerciseName("In order to see data here please log sets for " + exerciseName + " under Routines");
+            emptyMessage.setExerciseName("No sets logged for " + exerciseName);
             progressExerciseModels.add(emptyMessage);
         }
     }

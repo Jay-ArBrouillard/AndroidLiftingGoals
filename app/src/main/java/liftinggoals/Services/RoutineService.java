@@ -5,14 +5,17 @@ import android.content.Intent;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -56,6 +59,8 @@ public class RoutineService extends IntentService {
     private void fetchRemote() {
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
+
+        //TODO add muscle groups to musclesTrainedTable
 
         final ArrayList<RoutineModel> routineModels =  new ArrayList<>();
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
@@ -178,10 +183,6 @@ public class RoutineService extends IntentService {
                                 i++;
                             }   //End outer for loop
 
-                            //String message = intent.getStringExtra("message");
-                            //intent.setAction("action");
-                            //SystemClock.sleep(3000);
-                            //String echoMessage = "IntentService after a pause of 3 seconds echoes " + message;
                             Intent intent = new Intent("action");
                             intent.putExtra("updatedRoutines", routineModels);
                             intent.putExtra("message", "Default routines added");
@@ -197,6 +198,19 @@ public class RoutineService extends IntentService {
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse == null) {
+                    if (error.getClass().equals(NoConnectionError.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "No internet connection",
+                                Toast.LENGTH_LONG).show();
+
+                    } else if (error.getClass().equals(TimeoutError.class)) {
+                        Toast.makeText(getApplicationContext(),
+                                "Connectivity error. Try checking your internet and/or wifi",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
                 error.printStackTrace();
             }
         });
