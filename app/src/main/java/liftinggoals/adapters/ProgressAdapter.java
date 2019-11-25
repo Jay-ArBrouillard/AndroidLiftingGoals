@@ -3,6 +3,8 @@ package liftinggoals.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.liftinggoals.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import liftinggoals.classes.ExerciseModel;
+import liftinggoals.classes.VolumeGroupModel;
 
-public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.ExerciseViewHolder> {
-    private ArrayList<ExerciseModel> exerciseItems;
+public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.ExerciseViewHolder> implements Filterable {
+    private ArrayList<ExerciseModel> exerciseList = new ArrayList<>();
+    private ArrayList<ExerciseModel> exerciseListFull;
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
@@ -60,13 +65,10 @@ public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.Exerci
         }
     }
 
-    public ProgressAdapter(ArrayList<ExerciseModel> exerciseItems)
+    public ProgressAdapter(ArrayList<ExerciseModel> exerciseList)
     {
-        if (exerciseItems == null)
-        {
-            exerciseItems = new ArrayList<>();
-        }
-        this.exerciseItems = exerciseItems;
+        this.exerciseList = exerciseList;
+        exerciseListFull = new ArrayList<>(exerciseList);
     }
 
     @NonNull
@@ -79,7 +81,7 @@ public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.Exerci
 
     @Override
     public void onBindViewHolder(@NonNull ExerciseViewHolder holder, int position) {
-        ExerciseModel currentItem = exerciseItems.get(position);
+        ExerciseModel currentItem = exerciseList.get(position);
 
         holder.imageView.setImageResource(R.drawable.ic_keyboard_arrow_right_white_24dp);
         holder.textView.setText(currentItem.getExerciseName());
@@ -87,6 +89,47 @@ public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.Exerci
 
     @Override
     public int getItemCount() {
-        return exerciseItems.size();
+        return exerciseList.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return progressFilter;
+    }
+
+    private Filter progressFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<ExerciseModel> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0)
+            {
+                filteredList.addAll(exerciseListFull);
+            }
+            else
+            {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (ExerciseModel item : exerciseListFull)
+                {
+                    if (item.getExerciseName().toLowerCase().contains(filterPattern))
+                    {
+                        filteredList.add(item);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            exerciseList.clear();
+            exerciseList.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }

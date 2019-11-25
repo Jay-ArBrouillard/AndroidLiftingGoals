@@ -121,7 +121,7 @@ public class WorkoutActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 Intent startExerciseActivity = new Intent(WorkoutActivity.this, ExerciseActivity.class);
-                startExerciseActivity.putParcelableArrayListExtra("routine_models", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getExercises());
+                startExerciseActivity.putParcelableArrayListExtra("workout_exercise_models", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getExercises());
                 SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
                 sp.edit().putInt("selected_workout_index", position).commit();
                 System.out.println("selectedWorkoutIndex: " + position);

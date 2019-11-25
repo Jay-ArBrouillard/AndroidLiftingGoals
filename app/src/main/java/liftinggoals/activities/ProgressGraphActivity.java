@@ -49,7 +49,6 @@ public class ProgressGraphActivity extends AppCompatActivity {
     private ArrayList<ExerciseLogModel> exerciseLogModels;
     private LineChart lineChart;
     private ArrayList<Entry> entries = new ArrayList<>();
-    private TextView repRecords;
     private ArrayList<ProgressExerciseModel> progressExerciseModels;
 
     @Override
@@ -93,7 +92,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
         progressRecyclerView.setLayoutManager(progressLayoutManager);
         progressRecyclerView.setAdapter(progressAdapter);
 
-        if (progressExerciseModels.size() > 1)
+        if (progressExerciseModels.size() > 0)
         {
             buildLineGraph();
         }
@@ -101,7 +100,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
 
     private void setRecyclerViewData()
     {
-        List<ExerciseLogModel> temp = exerciseLogModels = new ArrayList<>();
+        List<ExerciseLogModel> temp;
         if (showAllData)
         {
             temp = db.getAllExerciseLogs();

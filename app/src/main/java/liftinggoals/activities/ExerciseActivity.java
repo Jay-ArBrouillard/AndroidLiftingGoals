@@ -59,13 +59,8 @@ public class ExerciseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
-        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("routine_models");
+        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("workout_exercise_models");
         final Spinner exerciseSpinner = findViewById(R.id.exercise_activity_spinner);
-
-        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
-        selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
-        selectedWorkoutIndex = sp.getInt("selected_workout_index", -1);
-        System.out.println("Inside ExerciseActivity- selectedWorkoutIndex: " + selectedWorkoutIndex);
 
         db = new DatabaseHelper(this);
         db.openDB();

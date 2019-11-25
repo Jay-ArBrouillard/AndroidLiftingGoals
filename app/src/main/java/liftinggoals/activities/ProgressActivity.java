@@ -29,7 +29,7 @@ import liftinggoals.classes.VolumeGroupModel;
 public class ProgressActivity extends AppCompatActivity {
     private ArrayList<VolumeGroupModel> volumeGroups;
     private RecyclerView volumeRecyclerView;
-    private RecyclerView.Adapter volumeAdapter;
+    private VolumeAdapter volumeAdapter;
     private RecyclerView.LayoutManager volumeLayoutManager;
     private ArrayList<ExerciseModel> exercisesList;
     private RecyclerView exerciseRecyclerView;
@@ -49,6 +49,7 @@ public class ProgressActivity extends AppCompatActivity {
         db.openDB();
 
         initializeRecyclerView();
+        initializeActionSearches();
         CardView overallCard = findViewById(R.id.activity_progress_overall_cardview);
         overallCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,15 +61,43 @@ public class ProgressActivity extends AppCompatActivity {
             }
         });
 
+
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_progress_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
 
+    }
+
+    private void initializeActionSearches() {
+        search = findViewById(R.id.activity_progress_action_search);
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                volumeAdapter.getFilter().filter(newText);
+                exerciseAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        //Make the entire text box clickable aswell
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search.onActionViewExpanded();
+            }
+        });
     }
 
     private void initializeRecyclerView() {
         volumeRecyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
         volumeRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
+
+        //TODO database stuff with volumes groups so you can click on them in progress tab
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Biceps"));
@@ -89,6 +118,12 @@ public class ProgressActivity extends AppCompatActivity {
         volumeRecyclerView.setLayoutManager(volumeLayoutManager);
         volumeRecyclerView.setAdapter(volumeAdapter);
 
+        volumeAdapter.setOnItemClickListener(new VolumeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                System.out.println("Clicked Volume item: " + volumeGroups.get(position).getVolumeGroup());
+            }
+        });
 
         exerciseRecyclerView = findViewById(R.id.activity_progress_exercises_recycler_view);
         exerciseRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
