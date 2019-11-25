@@ -96,7 +96,6 @@ public class ProgressActivity extends AppCompatActivity {
         volumeRecyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
         volumeRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
-
         //TODO database stuff with volumes groups so you can click on them in progress tab
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));

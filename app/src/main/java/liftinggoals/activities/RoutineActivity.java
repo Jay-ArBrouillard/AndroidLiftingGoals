@@ -28,6 +28,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import net.steamcrafted.loadtoast.LoadToast;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import liftinggoals.Services.RoutineService;
 import liftinggoals.adapters.RoutineAdapter;
@@ -37,7 +39,7 @@ import liftinggoals.classes.RoutineWorkoutModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.classes.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.misc.DefaultRoutineDialog;
+import liftinggoals.Dialogs.DefaultRoutineDialog;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 
@@ -55,6 +57,7 @@ public class RoutineActivity extends AppCompatActivity {
     private Button fetchButton;
     private LoadToast loadToast;
     private CardView createRoutine;
+    private boolean serviceError = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,23 @@ public class RoutineActivity extends AppCompatActivity {
                 loadToast.setBorderWidthDp(100);
                 DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, loadToast);
                 dialog.show(getSupportFragmentManager(), "Routine Dialog");
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        //Quit the loadToast if it takes longer than 7 seconds
+                        if (serviceError)
+                        {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loadToast.error();
+                                }
+                            });
+                        }
+                        timer.cancel();
+                    }
+                }, 7 * 1000);
             }
         });
 
@@ -130,6 +150,7 @@ public class RoutineActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            serviceError = false;
             Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
             routineModels = intent.getParcelableArrayListExtra("updatedRoutines");
             initializeRecyclerView();

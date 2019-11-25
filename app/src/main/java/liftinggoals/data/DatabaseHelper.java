@@ -18,7 +18,7 @@ import liftinggoals.classes.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 63;
+    public static final int DATABASE_VERSION = 64;
 
     public SQLiteDatabase myDB;
 
@@ -37,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(ExercisesTable.SQL_CREATE_EXERCISE_TABLE);
         db.execSQL(ExerciseLogTable.SQL_CREATE_EXERCISE_LOG_TABLE);
         db.execSQL(RecordsTable.SQL_CREATE_RECORDS_TABLE);
+        db.execSQL(MusclesTrainedTable.SQL_CREATE_MUSCLES_TRAINED_TABLE);
     }
 
     @Override
@@ -49,6 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(ExercisesTable.SQL_DROP_EXERCISE_TABLE);
         db.execSQL(ExerciseLogTable.SQL_DROP_EXERCISE_LOG_TABLE);
         db.execSQL(RecordsTable.SQL_DROP_RECORDS_TABLE);
+        db.execSQL(MusclesTrainedTable.SQL_DROP_MUSCLES_TRAINED_TABLE);
         onCreate(db);
     }
 

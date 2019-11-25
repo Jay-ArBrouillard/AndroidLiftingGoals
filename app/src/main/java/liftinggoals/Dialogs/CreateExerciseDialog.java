@@ -1,4 +1,4 @@
-package liftinggoals.misc;
+package liftinggoals.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

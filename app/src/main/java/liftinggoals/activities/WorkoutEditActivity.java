@@ -33,10 +33,10 @@ import liftinggoals.classes.ExerciseModel;
 import liftinggoals.classes.RoutineModel;
 import liftinggoals.classes.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.misc.CreateExerciseDialog;
+import liftinggoals.Dialogs.CreateExerciseDialog;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
-import liftinggoals.misc.WorkoutEditDialog;
+import liftinggoals.Dialogs.WorkoutEditDialog;
 
 public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEditDialog.WorkoutEditDialogListener, CreateExerciseDialog.CreateExerciseDialogListener {
     private ArrayList<RoutineModel> routineModels;
