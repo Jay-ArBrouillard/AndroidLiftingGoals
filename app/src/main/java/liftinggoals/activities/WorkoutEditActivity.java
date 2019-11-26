@@ -29,14 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import liftinggoals.adapters.WorkoutEditAdapter;
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.models.ExerciseModel;
+import liftinggoals.models.RoutineModel;
+import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.Dialogs.CreateExerciseDialog;
+import liftinggoals.dialogs.CreateExerciseDialog;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
-import liftinggoals.Dialogs.WorkoutEditDialog;
+import liftinggoals.dialogs.WorkoutEditDialog;
 
 public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEditDialog.WorkoutEditDialogListener, CreateExerciseDialog.CreateExerciseDialogListener {
     private ArrayList<RoutineModel> routineModels;

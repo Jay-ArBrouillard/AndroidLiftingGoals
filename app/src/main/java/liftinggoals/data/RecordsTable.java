@@ -8,8 +8,7 @@ import android.provider.BaseColumns;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RecordModel;
+import liftinggoals.models.RecordModel;
 
 public class RecordsTable {
 

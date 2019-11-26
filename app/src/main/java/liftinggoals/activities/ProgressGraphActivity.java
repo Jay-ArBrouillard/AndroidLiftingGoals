@@ -34,8 +34,8 @@ import java.util.Date;
 import java.util.List;
 
 import liftinggoals.adapters.ProgressExerciseAdapter;
-import liftinggoals.classes.ExerciseLogModel;
-import liftinggoals.classes.ProgressExerciseModel;
+import liftinggoals.models.ExerciseLogModel;
+import liftinggoals.models.ProgressExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class ProgressGraphActivity extends AppCompatActivity {

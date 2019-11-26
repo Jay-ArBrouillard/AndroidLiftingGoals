@@ -1,4 +1,4 @@
-package liftinggoals.classes;
+package liftinggoals.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

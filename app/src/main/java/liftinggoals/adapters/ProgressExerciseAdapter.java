@@ -12,7 +12,7 @@ import com.example.liftinggoals.R;
 
 import java.util.ArrayList;
 
-import liftinggoals.classes.ProgressExerciseModel;
+import liftinggoals.models.ProgressExerciseModel;
 
 public class ProgressExerciseAdapter extends RecyclerView.Adapter<ProgressExerciseAdapter.ProgressExerciseViewHolder> {
     private ArrayList<ProgressExerciseModel> progressExerciseModels;

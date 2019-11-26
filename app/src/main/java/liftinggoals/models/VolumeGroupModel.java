@@ -1,4 +1,4 @@
-package liftinggoals.classes;
+package liftinggoals.models;
 
 public class VolumeGroupModel {
     private int imageResource;

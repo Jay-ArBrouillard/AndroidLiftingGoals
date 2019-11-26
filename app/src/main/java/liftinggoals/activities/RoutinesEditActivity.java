@@ -5,14 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -21,8 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
-import liftinggoals.adapters.RoutineAdapter;
-import liftinggoals.classes.RoutineModel;
+import liftinggoals.models.RoutineModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class RoutinesEditActivity extends AppCompatActivity {

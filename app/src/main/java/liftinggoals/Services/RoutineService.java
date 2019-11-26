@@ -1,16 +1,13 @@
-package liftinggoals.Services;
+package liftinggoals.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Parcelable;
-import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -18,26 +15,19 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import net.steamcrafted.loadtoast.LoadToast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.RoutineWorkoutModel;
-import liftinggoals.classes.WorkoutExerciseModel;
-import liftinggoals.classes.WorkoutModel;
+import liftinggoals.models.ExerciseModel;
+import liftinggoals.models.RoutineModel;
+import liftinggoals.models.RoutineWorkoutModel;
+import liftinggoals.models.WorkoutExerciseModel;
+import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class RoutineService extends IntentService {

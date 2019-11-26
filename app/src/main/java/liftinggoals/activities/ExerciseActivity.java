@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -37,11 +36,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
-import liftinggoals.classes.ExerciseLogModel;
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RecordModel;
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.models.ExerciseLogModel;
+import liftinggoals.models.ExerciseModel;
+import liftinggoals.models.RecordModel;
+import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class ExerciseActivity extends AppCompatActivity {

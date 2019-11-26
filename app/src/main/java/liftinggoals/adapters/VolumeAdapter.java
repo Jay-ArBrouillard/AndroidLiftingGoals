@@ -16,7 +16,7 @@ import com.example.liftinggoals.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.VolumeGroupModel;
+import liftinggoals.models.VolumeGroupModel;
 
 public class VolumeAdapter extends RecyclerView.Adapter<VolumeAdapter.VolumeViewHolder> implements Filterable {
     private ArrayList<VolumeGroupModel> volumeGroupList;

@@ -16,7 +16,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.WorkoutModel;
+import liftinggoals.models.WorkoutModel;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutViewHolder> {
     private ArrayList<WorkoutModel> workoutList;

@@ -13,15 +13,12 @@ import android.widget.TextView;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 
 import liftinggoals.adapters.RecordsAdapter;
-import liftinggoals.classes.RecordModel;
+import liftinggoals.models.RecordModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class RepRecordActivity extends AppCompatActivity {

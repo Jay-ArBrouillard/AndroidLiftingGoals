@@ -16,8 +16,7 @@ import com.example.liftinggoals.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.VolumeGroupModel;
+import liftinggoals.models.ExerciseModel;
 
 public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.ExerciseViewHolder> implements Filterable {
     private ArrayList<ExerciseModel> exerciseList = new ArrayList<>();

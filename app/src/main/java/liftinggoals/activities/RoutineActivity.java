@@ -31,15 +31,15 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import liftinggoals.Services.RoutineService;
+import liftinggoals.services.RoutineService;
 import liftinggoals.adapters.RoutineAdapter;
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.RoutineWorkoutModel;
-import liftinggoals.classes.WorkoutExerciseModel;
-import liftinggoals.classes.WorkoutModel;
+import liftinggoals.models.ExerciseModel;
+import liftinggoals.models.RoutineModel;
+import liftinggoals.models.RoutineWorkoutModel;
+import liftinggoals.models.WorkoutExerciseModel;
+import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.Dialogs.DefaultRoutineDialog;
+import liftinggoals.dialogs.DefaultRoutineDialog;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 

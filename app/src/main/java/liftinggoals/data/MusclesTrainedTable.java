@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.MusclesTrainedModel;
+import liftinggoals.models.MusclesTrainedModel;
 
 public class MusclesTrainedTable {
     public static final String SQL_CREATE_MUSCLES_TRAINED_TABLE = "CREATE TABLE " +

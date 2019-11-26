@@ -1,8 +1,5 @@
 package liftinggoals.adapters;
 
-import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.RoutineModel;
+import liftinggoals.models.RoutineModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineViewHolder> implements Filterable {

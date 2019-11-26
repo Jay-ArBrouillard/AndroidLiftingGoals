@@ -19,12 +19,10 @@ import java.util.ArrayList;
 
 import liftinggoals.adapters.ProgressAdapter;
 import liftinggoals.adapters.VolumeAdapter;
-import liftinggoals.classes.ExerciseLogModel;
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.ProgressExerciseModel;
+import liftinggoals.models.ExerciseModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
-import liftinggoals.classes.VolumeGroupModel;
+import liftinggoals.models.VolumeGroupModel;
 
 public class ProgressActivity extends AppCompatActivity {
     private ArrayList<VolumeGroupModel> volumeGroups;

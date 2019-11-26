@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import java.util.ArrayList;
 import java.util.List;
-import liftinggoals.classes.RoutineModel;
+import liftinggoals.models.RoutineModel;
 
 public class RoutineTable{
 

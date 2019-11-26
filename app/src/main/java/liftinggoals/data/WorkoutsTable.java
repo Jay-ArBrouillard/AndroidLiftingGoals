@@ -8,8 +8,7 @@ import android.provider.BaseColumns;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.WorkoutModel;
+import liftinggoals.models.WorkoutModel;
 
 public class WorkoutsTable {
     public static final String SQL_CREATE_WORKOUT_TABLE= "CREATE TABLE " +

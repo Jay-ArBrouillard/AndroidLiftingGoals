@@ -1,4 +1,4 @@
-package liftinggoals.classes;
+package liftinggoals.models;
 
 public class ExerciseLogModel {
     private int userExerciseLogId;

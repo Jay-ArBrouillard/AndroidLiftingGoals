@@ -5,14 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-import com.github.mikephil.charting.utils.EntryXComparator;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RoutineWorkoutModel;
-import liftinggoals.classes.WorkoutExerciseModel;
+import liftinggoals.models.WorkoutExerciseModel;
 
 public class WorkoutExercisesTable {
 

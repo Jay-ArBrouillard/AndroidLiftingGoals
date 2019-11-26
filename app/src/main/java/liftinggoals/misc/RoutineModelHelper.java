@@ -4,11 +4,11 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.RoutineWorkoutModel;
-import liftinggoals.classes.WorkoutExerciseModel;
-import liftinggoals.classes.WorkoutModel;
+import liftinggoals.models.ExerciseModel;
+import liftinggoals.models.RoutineModel;
+import liftinggoals.models.RoutineWorkoutModel;
+import liftinggoals.models.WorkoutExerciseModel;
+import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 
 public class RoutineModelHelper {

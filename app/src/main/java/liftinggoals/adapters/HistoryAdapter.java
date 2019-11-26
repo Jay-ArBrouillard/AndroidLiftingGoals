@@ -12,7 +12,7 @@ import com.example.liftinggoals.R;
 
 import java.util.ArrayList;
 
-import liftinggoals.classes.HistoryItem;
+import liftinggoals.models.HistoryItem;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
     private ArrayList<HistoryItem> historyItems;

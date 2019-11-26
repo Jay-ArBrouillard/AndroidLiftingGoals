@@ -7,18 +7,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import liftinggoals.classes.ExerciseLogModel;
-import liftinggoals.classes.ExerciseModel;
-import liftinggoals.classes.RecordModel;
-import liftinggoals.classes.RoutineModel;
-import liftinggoals.classes.RoutineWorkoutModel;
-import liftinggoals.classes.WorkoutExerciseModel;
-import liftinggoals.classes.WorkoutModel;
+import liftinggoals.calendar.Event;
+import liftinggoals.models.ExerciseLogModel;
+import liftinggoals.models.ExerciseModel;
+import liftinggoals.models.RecordModel;
+import liftinggoals.models.RoutineModel;
+import liftinggoals.models.RoutineWorkoutModel;
+import liftinggoals.models.WorkoutExerciseModel;
+import liftinggoals.models.WorkoutModel;
 
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 64;
+    public static final int DATABASE_VERSION = 65;
 
     public SQLiteDatabase myDB;
 
@@ -38,6 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(ExerciseLogTable.SQL_CREATE_EXERCISE_LOG_TABLE);
         db.execSQL(RecordsTable.SQL_CREATE_RECORDS_TABLE);
         db.execSQL(MusclesTrainedTable.SQL_CREATE_MUSCLES_TRAINED_TABLE);
+        db.execSQL(EventsTable.SQL_CREATE_EVENTS_TABLE);
     }
 
     @Override
@@ -51,6 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(ExerciseLogTable.SQL_DROP_EXERCISE_LOG_TABLE);
         db.execSQL(RecordsTable.SQL_DROP_RECORDS_TABLE);
         db.execSQL(MusclesTrainedTable.SQL_DROP_MUSCLES_TRAINED_TABLE);
+        db.execSQL(EventsTable.SQL_DROP_EVENTSTABLE);
         onCreate(db);
     }
 
@@ -298,7 +301,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////EXERCISE LOG METHODS ///////////////////////////////////////////////////
+    ////////////////////////////EXERCISE LOG METHODS ///////////////////////////////////////////////
 
     public long insertExerciseLog(ExerciseLogModel exerciseLogModel)
     {
@@ -335,5 +338,17 @@ public class DatabaseHelper extends SQLiteOpenHelper
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////EVENT METHODS ///////////////////////////////////////////////
+
+    public long insertEvent(String event, String time, String date, String month, String year)
+    {
+        return EventsTable.insert(myDB, event, time, date, month, year);
+    }
+
+    public List<Event> getEventsByMonthAndYear (String month, String year)
+    {
+        return EventsTable.getEventsForMonth(myDB, month, year);
+    }
 
 }

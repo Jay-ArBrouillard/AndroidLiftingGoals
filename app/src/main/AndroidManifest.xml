@@ -76,7 +76,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="liftinggoals.Services.RoutineService" />
+        <service android:name="liftinggoals.services.RoutineService" />
     </application>
 
 </manifest>

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.liftinggoals.R;
 import java.util.ArrayList;
-import liftinggoals.classes.RecordModel;
+import liftinggoals.models.RecordModel;
 
 public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordViewHolder> {
     private ArrayList<RecordModel> recordModels;

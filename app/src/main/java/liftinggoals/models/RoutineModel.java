@@ -1,10 +1,9 @@
-package liftinggoals.classes;
+package liftinggoals.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class RoutineModel implements Parcelable {
     private int imageResource;
