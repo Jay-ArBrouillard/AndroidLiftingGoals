@@ -26,9 +26,11 @@ public class RoutinesEditActivity extends AppCompatActivity {
     private ArrayList<RoutineModel> routineModels;
     private int selectedRoutineIndex;
     private EditText routineNameEditText;
+    private EditText routineDescEditText;
     private DatabaseHelper db;
     private ImageView commitButton;
     private String routineNameUnchanged;
+    private String routineDescUnchanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +42,13 @@ public class RoutinesEditActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
         db.openDB();
 
-        routineNameEditText = findViewById(R.id.activity_routines_edit_edit_text);
+        routineNameEditText = findViewById(R.id.activity_routines_edit_text);
         routineNameEditText.setText(routineModels.get(selectedRoutineIndex).getRoutineName());
         commitButton = findViewById(R.id.routine_activity_commit_button);
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.updateRoutineName(routineModels.get(selectedRoutineIndex).getRoutineId(), routineNameEditText.getText().toString());
+                db.updateRoutineNameAndDescription(routineModels.get(selectedRoutineIndex).getRoutineId(), routineNameEditText.getText().toString(), routineDescEditText.getText().toString());
                 commitButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
         });
@@ -65,6 +67,33 @@ public class RoutinesEditActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (!s.equals(routineNameUnchanged))
+                {
+                    commitButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                }
+                else
+                {
+                    commitButton.setImageResource(R.drawable.ic_checked_neutral_48dp);
+                }
+            }
+        });
+
+        routineDescEditText = findViewById(R.id.activity_routines_edit_description_text);
+        routineDescEditText.setText(routineModels.get(selectedRoutineIndex).getRoutineDescription());
+        routineDescUnchanged = routineModels.get(selectedRoutineIndex).getRoutineDescription();
+        routineDescEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.equals(routineDescUnchanged))
                 {
                     commitButton.setImageResource(R.drawable.ic_checked_red_48dp);
                 }

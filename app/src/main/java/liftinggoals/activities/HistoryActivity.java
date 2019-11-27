@@ -42,47 +42,8 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         customCalendarView = findViewById(R.id.custom_calendar_view);
-/*
-
-        calendar = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
-        String[] d = {"","","","","","",""};
-        calendar.setDayColumnNames(d);
-
-        t = (TextView) findViewById(R.id.history_fragment_workout_details);
-
-        //Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/avebetwan.ttf");
-        sdf = new SimpleDateFormat("MMMM");
-
-        t.setText(sdf.format(calendar.getFirstDayOfCurrentMonth()));
-        //t.setTypeface(custom_font);
-
-        Date date1 = new Date(117,7,15);
-        Event e = new Event(Color.DKGRAY, date1.getTime(),"text1");
-        calendar.addEvent(e);
-
-        calendar.setListener(new CompactCalendarView.CompactCalendarViewListener() {
-            @Override
-            public void onDayClick(Date dateClicked) {
-
-            }
-
-            @Override
-            public void onMonthScroll(Date firstDayOfNewMonth) {
-                t.setText(sdf.format(calendar.getFirstDayOfCurrentMonth()));
-            }
-        });
-
         //Recycler View
-        DatabaseHelper db = new DatabaseHelper(this);
-        db.openDB();
-        historyItems = new ArrayList<>();
-        for (WorkoutModel workoutModel : db.getAllWorkouts()) //Fix
-        {
-            String workoutName = workoutModel.getWorkoutName();
-            HistoryItem historyItem = new HistoryItem(workoutName, "No Data", "No Date data");
-            historyItems.add(historyItem);
-        }
-
+/*
         historyRecyclerView = findViewById(R.id.activity_history_recycler_view);
         historyRecyclerView.setHasFixedSize(true);
         historyLayoutManager = new LinearLayoutManager(this);
@@ -91,9 +52,9 @@ public class HistoryActivity extends AppCompatActivity {
         historyRecyclerView.setLayoutManager(historyLayoutManager);
         historyRecyclerView.setAdapter(historyAdapter);
 
-
+*/
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_history_bottom_navigation);
-        bottomNavigation.setOnNavigationItemSelectedListener(navListener);*/
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -107,9 +68,6 @@ public class HistoryActivity extends AppCompatActivity {
                     break;
                 case R.id.nav_progress:
                     selectedActivity = new Intent(HistoryActivity.this, ProgressActivity.class);
-                    break;
-                case R.id.nav_history:
-                    //selectedActivity = new Intent(ProgressActivity.this, HistoryActivity.class);
                     break;
                 case R.id.nav_maps:
                     selectedActivity = new Intent(HistoryActivity.this, MapsActivity.class);

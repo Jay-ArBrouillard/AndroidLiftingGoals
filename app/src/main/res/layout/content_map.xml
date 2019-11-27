@@ -8,7 +8,6 @@
     tools:context="liftinggoals.activities.MapsActivity"
     tools:showIn="@layout/activity_maps">
 
-
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -30,8 +29,9 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:translationY="-18dp"
-            android:src="@drawable/ic_checked_green_48dp"/>
+            android:src="@drawable/ic_location_on_red_24dp"/>
     </com.skyfishjy.library.RippleBackground>
+
     <com.mancj.materialsearchbar.MaterialSearchBar
         style="@style/MaterialSearchBarLight"
         app:mt_speechMode="false"

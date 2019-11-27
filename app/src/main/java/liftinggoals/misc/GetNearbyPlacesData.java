@@ -1,26 +1,31 @@
 package liftinggoals.misc;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
-
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
-    String googlePlacesData;
-    GoogleMap mMap;
-    String url;
 
+public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
+    private String googlePlacesData;
+    private GoogleMap mMap;
+    private String url;
+    private Context context;
     @Override
     protected String doInBackground(Object... objects) {
         mMap = (GoogleMap) objects[0];
         url = (String) objects[1];
+        this.context = (Context) objects[2];
 
         DownloadUrl downloadUrl = new DownloadUrl();
         try {
@@ -29,7 +34,6 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
             e.printStackTrace();
         }
 
-        System.out.println(googlePlacesData);
         return googlePlacesData;
     }
 
@@ -41,6 +45,10 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
             DataParser parser = new DataParser();
             nearByPlaceList = parser.parse(s);
             showNearByPlaces(nearByPlaceList);
+
+            Intent intent = new Intent("mapsAction");
+            intent.putExtra("count", nearByPlaceList.size());
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
     }
 
@@ -48,7 +56,7 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
     {
         for (int i = 0; i < nearByPlaceList.size(); i++)
         {
-            MarkerOptions markerOptions = new MarkerOptions();
+            final MarkerOptions markerOptions = new MarkerOptions();
             HashMap<String, String> googlePlace = nearByPlaceList.get(i);
 
             String placeName = googlePlace.get("place_name");

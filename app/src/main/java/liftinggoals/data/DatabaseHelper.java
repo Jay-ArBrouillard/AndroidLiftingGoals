@@ -81,9 +81,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.insert(myDB, userId, name, description, numberWorkouts);
     }
 
-    public long updateRoutineName(int routineId, String name)
+    public long updateRoutineNameAndDescription(int routineId, String name, String description)
     {
-        return RoutineTable.update(myDB, routineId, name);
+        return RoutineTable.update(myDB, routineId, name, description);
     }
 
     public long updateRoutine(int routineId, String name, String description, int numberWorkouts)

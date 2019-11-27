@@ -167,9 +167,6 @@ public class RoutineActivity extends AppCompatActivity {
             Intent selectedActivity = null;
 
             switch (menuItem.getItemId()) {
-                case R.id.nav_routine:
-                    selectedActivity = new Intent(RoutineActivity.this, RoutineActivity.class);
-                    break;
                 case R.id.nav_progress:
                     selectedActivity = new Intent(RoutineActivity.this, ProgressActivity.class);
                     break;

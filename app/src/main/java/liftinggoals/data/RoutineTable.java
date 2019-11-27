@@ -40,10 +40,11 @@ public class RoutineTable{
         return myDB.insert(RoutineEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, int routineId, String name)
+    public static long update(SQLiteDatabase myDB, int routineId, String name, String description)
     {
         ContentValues values = new ContentValues();
         values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
+        values.put(RoutineEntry.COLUMN_DESCRIPTION, description);
 
         return myDB.update(RoutineEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(routineId)});
     }

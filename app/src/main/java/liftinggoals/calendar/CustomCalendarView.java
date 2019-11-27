@@ -80,14 +80,12 @@ public class CustomCalendarView extends LinearLayout {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setCancelable(true);
-                view.setBackgroundColor(Color.TRANSPARENT);
-                final View addView = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_add_new_event, parent, false);
-                addView.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                //TODO fix background transparent
+                final View addView = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_add_new_event, null);
                 final EditText eventName = addView.findViewById(R.id.event_name);
                 final TextView eventTime = addView.findViewById(R.id.event_time);
-                ImageButton setTime = addView.findViewById(R.id.set_event_time);
+                final ImageButton setTime = addView.findViewById(R.id.set_event_time);
                 final Button addEventButton = addView.findViewById(R.id.add_event);
+
                 setTime.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -111,6 +109,15 @@ public class CustomCalendarView extends LinearLayout {
                     }
                 });
 
+
+                eventTime.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setTime.callOnClick();
+                    }
+                });
+
+
                 final String date = eventDateFormat.format(dates.get(position));
                 final String month = monthFormat.format(dates.get(position));
                 final String year = yearFormat.format(dates.get(position));
@@ -128,6 +135,7 @@ public class CustomCalendarView extends LinearLayout {
                 builder.show();
             }
         });
+
     }
 
     private void saveEvent(String event, String time, String date, String month, String year)

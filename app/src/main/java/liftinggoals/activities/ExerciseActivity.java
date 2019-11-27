@@ -50,8 +50,6 @@ public class ExerciseActivity extends AppCompatActivity {
     private DatabaseHelper db;
     private ArrayList<Entry> entries = new ArrayList<>();
     private Spinner spinner;
-    private int selectedRoutineIndex;
-    private int selectedWorkoutIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -46,7 +46,6 @@ public class SettingsActivity extends AppCompatActivity {
         exportData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("here");
                 ExportDatabaseCSVTask task = new ExportDatabaseCSVTask();
                 task.execute();
             }
@@ -75,10 +74,6 @@ public class SettingsActivity extends AppCompatActivity {
                 case R.id.nav_maps:
                     selectedActivity = new Intent(SettingsActivity.this, MapsActivity.class);
                     break;
-                case R.id.nav_settings:
-                    //selectedActivity = new Intent(SettingsActivity.this, SettingsActivity.class);
-                    break;
-
             }
             if (selectedActivity != null)
             {

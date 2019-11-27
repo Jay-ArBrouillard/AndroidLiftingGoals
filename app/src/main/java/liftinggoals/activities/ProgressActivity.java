@@ -132,6 +132,11 @@ public class ProgressActivity extends AppCompatActivity {
         db.openDB();
         exercisesList = (ArrayList<ExerciseModel>) db.getAllExercises();
 
+        if (exercisesList == null)
+        {
+            exercisesList = new ArrayList<>();
+        }
+
         exerciseLayoutManager = new LinearLayoutManager(this);
         exerciseAdapter = new ProgressAdapter(exercisesList);
         exerciseRecyclerView.setLayoutManager(exerciseLayoutManager);
@@ -160,9 +165,6 @@ public class ProgressActivity extends AppCompatActivity {
             switch (menuItem.getItemId()) {
                 case R.id.nav_routine:
                     selectedActivity = new Intent(ProgressActivity.this, RoutineActivity.class);
-                    break;
-                case R.id.nav_progress:
-                    //selectedActivity = new Intent(ProgressActivity.this, ProgressActivity.class);
                     break;
                 case R.id.nav_history:
                     selectedActivity = new Intent(ProgressActivity.this, HistoryActivity.class);

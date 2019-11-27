@@ -1,22 +1,29 @@
 package liftinggoals.activities;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.liftinggoals.R;
 import com.google.android.gms.common.api.ApiException;
@@ -50,6 +57,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
 import com.skyfishjy.library.RippleBackground;
@@ -73,8 +81,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private View mapView;
     private Button btnFind;
     private RippleBackground rippleBg;
-
+    private int PROXIMITY_RADIUS = 8046;
+    private ResponseReceiver myReceiver;
     private final float DEFAULT_ZOOM = 15;
+    private GetNearbyPlacesData getNearbyPlacesData;
+    private Button decrementRadiusDist;
+    private Button incrementRadiusDist;
+    private TextView searchRadius;
+    private LatLng currentMarkerLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +99,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnFind = findViewById(R.id.btn_find);
         rippleBg = findViewById(R.id.ripple_bg);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mapView = mapFragment.getView();
 
@@ -210,30 +224,133 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
+        searchRadius = findViewById(R.id.searchRadiusTextValue);
+        incrementRadiusDist = findViewById(R.id.incrementRadiusBtn);
+        decrementRadiusDist = findViewById(R.id.decrementRadiusBtn);
+        incrementRadiusDist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int miles = Integer.parseInt(searchRadius.getText().toString());
+                miles++;
+                searchRadius.setText(Integer.toString(miles));
+                PROXIMITY_RADIUS += 1609;
+            }
+        });
+
+        decrementRadiusDist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int miles = Integer.parseInt(searchRadius.getText().toString());
+                if (miles > 0)
+                {
+                    miles--;
+                    searchRadius.setText(Integer.toString(miles));
+                    PROXIMITY_RADIUS -= 1609;
+                }
+            }
+        });
+
+
         btnFind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LatLng currentMarkerLocation = mMap.getCameraPosition().target;
-                GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
-                String url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&fields=photos,formatted_address,name,rating,opening_hours,geometry&key=AIzaSyCeHcBAjLZABKGkm18qvsc3D-Gkc93JL44";
-                Object data [] = new Object[2];
+                LatLng centerLatLang = mMap.getProjection().getVisibleRegion().latLngBounds.getCenter();
+                getNearbyPlacesData = new GetNearbyPlacesData();
+                StringBuilder urlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+                urlBuilder.append("location=").append(centerLatLang.latitude).append(",").append(centerLatLang.longitude);
+                urlBuilder.append("&radius="+PROXIMITY_RADIUS);
+                urlBuilder.append("&type=gym");
+                urlBuilder.append("&sensor=true");
+                urlBuilder.append("&key=").append("AIzaSyCeHcBAjLZABKGkm18qvsc3D-Gkc93JL44");
+                Object data [] = new Object[3];
                 data[0] = mMap;
-                data[1] = url;
+                data[1] = urlBuilder.toString();
+                data[2] = getApplicationContext();
                 getNearbyPlacesData.execute(data);
-                Toast.makeText(MapsActivity.this, "Showing nearby gyms", Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this, "Please hold while we find nearby gyms...", Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this, "This may take up to a minute", Toast.LENGTH_LONG).show();
                 rippleBg.startRippleAnimation();
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        if (getNearbyPlacesData.getStatus() != AsyncTask.Status.FINISHED)
+                        {
+                            Toast.makeText(MapsActivity.this, "Gym Locator has timed out. Try again in a minute.", Toast.LENGTH_LONG).show();
+                        }
                         rippleBg.stopRippleAnimation();
-
-                        //startActivity(new Intent(MapsActivity.this, RoutineActivity.class));
-                        //finish();
                     }
-                }, 3000);
+                }, 60000);
 
             }
         });
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.activity_maps_bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            Intent selectedActivity = null;
+
+            switch (menuItem.getItemId()) {
+                case R.id.nav_routine:
+                    selectedActivity = new Intent(MapsActivity.this, RoutineActivity.class);
+                    break;
+                case R.id.nav_progress:
+                    selectedActivity = new Intent(MapsActivity.this, ProgressActivity.class);
+                    break;
+                case R.id.nav_history:
+                    selectedActivity = new Intent(MapsActivity.this, HistoryActivity.class);
+                    break;
+                case R.id.nav_settings:
+                    selectedActivity = new Intent(MapsActivity.this, SettingsActivity.class);
+                    break;
+
+            }
+            if (selectedActivity != null)
+            {
+                startActivity(selectedActivity);
+            }
+
+            return true;    //Means we want to select the clicked item
+        }
+    };
+
+    private void setReceiver() {
+        myReceiver = new MapsActivity.ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("mapsAction");
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
+    }
+
+    public class ResponseReceiver extends BroadcastReceiver {
+        private ResponseReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            rippleBg.stopRippleAnimation();
+            int numberGyms = intent.getIntExtra("count", 0);
+
+            if (getNearbyPlacesData.getStatus() == AsyncTask.Status.FINISHED)
+            {
+                if (numberGyms == 0)
+                {
+                    Toast.makeText(MapsActivity.this, "Couldn't find any nearby gyms. Try increasing search radius or moving locations", Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    Toast.makeText(MapsActivity.this, "Success found " + numberGyms + " nearby gyms", Toast.LENGTH_LONG).show();
+                }
+            }
+            else
+            {
+                Toast.makeText(MapsActivity.this, "Connectivity error", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -340,5 +457,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
+    }
+
+    @Override
+    protected void onStart() {
+        setReceiver();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        super.onStop();
     }
 }
