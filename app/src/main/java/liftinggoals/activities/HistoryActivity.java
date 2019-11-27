@@ -2,29 +2,22 @@ package liftinggoals.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.liftinggoals.R;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
-import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
-import liftinggoals.adapters.HistoryAdapter;
 import liftinggoals.calendar.CustomCalendarView;
 import liftinggoals.models.HistoryItem;
-import liftinggoals.models.WorkoutModel;
-import liftinggoals.data.DatabaseHelper;
 
 public class HistoryActivity extends AppCompatActivity {
     private CompactCalendarView calendar;
@@ -42,17 +35,7 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         customCalendarView = findViewById(R.id.custom_calendar_view);
-        //Recycler View
-/*
-        historyRecyclerView = findViewById(R.id.activity_history_recycler_view);
-        historyRecyclerView.setHasFixedSize(true);
-        historyLayoutManager = new LinearLayoutManager(this);
-        historyAdapter = new HistoryAdapter(historyItems);
 
-        historyRecyclerView.setLayoutManager(historyLayoutManager);
-        historyRecyclerView.setAdapter(historyAdapter);
-
-*/
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_history_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
     }
