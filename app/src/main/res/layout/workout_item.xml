@@ -39,7 +39,7 @@
                 android:text="Num exercise(s): "/>
 
             <TextView
-                android:id="@+id/description_text_view"
+                android:id="@+id/workout_item_num_exercises_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15dp"

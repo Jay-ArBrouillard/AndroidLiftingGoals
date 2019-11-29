@@ -25,6 +25,17 @@ public class RoutineWorkoutsTable {
         public static final String COLUMN_ROUTINE_ID = "routine_id";
         public static final String COLUMN_WORKOUT_ID = "workout_id";
     }
+
+    public static long insert(SQLiteDatabase myDB, int routineWorkoutId, int routineId, int workoutId)
+    {
+        ContentValues values = new ContentValues();
+        values.put(RoutineWorkoutEntry._ID, routineWorkoutId);
+        values.put(RoutineWorkoutEntry.COLUMN_ROUTINE_ID, routineId);
+        values.put(RoutineWorkoutEntry.COLUMN_WORKOUT_ID, workoutId);
+
+        return myDB.insert(RoutineWorkoutEntry.TABLE_NAME, null, values);
+    }
+
     public static long insert(SQLiteDatabase myDB, int routineId, int workoutId)
     {
         ContentValues values = new ContentValues();
@@ -50,11 +61,11 @@ public class RoutineWorkoutsTable {
         return myDB.delete(RoutineWorkoutEntry.TABLE_NAME, where, null);
     }
 
-    public static RoutineWorkoutModel getRoutineWorkout(SQLiteDatabase myDB, int routineId, int workoutId)
+    public static RoutineWorkoutModel get(SQLiteDatabase myDB, int routineWorkoutId)
     {
-        String query = "SELECT * FROM " + RoutineWorkoutEntry.TABLE_NAME + " WHERE " + RoutineWorkoutEntry.COLUMN_ROUTINE_ID  + " = ? AND " + RoutineWorkoutEntry.COLUMN_WORKOUT_ID  + " = ?";
+        String query = "SELECT * FROM " + RoutineWorkoutEntry.TABLE_NAME + " WHERE " + RoutineWorkoutEntry._ID + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(routineId), Integer.toString(workoutId)});
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(routineWorkoutId)});
 
         if (c.getCount() == 0)
         {

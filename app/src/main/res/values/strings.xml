@@ -5,7 +5,23 @@
     <string name="third_nav_tab">History</string>
     <string name="fourth_nav_tab">Maps</string>
     <string name="fifth_nav_tab">Settings</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
+    <string-array name="exercise_muscle_groups">
+        <item>Arms</item>
+        <item>Back</item>
+        <item>Biceps</item>
+        <item>Calves</item>
+        <item>Chest</item>
+        <item>Erector Spinae</item>
+        <item>Forearms</item>
+        <item>Glutes</item>
+        <item>Hamstrings</item>
+        <item>Lats</item>
+        <item>Neck</item>
+        <item>Quadriceps</item>
+        <item>Trapezius</item>
+        <item>Triceps</item>
+        <item>Shoulders</item>
+    </string-array>
 </resources>

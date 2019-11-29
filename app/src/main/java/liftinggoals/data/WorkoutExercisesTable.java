@@ -37,6 +37,23 @@ public class WorkoutExercisesTable {
         public static final String COLUMN_MAXIMUM_REPS = "maximum_reps";
         public static final String COLUMN_INTENSITY = "intensity";
     }
+
+    public static long insert(SQLiteDatabase myDB, int workoutExerciseId, int workoutId, int exerciseId,
+                              int minimumSets, int minimumReps, int maximumSets, int maximumReps, double intensity)
+    {
+        ContentValues values = new ContentValues();
+        values.put(WorkoutExercisesEntry._ID, workoutExerciseId);
+        values.put(WorkoutExercisesEntry.COLUMN_WORKOUT_ID, workoutId);
+        values.put(WorkoutExercisesEntry.COLUMN_EXERCISE_ID, exerciseId);
+        values.put(WorkoutExercisesEntry.COLUMN_MINIMUM_SETS, minimumSets);
+        values.put(WorkoutExercisesEntry.COLUMN_MINIMUM_REPS, minimumReps);
+        values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_SETS, maximumSets);
+        values.put(WorkoutExercisesEntry.COLUMN_MAXIMUM_REPS, maximumReps);
+        values.put(WorkoutExercisesEntry.COLUMN_INTENSITY, intensity);
+
+        return myDB.insert(WorkoutExercisesEntry.TABLE_NAME, null, values);
+    }
+
     public static long insert(SQLiteDatabase myDB, int workoutId, int exerciseId,
                               int minimumSets, int minimumReps, int maximumSets, int maximumReps, double intensity)
     {

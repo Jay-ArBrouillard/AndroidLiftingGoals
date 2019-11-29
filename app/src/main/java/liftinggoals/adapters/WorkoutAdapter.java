@@ -131,7 +131,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
             dumbbellIcon = itemView.findViewById(R.id.dumbbell_icon);
             editIcon = itemView.findViewById(R.id.edit_icon);
             workoutName = itemView.findViewById(R.id.title_text_view);
-            numExercises = itemView.findViewById(R.id.description_text_view);
+            numExercises = itemView.findViewById(R.id.workout_item_num_exercises_value);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

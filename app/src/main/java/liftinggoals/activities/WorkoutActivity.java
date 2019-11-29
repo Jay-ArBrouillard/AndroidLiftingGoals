@@ -21,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import liftinggoals.adapters.WorkoutAdapter;
 import liftinggoals.models.RoutineModel;
+import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.RoutineModelHelper;
@@ -35,6 +36,7 @@ public class WorkoutActivity extends AppCompatActivity {
     private SearchView search;
     private CardView createWorkout;
     private DatabaseHelper db;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class WorkoutActivity extends AppCompatActivity {
 
         routineModels = getIntent().getExtras().getParcelableArrayList("routine_models");
         SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        userId = sp.getInt("UserId", -1);
         selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
 
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
@@ -54,7 +57,6 @@ public class WorkoutActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.multiple_workout_recycler_view);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4)); //only do this once
 
-        initializeRecyclerView();
         initializeActionSearch();
         initializeSwipe();
 
@@ -109,6 +111,7 @@ public class WorkoutActivity extends AppCompatActivity {
 
     private void initializeRecyclerView()
     {
+        routineModels =  RoutineModelHelper.populateRoutineModels(this, userId);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
 
@@ -118,9 +121,9 @@ public class WorkoutActivity extends AppCompatActivity {
             public void onItemClick(int position) {
                 Intent startExerciseActivity = new Intent(WorkoutActivity.this, ExerciseActivity.class);
                 startExerciseActivity.putParcelableArrayListExtra("workout_exercise_models", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getExercises());
+                startExerciseActivity.putExtra("workout_name", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getWorkoutName());
                 SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
                 sp.edit().putInt("selected_workout_index", position).commit();
-                System.out.println("selectedWorkoutIndex: " + position);
                 startActivity(startExerciseActivity);
             }
 
@@ -183,7 +186,6 @@ public class WorkoutActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        routineModels = RoutineModelHelper.populateRoutineModels(getApplicationContext());
         initializeRecyclerView();
     }
 }

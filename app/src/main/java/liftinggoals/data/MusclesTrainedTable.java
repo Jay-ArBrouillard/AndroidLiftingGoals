@@ -25,6 +25,17 @@ public class MusclesTrainedTable {
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
         public static final String COLUMN_MUSCLE_GROUP = "muscle_group";
     }
+
+    public static long insert(SQLiteDatabase myDB, int musclesTrainedId, int exerciseId, String muscleGroup)
+    {
+        ContentValues values = new ContentValues();
+        values.put(MusclesTrainedEntry._ID, musclesTrainedId);
+        values.put(MusclesTrainedEntry.COLUMN_EXERCISE_ID, exerciseId);
+        values.put(MusclesTrainedEntry.COLUMN_MUSCLE_GROUP, muscleGroup);
+
+        return myDB.insert(MusclesTrainedEntry.TABLE_NAME, null, values);
+    }
+
     public static long insert(SQLiteDatabase myDB, int exerciseId, String muscleGroup)
     {
         ContentValues values = new ContentValues();
@@ -48,6 +59,56 @@ public class MusclesTrainedTable {
         String where = MusclesTrainedEntry._ID + " = " + id;
 
         return myDB.delete(MusclesTrainedEntry.TABLE_NAME, where, null);
+    }
+
+    public static MusclesTrainedModel get(SQLiteDatabase myDB, int musclesTrainedId)
+    {
+        String query = "SELECT * FROM " + MusclesTrainedEntry.TABLE_NAME + " WHERE " + MusclesTrainedEntry._ID + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(musclesTrainedId)});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            MusclesTrainedModel musclesTrainedModel = new MusclesTrainedModel();
+
+            while(c.moveToNext()){
+                musclesTrainedModel.setMusclesTrainedId(c.getInt(c.getColumnIndexOrThrow(MusclesTrainedEntry._ID)));
+                musclesTrainedModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(MusclesTrainedEntry.COLUMN_EXERCISE_ID)));
+                musclesTrainedModel.setMuscleGroup(c.getString(c.getColumnIndexOrThrow(MusclesTrainedEntry.COLUMN_MUSCLE_GROUP)));
+            }
+
+            return musclesTrainedModel;
+        }
+    }
+
+    public static List<MusclesTrainedModel> get(SQLiteDatabase myDB, String muscleGroup)
+    {
+        String query = "SELECT * FROM " + MusclesTrainedEntry.TABLE_NAME + " WHERE " + MusclesTrainedEntry.COLUMN_MUSCLE_GROUP + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {muscleGroup});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<MusclesTrainedModel> musclesTrainedModels = new ArrayList<>();
+
+            while(c.moveToNext()){
+                MusclesTrainedModel musclesTrainedModel = new MusclesTrainedModel();
+                musclesTrainedModel.setMusclesTrainedId(c.getInt(c.getColumnIndexOrThrow(MusclesTrainedEntry._ID)));
+                musclesTrainedModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(MusclesTrainedEntry.COLUMN_EXERCISE_ID)));
+                musclesTrainedModel.setMuscleGroup(c.getString(c.getColumnIndexOrThrow(MusclesTrainedEntry.COLUMN_MUSCLE_GROUP)));
+                musclesTrainedModels.add(musclesTrainedModel);
+            }
+
+            return musclesTrainedModels;
+        }
     }
 
     public static List<MusclesTrainedModel> getAll(SQLiteDatabase myDB)

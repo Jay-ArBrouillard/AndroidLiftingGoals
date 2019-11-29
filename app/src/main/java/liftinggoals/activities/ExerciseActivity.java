@@ -1,12 +1,14 @@
 package liftinggoals.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -32,8 +34,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import liftinggoals.models.ExerciseLogModel;
@@ -50,23 +56,34 @@ public class ExerciseActivity extends AppCompatActivity {
     private DatabaseHelper db;
     private ArrayList<Entry> entries = new ArrayList<>();
     private Spinner spinner;
+    private TextView weightTextView;
+    private TextView repsTextView;
+    private String workoutName;
+    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
+    private SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
+    private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
+    private SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
         workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("workout_exercise_models");
-        final Spinner exerciseSpinner = findViewById(R.id.exercise_activity_spinner);
+        workoutName = getIntent().getExtras().getString("workout_name");
 
         db = new DatabaseHelper(this);
         db.openDB();
 
+        spinner = findViewById(R.id.exercise_activity_spinner);
         doneButton = findViewById(R.id.activity_exercise_done_button);
         logButton = findViewById(R.id.exercise_activity_log_button);
+        weightTextView = findViewById(R.id.exercise_activity_weight_value);
+        repsTextView = findViewById(R.id.exercise_activity_reps_value);
 
         if (workoutExerciseModels.size() > 0)
         {
-            buildLineGraph(workoutExerciseModels.get(0));
             logButton.setEnabled(true);
         }
         else
@@ -78,6 +95,13 @@ public class ExerciseActivity extends AppCompatActivity {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final String time = dateFormat.format(calendar.getTime());
+                final String date = eventDateFormat.format(calendar.getTime());
+                final String month = monthFormat.format(calendar.getTime());
+                final String year = yearFormat.format(calendar.getTime());
+                String longDate = longDateFormat.format(calendar.getTime());
+                String exerciseDescription = buildExerciseString();
+                db.insertEventWithExercises(workoutName, exerciseDescription, time, date, month, year, longDate);
                 Intent intent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
                 startActivity(intent);
                 finish();
@@ -90,13 +114,13 @@ public class ExerciseActivity extends AppCompatActivity {
                 logButton.setEnabled(false);    //Prevent double button click
 
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
-                exerciseLogModel.setWorkoutExeriseId(workoutExerciseModels.get(exerciseSpinner.getSelectedItemPosition()).getWorkoutExerciseId());
+                exerciseLogModel.setWorkoutExeriseId(workoutExerciseModels.get(spinner.getSelectedItemPosition()).getWorkoutExerciseId());
                 TextView set = findViewById(R.id.exercise_activity_set_value);
                 EditText repsEditText = findViewById(R.id.exercise_activity_reps_value);
                 EditText weightEditText = findViewById(R.id.exercise_activity_weight_value);
 
                 try {
-                    int selectedIndex = exerciseSpinner.getSelectedItemPosition();
+                    int selectedIndex = spinner.getSelectedItemPosition();
                     int index = Integer.parseInt(set.getText().toString());
                     int reps = Integer.parseInt(repsEditText.getText().toString().trim());
                     double weight = Double.parseDouble(weightEditText.getText().toString().trim());
@@ -134,14 +158,26 @@ public class ExerciseActivity extends AppCompatActivity {
         }
         ArrayAdapter<String> exerciseAdapter = new ArrayAdapter<>(ExerciseActivity.this, android.R.layout.simple_list_item_1, exerciseNames);
         exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        exerciseSpinner.setAdapter(exerciseAdapter);
+        spinner.setAdapter(exerciseAdapter);
 
-        spinner = findViewById(R.id.exercise_activity_spinner);
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 WorkoutExerciseModel selected = workoutExerciseModels.get(position);
                 buildLineGraph(selected);
+
+                double intensity = selected.getIntensity();
+                if (intensity != 0 && intensity != -1)
+                {
+                    weightTextView.setText(Double.toString(intensity));
+                }
+
+                int minimumReps = selected.getMinimumReps();
+                if (minimumReps != 0 && minimumReps != -1)
+                {
+                    repsTextView.setText(Integer.toString(minimumReps));
+                }
             }
 
             @Override
@@ -152,6 +188,24 @@ public class ExerciseActivity extends AppCompatActivity {
 
                 //this leaves the keyboard hidden on load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private String buildExerciseString()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < workoutExerciseModels.size(); i++)
+        {
+            ExerciseModel exercise = workoutExerciseModels.get(i).getExercise();
+            builder.append(exercise.getExerciseName());
+
+            if (i != (workoutExerciseModels.size() - 1))
+            {
+                builder.append(", ");
+            }
+        }
+
+        return builder.toString();
     }
 
     private void processRecords(int userId, int exerciseId, double weight, int reps, String date)
@@ -279,6 +333,10 @@ public class ExerciseActivity extends AppCompatActivity {
         }
 
         lineChart = findViewById(R.id.line_graph);
+        final DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        lineChart.setMinimumHeight(displayMetrics.heightPixels/2);
+
         lineChart.setScaleEnabled(true);
         lineChart.setDragEnabled(true);
         lineChart.setDrawMarkers(false);

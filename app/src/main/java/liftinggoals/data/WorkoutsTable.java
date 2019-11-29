@@ -30,6 +30,19 @@ public class WorkoutsTable {
         public static final String COLUMN_DURATION = "duration";
         public static final String COLUMN_NUMBER_EXERCISES = "number_exercises";
     }
+
+    public static long insert(SQLiteDatabase myDB, int workoutId, String name, String description, double duration, int exercises)
+    {
+        ContentValues values = new ContentValues();
+        values.put(WorkoutEntry._ID, workoutId);
+        values.put(WorkoutEntry.COLUMN_WORKOUT_NAME, name);
+        values.put(WorkoutEntry.COLUMN_DESCRIPTION, description);
+        values.put(WorkoutEntry.COLUMN_DURATION, duration);
+        values.put(WorkoutEntry.COLUMN_NUMBER_EXERCISES, exercises);
+
+        return myDB.insert(WorkoutEntry.TABLE_NAME, null, values);
+    }
+
     public static long insert(SQLiteDatabase myDB, String name, String description, double duration, int exercises)
     {
         ContentValues values = new ContentValues();
@@ -66,6 +79,14 @@ public class WorkoutsTable {
     {
         ContentValues values = new ContentValues();
         values.put(WorkoutEntry.COLUMN_WORKOUT_NAME, name);
+
+        return myDB.update(WorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutId)});
+    }
+
+    public static long update(SQLiteDatabase myDB, int workoutId, int numExercises)
+    {
+        ContentValues values = new ContentValues();
+        values.put(WorkoutEntry.COLUMN_NUMBER_EXERCISES, numExercises);
 
         return myDB.update(WorkoutEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(workoutId)});
     }

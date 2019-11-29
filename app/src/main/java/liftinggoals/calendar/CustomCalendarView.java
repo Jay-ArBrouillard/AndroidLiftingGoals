@@ -39,7 +39,7 @@ public class CustomCalendarView extends LinearLayout {
     private ImageButton nextButton, previousButton;
     private TextView currentDate;
     private GridView gridView;
-    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ENGLISH);
+    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
     private Context context;
     private List<Date> dates = new ArrayList<>();
     private List<Event> eventList = new ArrayList<>();
@@ -47,6 +47,7 @@ public class CustomCalendarView extends LinearLayout {
     private SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
     private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
     private SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
     private CalendarGridAdapter calendarGridAdapter;
 
     public CustomCalendarView(Context context) {
@@ -121,11 +122,12 @@ public class CustomCalendarView extends LinearLayout {
                 final String date = eventDateFormat.format(dates.get(position));
                 final String month = monthFormat.format(dates.get(position));
                 final String year = yearFormat.format(dates.get(position));
+                final String longDate = longDateFormat.format(calendar.getTime());
 
                 addEventButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        saveEvent(eventName.getText().toString(), eventTime.getText().toString(), date, month, year);
+                        saveEvent(eventName.getText().toString(), eventTime.getText().toString(), date, month, year, longDate);
                         setupCalendar();
                     }
                 });
@@ -138,11 +140,11 @@ public class CustomCalendarView extends LinearLayout {
 
     }
 
-    private void saveEvent(String event, String time, String date, String month, String year)
+    private void saveEvent(String event, String time, String date, String month, String year, String longDate)
     {
         DatabaseHelper db = new DatabaseHelper(context);
         db.openDB();
-        db.insertEvent(event, time, date, month, year);
+        db.insertEvent(event, time, date, month, year, longDate);
         db.closeDB();
         Toast.makeText(context, "Event Saved", Toast.LENGTH_SHORT).show();
     }

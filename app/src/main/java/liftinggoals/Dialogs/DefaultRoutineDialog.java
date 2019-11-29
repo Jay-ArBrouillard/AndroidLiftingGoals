@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import net.steamcrafted.loadtoast.LoadToast;
-import liftinggoals.services.RoutineService;
+import liftinggoals.services.DefaultRoutineService;
 
 public class DefaultRoutineDialog extends AppCompatDialogFragment {
     private String username;
@@ -39,7 +39,7 @@ public class DefaultRoutineDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         loadToast.show();
-                        Intent intent = new Intent(getActivity().getApplicationContext(), RoutineService.class);
+                        Intent intent = new Intent(getActivity().getApplicationContext(), DefaultRoutineService.class);
                         intent.putExtra("username", username);
                         getActivity().startService(intent);
                     }

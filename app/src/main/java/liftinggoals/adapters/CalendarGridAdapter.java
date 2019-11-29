@@ -29,7 +29,6 @@ public class CalendarGridAdapter extends ArrayAdapter {
     private List<Event> events;
     private LayoutInflater inflater;
 
-
     public CalendarGridAdapter(@Nullable Context context, List<Date> dates, Calendar currentDate, List<Event> events) {
         super(context, R.layout.calendar_single_cell);
         this.dates = dates;

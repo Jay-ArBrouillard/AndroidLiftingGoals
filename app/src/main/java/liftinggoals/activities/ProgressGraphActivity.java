@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -60,7 +61,15 @@ public class ProgressGraphActivity extends AppCompatActivity {
         exerciseId = getIntent().getIntExtra("exercise_id", -1);
         exerciseName = getIntent().getStringExtra("exercise_name");
         muscleGroup = getIntent().getStringExtra("volume_group_name");
-        ((TextView)(findViewById(R.id.activity_progress_graph_title))).setText(exerciseName);
+
+        if (exerciseName == null)
+        {
+            ((TextView)(findViewById(R.id.activity_progress_graph_title))).setText(muscleGroup);
+        }
+        else
+        {
+            ((TextView)(findViewById(R.id.activity_progress_graph_title))).setText(exerciseName);
+        }
 
         db = new DatabaseHelper(this);
         db.openDB();
@@ -114,7 +123,11 @@ public class ProgressGraphActivity extends AppCompatActivity {
         }
         else if (muscleGroup != null)
         {
-            //TODO
+            temp = db.getExercisesLogsByMuscleGroup(muscleGroup);
+            if (temp != null && temp.size() > 0)
+            {
+                exerciseLogModels = (ArrayList<ExerciseLogModel>) temp;
+            }
         }
         else
         {
@@ -135,7 +148,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
         for (int i = 0; i < exerciseLogModels.size(); i++)
         {
             String exerciseName = null;
-            if (showAllData)
+            if (showAllData || muscleGroup != null )
             {
                 exerciseName = db.getExercise(db.getWorkoutExercise(exerciseLogModels.get(i).getWorkoutExeriseId()).getExerciseId()).getExerciseName();
             }

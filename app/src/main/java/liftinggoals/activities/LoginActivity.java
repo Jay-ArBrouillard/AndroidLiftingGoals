@@ -7,14 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.NoConnectionError;
@@ -34,16 +31,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import liftinggoals.data.DatabaseHelper;
+import liftinggoals.models.UserModel;
 
 public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Button registerButton;
     private EditText username;
     private EditText password;
-    private DatabaseHelper databaseHelper;
+    private DatabaseHelper db;
     private CheckBox rememberMe;
 
     @Override
@@ -52,8 +52,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //Setup database
-        databaseHelper = new DatabaseHelper(this.getApplicationContext());
-        databaseHelper.openDB();
+        db = new DatabaseHelper(this.getApplicationContext());
+        db.openDB();
 
         loginButton = findViewById(R.id.login_button);
         registerButton = findViewById(R.id.register_button);
@@ -89,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
             loadToast.setText("Login...");
             loadToast.setTranslationY(50);
             loadToast.show();
-
             loginUserDatabase(loadToast);
         }
     }
@@ -150,24 +149,29 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             else
                             {
-                                loadToast.success();
-                                Toast.makeText(getApplicationContext(), "Successful login: " + userNameInput, Toast.LENGTH_LONG).show();
-
-                                Intent startMainActivity = new Intent(LoginActivity.this, RoutineActivity.class);
-                                startMainActivity.putExtra("username", userNameInput);
-                                if (status.equals("firstLogin"))
+                                //Local Database Begin
+                                UserModel user = db.getUser(userNameInput,passwordInput);
+                                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+                                Date date = new Date();
+                                if (user == null)
                                 {
-                                    startMainActivity.putExtra("firstLogin", true);
-
+                                    db.insertUser(userNameInput, passwordInput, 0, formatter.format(date));
                                 }
                                 else
                                 {
-                                    startMainActivity.putExtra("firstLogin", false);
+                                    db.updateUserLoginTime(userNameInput, formatter.format(date));
                                 }
+                                //Local Database End
 
+                                loadToast.success();
+                                Toast.makeText(getApplicationContext(), "Successful login: " + userNameInput, Toast.LENGTH_LONG).show();
+
+                                boolean firstLogin = status.equals("firstLogin") ? true: false;
                                 SharedPreferences sp = getSharedPreferences("lifting_goals", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sp.edit();
+                                editor.putString("username", userNameInput);
                                 editor.putInt("UserId", Integer.parseInt(userId));
+                                editor.putBoolean("firstLogin", firstLogin);
                                 editor.commit();
 
                                 //Remember me
@@ -182,6 +186,7 @@ public class LoginActivity extends AppCompatActivity {
                                     sp.edit().clear();
                                 }
 
+                                Intent startMainActivity = new Intent(LoginActivity.this, RoutineActivity.class);
                                 startActivity(startMainActivity);
                                 finish();   //Prevent user from pressing back button and going to login page
                             }
@@ -219,14 +224,21 @@ public class LoginActivity extends AppCompatActivity {
     {
         final String userNameInput = username.getEditableText().toString();
         final String passwordInput = password.getEditableText().toString();
-        RequestQueue queue = Volley.newRequestQueue(this);
 
+        RequestQueue queue = Volley.newRequestQueue(this);
         String url = String.format("http://3.221.56.60/register.php?username=%s&password=%s", userNameInput, passwordInput);
         StringRequest stringRequest = new StringRequest (Request.Method.GET, url, new
                 Response.Listener<String>() {
                     public void onResponse(String response) {
                         if (response.equals("success"))
                         {
+                            //Register on local Database
+                            if (db.getUser(userNameInput,passwordInput) == null)
+                            {
+                                db.insertUser(userNameInput, passwordInput, 0, null);
+                            }
+                            //End register on local Database
+
                             loadToast.success();
                             Toast.makeText(getApplicationContext(), "Successfully registered " + userNameInput, Toast.LENGTH_LONG).show();
                         }
@@ -248,7 +260,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         queue.add(stringRequest);
-
     }
 
     private boolean validatePassReq() {
@@ -313,6 +324,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onDestroy()
     {
         super.onDestroy();
-        databaseHelper.closeDB();
+        db.closeDB();
     }
 }

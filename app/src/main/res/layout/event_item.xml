@@ -11,49 +11,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
-        android:layout_marginBottom="1dp"
-        android:background="@android:color/black">
+        android:background="#cccccc">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:orientation="horizontal"
-            android:weightSum="2"
+            android:weightSum="3"
             android:paddingLeft="10dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/history_item_workout_name"
+                    android:id="@+id/event_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Workout"
+                    android:text="Event"
                     android:textColor="@android:color/white"
                     android:textSize="20dp" />
 
                 <TextView
-                    android:id="@+id/history_item_exercises"
+                    android:id="@+id/event_exercises"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Exercises"
+                    android:text="No Exercise Data"
+                    android:maxLines="2"
                     android:textColor="@android:color/white"
                     android:textSize="18dp" />
 
             </LinearLayout>
 
             <TextView
-                android:id="@+id/history_item_date"
+                android:id="@+id/event_date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:text="date"
+                android:layout_weight="1"
+                android:text="No Date Data"
                 android:textColor="@android:color/white"
-                android:layout_weight="1"/>
+                android:textSize="18dp" />
 
 
         </LinearLayout>

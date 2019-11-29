@@ -25,6 +25,16 @@ public class ExercisesTable {
         public static final String TABLE_NAME = "Exercises";
         public static final String COLUMN_EXERCISE_NAME = "exercise_name";
     }
+
+    public static long insert(SQLiteDatabase myDB, int exerciseId, String name)
+    {
+        ContentValues values = new ContentValues();
+        values.put(ExerciseEntry._ID, exerciseId);
+        values.put(ExerciseEntry.COLUMN_EXERCISE_NAME, name);
+
+        return myDB.insert(ExerciseEntry.TABLE_NAME, null, values);
+    }
+
     public static long insert(SQLiteDatabase myDB, String name)
     {
         ContentValues values = new ContentValues();
@@ -33,12 +43,13 @@ public class ExercisesTable {
         return myDB.insert(ExerciseEntry.TABLE_NAME, null, values);
     }
 
-    public static long update(SQLiteDatabase myDB, String name)
+    public static long update(SQLiteDatabase myDB, int exerciseId, String name)
     {
         ContentValues values = new ContentValues();
+        values.put(ExerciseEntry._ID, exerciseId);
         values.put(ExerciseEntry.COLUMN_EXERCISE_NAME, name);
 
-        return myDB.update(ExerciseEntry.TABLE_NAME, values, "exercise_name = ?", new String[] {name});
+        return myDB.update(ExerciseEntry.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(exerciseId)});
     }
 
     public static long delete(SQLiteDatabase myDB, String name)

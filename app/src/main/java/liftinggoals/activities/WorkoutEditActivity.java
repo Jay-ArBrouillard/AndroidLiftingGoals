@@ -56,6 +56,8 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     private ArrayList<ExerciseModel> spinnerExerciseModels;
     private Button createExerciseButton;
     private ArrayAdapter<ExerciseModel> exerciseAdapter;
+    private int userId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
         selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
         selectedWorkoutIndex = sp.getInt("selected_workout_index", -1);
+        userId = sp.getInt("UserId", -1);
         System.out.println("Inside workoutEditActivity- selectedWorkoutIndex: " + selectedWorkoutIndex);
 
         workoutName = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutName();
@@ -148,6 +151,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
                 if (position == 0) { return;}
 
                 int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
+                int numExercises = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getNumberExercises() + 1;
 
                 WorkoutExerciseModel newWorkoutExercise = new WorkoutExerciseModel();
                 newWorkoutExercise.setWorkoutId(workoutId);
@@ -160,6 +164,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
                 long insertResult = db.insertWorkoutExercise(workoutId, spinnerExerciseModels.get(position).getExerciseId(), 0,0,0,0,0);
                 routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().add(newWorkoutExercise);
+                db.updateWorkoutNumExercises(workoutId, numExercises);
                 initializeRecyclerView();
             }
 
@@ -235,7 +240,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
     private void initializeRecyclerView()
     {
-        routineModels = RoutineModelHelper.populateRoutineModels(getApplicationContext());
+        routineModels = RoutineModelHelper.populateRoutineModels(this, userId);
         recyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this);
@@ -264,8 +269,13 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     }
 
     @Override
-    public void applyChanges(String name) {
+    public void applyChanges(String name, ArrayList<String> selectedMuscleGroups) {
         long insertedPK = db.insertExercise(name);
+        for (String muscleGroup : selectedMuscleGroups)
+        {
+            db.insertMuscleGroup((int)insertedPK, muscleGroup);
+        }
+
         spinnerExerciseModels.add(new ExerciseModel((int)insertedPK, name));
         exerciseAdapter.notifyDataSetChanged();
         addExerciseSpinner.postInvalidate();
@@ -278,7 +288,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
         int workoutExerciseId = db.getWorkoutExerciseByWorkoutAndExerciseId(workoutId, exerciseId).getWorkoutExerciseId();
         try {
-            long updateResult = db.updateWorkoutExcercise(workoutExerciseId, Integer.parseInt(minSets), Integer.parseInt(minReps), Integer.parseInt(maxSets), Integer.parseInt(maxReps), Double.parseDouble(weight));
+            db.updateWorkoutExcercise(workoutExerciseId, Integer.parseInt(minSets), Integer.parseInt(minReps), Integer.parseInt(maxSets), Integer.parseInt(maxReps), Double.parseDouble(weight));
             initializeRecyclerView();
         } catch (NumberFormatException e) {
             Toast.makeText(getApplicationContext(), "Must enter an integer for Sets and Reps or number for intensity", Toast.LENGTH_LONG).show();

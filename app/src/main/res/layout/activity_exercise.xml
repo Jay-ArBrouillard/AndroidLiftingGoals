@@ -24,8 +24,7 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/line_graph"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="300dp"
+            android:layout_height="match_parent"
             android:layout_weight="4"
             android:layout_below="@+id/activity_exercise_done_button" />
 

@@ -110,6 +110,7 @@ public class ProgressActivity extends AppCompatActivity {
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Quadriceps"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Trapezius"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Triceps"));
+        volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Shoulders"));
 
         volumeLayoutManager = new LinearLayoutManager(this);
         volumeAdapter = new VolumeAdapter(volumeGroups);

@@ -29,6 +29,7 @@ public class WorkoutExerciseModel implements Parcelable {
         minimumReps = in.readInt();
         maximumSets = in.readInt();
         maximumReps = in.readInt();
+        intensity = in.readDouble();
         exercise = in.readParcelable(ExerciseModel.class.getClassLoader());
     }
 
@@ -138,6 +139,7 @@ public class WorkoutExerciseModel implements Parcelable {
         dest.writeInt(minimumReps);
         dest.writeInt(maximumSets);
         dest.writeInt(maximumReps);
+        dest.writeDouble(intensity);
         dest.writeParcelable(exercise, flags);
     }
 }

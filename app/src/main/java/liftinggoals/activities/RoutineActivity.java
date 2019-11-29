@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import liftinggoals.services.RoutineService;
+import liftinggoals.services.DefaultRoutineService;
 import liftinggoals.adapters.RoutineAdapter;
 import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RoutineModel;
@@ -42,6 +42,7 @@ import liftinggoals.data.DatabaseHelper;
 import liftinggoals.dialogs.DefaultRoutineDialog;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
+import liftinggoals.services.InitializeRoutineService;
 
 public class RoutineActivity extends AppCompatActivity {
     private ArrayList<RoutineModel> routineModels;
@@ -55,7 +56,8 @@ public class RoutineActivity extends AppCompatActivity {
     private int userId;
     private boolean isFirstLogin;
     private Button fetchButton;
-    private LoadToast loadToast;
+    private LoadToast defaultLoadToast;
+    private LoadToast initializeLoadToast;
     private CardView createRoutine;
     private boolean serviceError = true;
 
@@ -68,15 +70,18 @@ public class RoutineActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));//only do this once
 
-        userId = getIntent().getIntExtra("userId", -1);
-        username = getIntent().getStringExtra("username");
-        isFirstLogin = getIntent().getBooleanExtra("firstLogin", false);
-        loadToast = new LoadToast(this);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        userId = sp.getInt("UserId", -1);
+        username = sp.getString("username", null);
+        isFirstLogin = sp.getBoolean("firstLogin", false);
+        defaultLoadToast = new LoadToast(this);
+        initializeLoadToast = new LoadToast(this);
+        final DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
 
-        initializeRecyclerView();
         initializeActionSearch();
         initializeSwipe();
 
@@ -87,39 +92,37 @@ public class RoutineActivity extends AppCompatActivity {
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadToast.setText("Fetching default routines...");
-                DisplayMetrics displayMetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                loadToast.setTranslationY(displayMetrics.heightPixels/2);
-                loadToast.setBorderWidthDp(100);
-                DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, loadToast);
+                defaultLoadToast.setText("Fetching default routines...");
+                defaultLoadToast.setTranslationY(displayMetrics.heightPixels/2);
+                defaultLoadToast.setBorderWidthDp(100);
+                DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, defaultLoadToast);
                 dialog.show(getSupportFragmentManager(), "Routine Dialog");
                 final Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //Quit the loadToast if it takes longer than 10 seconds
+                        //Quit the defaultLoadToast if it takes longer than 10 seconds
                         if (serviceError)
                         {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    loadToast.error();
+                                    defaultLoadToast.error();
                                 }
                             });
                         }
                         timer.cancel();
                     }
-                }, 10 * 1000);
+                }, 10000);
             }
         });
 
         //If it is the first Login Start service to get default routines
         if (isFirstLogin)
         {
-            Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
-            intent.putExtra("username", username);
-            startService(intent);
+            Intent defaultRoutine = new Intent(RoutineActivity.this, DefaultRoutineService.class);
+            defaultRoutine.putExtra("username", username);
+            startService(defaultRoutine);
         }
 
         final ImageView commitChangesImage = findViewById(R.id.routine_activity_commit_changes);
@@ -135,12 +138,34 @@ public class RoutineActivity extends AppCompatActivity {
             }
         });
 
+        //Fetch initialize Routines
+        Intent intent = new Intent(RoutineActivity.this, InitializeRoutineService.class);
+        intent.putExtra("user_id", userId);
+        initializeLoadToast.setText("Loading your routines...");
+        initializeLoadToast.setTranslationY(displayMetrics.heightPixels/2);
+        initializeLoadToast.setBorderWidthDp(100);
+        initializeLoadToast.show();
+        startService(intent);
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        initializeLoadToast.error();
+                    }
+                });
+                timer.cancel();
+            }
+        }, 20000);
     }
 
     private void setReceiver() {
         myReceiver = new ResponseReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("action");
+        intentFilter.addAction("initializeRoutinesAction");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
     }
 
@@ -151,12 +176,23 @@ public class RoutineActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             serviceError = false;
-            Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
-            routineModels = intent.getParcelableArrayListExtra("updatedRoutines");
-            initializeRecyclerView();
-            initializeActionSearch();
-            initializeSwipe();
-            loadToast.success();
+
+            if (intent.getAction().equals("initializeRoutinesAction"))
+            {
+                Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
+                initializeRecyclerView();
+                initializeActionSearch();
+                initializeSwipe();
+                initializeLoadToast.success();
+            }
+            else if (intent.getAction().equals("action"))
+            {
+                Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
+                initializeRecyclerView();
+                initializeActionSearch();
+                initializeSwipe();
+                defaultLoadToast.success();
+            }
         }
     }
 
@@ -190,10 +226,10 @@ public class RoutineActivity extends AppCompatActivity {
         }
     };
 
-    private void initializeRecyclerView() {
-        populateRoutines();
+    private void initializeRecyclerView()
+    {
+        routineModels =  RoutineModelHelper.populateRoutineModels(this, userId);
         recyclerView.setHasFixedSize(true);
-
         layoutManager = new LinearLayoutManager(this);
         adapter = new RoutineAdapter(routineModels);
 
@@ -223,18 +259,9 @@ public class RoutineActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void populateRoutines()
-    {
-        routineModels =  RoutineModelHelper.populateRoutineModels(this);
-    }
-
     // Print Helper
     private void printLocalDatabase()
     {
-        for (RoutineModel r : db.getAllRoutines())
-        {
-            System.out.println(r.getRoutineName() + ": " + r.getRoutineDescription());
-        }
 
         for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
         {

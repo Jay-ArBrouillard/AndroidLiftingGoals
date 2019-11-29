@@ -3,6 +3,7 @@ package liftinggoals.misc;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RoutineModel;
@@ -14,12 +15,12 @@ import liftinggoals.data.DatabaseHelper;
 public class RoutineModelHelper {
     private static DatabaseHelper db;
 
-    public static ArrayList<RoutineModel> populateRoutineModels(Context context)
+    public static ArrayList<RoutineModel> populateRoutineModels(Context context, int userId)
     {
         db = new DatabaseHelper(context);
         db.openDB();
 
-        ArrayList<RoutineModel> routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
+        ArrayList<RoutineModel> routineModels = (ArrayList<RoutineModel>) db.getAllRoutinesForUser(userId);
         if (routineModels == null) routineModels = new ArrayList<>();
         for (int i = 0; i < routineModels.size(); i++)
         {
@@ -44,7 +45,7 @@ public class RoutineModelHelper {
                     ExerciseModel exerciseModel = db.getExercise(exerciseId);
                     workoutExerciseList.get(k).setExercise(exerciseModel);
                 }
-
+                listOfWorkouts.get(j).setNumberExercises(workoutExerciseList.size());   //Added so numExercisesDisplays right
                 listOfWorkouts.get(j).setExercises(workoutExerciseList);
             }
 

@@ -1,19 +1,12 @@
 package liftinggoals.calendar;
 
 public class Event {
-    private String EVENT, TIME, DATE, MONTH, YEAR;
+    private String EVENT, TIME, DATE, MONTH, YEAR, LONGDATE;
+    private String exercises;
 
     public Event()
     {
 
-    }
-
-    public Event(String EVENT, String TIME, String DATE, String MONTH, String YEAR) {
-        this.EVENT = EVENT;
-        this.TIME = TIME;
-        this.DATE = DATE;
-        this.MONTH = MONTH;
-        this.YEAR = YEAR;
     }
 
     public String getEVENT() {
@@ -54,5 +47,21 @@ public class Event {
 
     public void setYEAR(String YEAR) {
         this.YEAR = YEAR;
+    }
+
+    public String getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(String exercises) {
+        this.exercises = exercises;
+    }
+
+    public String getLONGDATE() {
+        return LONGDATE;
+    }
+
+    public void setLONGDATE(String LONGDATE) {
+        this.LONGDATE = LONGDATE;
     }
 }

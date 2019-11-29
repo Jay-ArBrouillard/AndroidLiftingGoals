@@ -29,6 +29,19 @@ public class RoutineTable{
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_NUMBER_WORKOUTS = "number_workouts";
     }
+
+    public static long insert(SQLiteDatabase myDB, int routineId, int userId, String name, String description, int workouts)
+    {
+        ContentValues values = new ContentValues();
+        values.put(RoutineEntry._ID, routineId);
+        values.put(RoutineEntry.COLUMN_USER_ID, userId);
+        values.put(RoutineEntry.COLUMN_ROUTINE_NAME, name);
+        values.put(RoutineEntry.COLUMN_DESCRIPTION, description);
+        values.put(RoutineEntry.COLUMN_NUMBER_WORKOUTS, workouts);
+
+        return myDB.insert(RoutineEntry.TABLE_NAME, null, values);
+    }
+
     public static long insert(SQLiteDatabase myDB, int userId, String name, String description, int workouts)
     {
         ContentValues values = new ContentValues();
@@ -66,11 +79,11 @@ public class RoutineTable{
         return myDB.delete(RoutineEntry.TABLE_NAME, where, new String[] {name});
     }
 
-    public static RoutineModel getRoutine(SQLiteDatabase myDB, String routineName)
+    public static RoutineModel getRoutine(SQLiteDatabase myDB, int routineId)
     {
-        String query = "SELECT * FROM " + RoutineEntry.TABLE_NAME + " WHERE " + RoutineEntry.COLUMN_ROUTINE_NAME  + " = ?";
+        String query = "SELECT * FROM " + RoutineEntry.TABLE_NAME + " WHERE " + RoutineEntry._ID  + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[] {routineName});
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(routineId)});
 
         if (c.getCount() == 0)
         {
@@ -90,7 +103,7 @@ public class RoutineTable{
         }
     }
 
-    public static List<RoutineModel> getAllRoutines(SQLiteDatabase myDB)
+    public static List<RoutineModel> getAll(SQLiteDatabase myDB)
     {
         String query = "SELECT * FROM " + RoutineEntry.TABLE_NAME;
 

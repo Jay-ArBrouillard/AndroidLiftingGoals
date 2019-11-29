@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,14 +16,41 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.example.liftinggoals.R;
 
+import java.util.ArrayList;
+
+import liftinggoals.data.DatabaseHelper;
+
 public class CreateExerciseDialog extends AppCompatDialogFragment {
     private EditText exerciseName;
     private CreateExerciseDialog.CreateExerciseDialogListener listener;
+    //Multiple choice dialog vars
+    private String[] listItems;
+    private boolean[] checkedItems;
+    private ArrayList<String> userItems = new ArrayList<>();
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        listItems = getResources().getStringArray(R.array.exercise_muscle_groups);
+        checkedItems = new boolean[listItems.length];
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMultiChoiceItems(listItems, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int position, boolean isChecked) {
+                if (isChecked)
+                {
+                    if (!userItems.contains(listItems[position]))
+                    {
+                        userItems.add(listItems[position]);
+                    }
+                    else
+                    {
+                        userItems.remove(position);
+                    }
+                }
+            }
+        });
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.workout_edit_create_exercise_dialog, null);
@@ -37,8 +65,31 @@ public class CreateExerciseDialog extends AppCompatDialogFragment {
                 .setPositiveButton("create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        if (userItems.size() == 0)
+                        {
+                            Toast.makeText(getActivity().getApplicationContext(), "Must select atleast 1 muscle group", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         String name = exerciseName.getText().toString();
-                        listener.applyChanges(name);
+
+                        if (name == null || name.length() == 0)
+                        {
+                            Toast.makeText(getActivity().getApplicationContext(), "Please enter an exercise name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        listener.applyChanges(name, userItems);
+                    }
+                })
+                .setNeutralButton("clear all", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        for (int i = 0; i < checkedItems.length; i++)
+                        {
+                            checkedItems[i] = false;
+                        }
+                        userItems.clear();
                     }
                 });
 
@@ -59,6 +110,6 @@ public class CreateExerciseDialog extends AppCompatDialogFragment {
 
     public interface CreateExerciseDialogListener
     {
-        void applyChanges(String name);
+        void applyChanges(String name, ArrayList<String> selectedMuscleGroups);
     }
 }
