@@ -1,6 +1,9 @@
 package liftinggoals.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -8,10 +11,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,14 +25,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import liftinggoals.adapters.WorkoutAdapter;
+import liftinggoals.dialogs.DeleteRoutineDialog;
 import liftinggoals.models.RoutineModel;
 import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
+import liftinggoals.services.RoutineService;
+import liftinggoals.services.WorkoutService;
 
-public class WorkoutActivity extends AppCompatActivity {
+public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineDialog.DeleteDialogListener {
     private ArrayList<RoutineModel> routineModels;
     private int selectedRoutineIndex;
     private RecyclerView recyclerView;
@@ -37,6 +45,8 @@ public class WorkoutActivity extends AppCompatActivity {
     private CardView createWorkout;
     private DatabaseHelper db;
     private int userId;
+    private ImageView commitChangesImage;
+    private ResponseReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +64,7 @@ public class WorkoutActivity extends AppCompatActivity {
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
         title.setText(routineModels.get(selectedRoutineIndex).getRoutineName());   //Set Workout Title
 
+        commitChangesImage = findViewById(R.id.workout_activity_commit_button);
         recyclerView = findViewById(R.id.multiple_workout_recycler_view);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4)); //only do this once
 
@@ -64,11 +75,12 @@ public class WorkoutActivity extends AppCompatActivity {
         createWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                long insertedPK = db.insertWorkout("Untitled Workout", "Empty Description", 0, 0);
-                db.insertRoutineWorkout(routineModels.get(selectedRoutineIndex).getRoutineId(), (int)insertedPK);
-                routineModels.get(selectedRoutineIndex).getWorkouts().add(new WorkoutModel("Untitled Workout", "Empty Description", 0, 0));
-                adapter.notifyDataSetChanged();
-                ((ImageView)findViewById(R.id.workout_activity_commit_button)).setImageResource(R.drawable.ic_checked_green_48dp);
+                commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                Intent intent = new Intent(WorkoutActivity.this, WorkoutService.class);
+                intent.putExtra("type", "insert");
+                intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
+                startService(intent);
+
             }
         });
 
@@ -143,7 +155,8 @@ public class WorkoutActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void initializeActionSearch() {
+    private void initializeActionSearch()
+    {
         //Search
         search = findViewById(R.id.fragment_multiple_workout_action_search);
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -167,7 +180,8 @@ public class WorkoutActivity extends AppCompatActivity {
         });
     }
 
-    private void initializeSwipe() {
+    private void initializeSwipe()
+    {
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -178,14 +192,72 @@ public class WorkoutActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int pos = viewHolder.getAdapterPosition();
+                openDeleteDialog(pos, adapter.getItem(pos));
                 adapter.delete(viewHolder, pos);
             }
         }).attachToRecyclerView(recyclerView);
     }
 
+    private void openDeleteDialog(int position, Object item)
+    {
+        DeleteRoutineDialog deleteRoutineDialog = new DeleteRoutineDialog(position, item);
+        deleteRoutineDialog.show(getSupportFragmentManager(), "deleteRoutineDialog");
+    }
+
+    @Override
+    public void onCancelClicked(int position, Object item)
+    {
+        routineModels.get(selectedRoutineIndex).getWorkouts().add(position, (WorkoutModel) item);
+        adapter.notifyItemInserted(routineModels.get(selectedRoutineIndex).getWorkouts().size()-1);
+    }
+
+    @Override
+    public void onDeleteClicked(int position, Object item)
+    {
+        commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+        Intent intent = new Intent(this, WorkoutService.class);
+        intent.putExtra("type", "delete");
+        intent.putExtra("workoutId", ((WorkoutModel)item).getWorkoutId());
+        intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
+        startService(intent);
+    }
+
+    private void setReceiver() {
+        myReceiver = new ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("workoutAction");
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
+    }
+
+    public class ResponseReceiver extends BroadcastReceiver {
+        private ResponseReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals("workoutAction"))
+            {
+                routineModels.get(selectedRoutineIndex).getWorkouts().add(new WorkoutModel("Untitled Workout", "Untitled Description", 0.0, 0));
+                adapter.notifyItemInserted(routineModels.get(selectedRoutineIndex).getWorkouts().size()-1);
+                initializeRecyclerView();
+                initializeActionSearch();
+                initializeSwipe();
+                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
+            }
+        }
+    }
+
     @Override
     protected void onStart() {
+        setReceiver();
         super.onStart();
         initializeRecyclerView();
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        super.onStop();
     }
 }

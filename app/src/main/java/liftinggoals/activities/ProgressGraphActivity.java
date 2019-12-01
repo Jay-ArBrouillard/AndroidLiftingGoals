@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import liftinggoals.adapters.ProgressExerciseAdapter;
 import liftinggoals.models.ExerciseLogModel;
@@ -52,6 +53,8 @@ public class ProgressGraphActivity extends AppCompatActivity {
     private LineChart lineChart;
     private ArrayList<Entry> entries = new ArrayList<>();
     private ArrayList<ProgressExerciseModel> progressExerciseModels;
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMMM, dd, yy, hh:mm a", Locale.ENGLISH);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,8 +190,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
 
         try {
             Date dt = formatter.parse(timeToFormat);
-            SimpleDateFormat sd2 = new SimpleDateFormat("MMMM, dd, hh:mm a");
-            String newDate = sd2.format(dt);
+            String newDate = longDateFormat.format(dt);
 
             return newDate;
         } catch (ParseException e) {

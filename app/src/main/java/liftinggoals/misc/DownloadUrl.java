@@ -50,7 +50,7 @@ public class DownloadUrl {
                 urlConnection.disconnect();
             }
         }
-        Log.d("DownloadURL","Returning data= "+data);
+        //Log.d("DownloadURL","Returning data= "+data);
 
         return data;
     }

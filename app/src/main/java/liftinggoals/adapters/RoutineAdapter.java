@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.liftinggoals.R;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,6 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     private ArrayList<RoutineModel> routineList;
     private ArrayList<RoutineModel> routineListFull; //Need a copy for the search function
     private OnItemClickListener listener;
-    private int removedPosition = 0;
-    private RoutineModel removedItem;
     private DatabaseHelper db;
 
     public RoutineAdapter (ArrayList<RoutineModel> routineList) {
@@ -38,22 +37,9 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     }
 
     public void delete(RecyclerView.ViewHolder viewHolder, final int position) {
-        removedPosition = position;
-        removedItem = getItem(position);
-
         routineList.remove(position);
         routineListFull = new ArrayList<>(routineList);
         notifyItemRemoved(position);
-
-        Snackbar.make(viewHolder.itemView, removedItem.getRoutineName() + " deleted", Snackbar.LENGTH_LONG).setAction("UNDO", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                routineList.add(removedPosition, removedItem);
-                routineListFull = new ArrayList<>(routineList);
-                notifyItemInserted(removedPosition);
-            }
-        }).show();
-
     }
 
     @NonNull
@@ -117,7 +103,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     };
 
     //Inner class
-    public static class RoutineViewHolder extends RecyclerView.ViewHolder {
+    public static class RoutineViewHolder extends RecyclerView.ViewHolder implements Serializable {
         public ImageView folderIcon;
         public ImageView editIcon;
         public TextView routineName;

@@ -16,6 +16,7 @@ public class EventsTable {
     public static final String SQL_CREATE_EVENTS_TABLE = "CREATE TABLE " +
             EventEntry.TABLE_NAME + " (" +
             EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            EventEntry.COLUMN_USER_ID + " INTEGER NOT NULL, " +
             EventEntry.COLUMN_EVENT + " TEXT NOT NULL, " +
             EventEntry.COLUMN_EXERCISES + " TEXT, " +
             EventEntry.COLUMN_TIME + " TEXT, " +
@@ -24,11 +25,12 @@ public class EventsTable {
             EventEntry.COLUMN_MONTH + " TEXT, " +
             EventEntry.COLUMN_YEAR + " TEXT" +
             ");";
-    public static final String SQL_DROP_EVENTSTABLE = "DROP TABLE IF EXISTS " + EventEntry.TABLE_NAME;
+    public static final String SQL_DROP_EVENTS_TABLE = "DROP TABLE IF EXISTS " + EventEntry.TABLE_NAME;
 
     public static abstract class EventEntry implements BaseColumns
     {
         public static final String TABLE_NAME = "Events";
+        public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_EVENT = "event";
         public static final String COLUMN_EXERCISES = "exercises";
         public static final String COLUMN_TIME = "time";
@@ -38,9 +40,10 @@ public class EventsTable {
         public static final String COLUMN_YEAR = "year";
     }
 
-    public static long insert(SQLiteDatabase myDB, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
+    public static long insert(SQLiteDatabase myDB, int userId, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
     {
         ContentValues values = new ContentValues();
+        values.put(EventEntry.COLUMN_USER_ID, userId);
         values.put(EventEntry.COLUMN_EVENT, event);
         values.put(EventEntry.COLUMN_EXERCISES, exerciseInfo);
         values.put(EventEntry.COLUMN_TIME, time);
@@ -52,9 +55,10 @@ public class EventsTable {
         return myDB.insert(EventEntry.TABLE_NAME, null, values);
     }
 
-    public static long insert(SQLiteDatabase myDB, String event, String time, String date, String month, String year, String longDate)
+    public static long insert(SQLiteDatabase myDB, int userId, String event, String time, String date, String month, String year, String longDate)
     {
         ContentValues values = new ContentValues();
+        values.put(EventEntry.COLUMN_USER_ID, userId);
         values.put(EventEntry.COLUMN_EVENT, event);
         values.put(EventEntry.COLUMN_TIME, time);
         values.put(EventEntry.COLUMN_DATE, date);
@@ -108,10 +112,12 @@ public class EventsTable {
         }
     }
 
-    public static List<Event> getEventsForMonth(SQLiteDatabase myDB, String month, String year) {
-        String query = "SELECT * FROM " + EventEntry.TABLE_NAME + " WHERE " + EventEntry.COLUMN_MONTH + " = ? AND " + EventEntry.COLUMN_YEAR + " = ?";
+    public static List<Event> getEventsForMonth(SQLiteDatabase myDB, int userId, String month, String year) {
+        String query = "SELECT * FROM " + EventEntry.TABLE_NAME + " WHERE " + EventEntry.COLUMN_USER_ID + " = ? AND "
+                                                                            + EventEntry.COLUMN_MONTH + " = ? AND "
+                                                                            + EventEntry.COLUMN_YEAR + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[]{month, year});
+        Cursor c = myDB.rawQuery(query, new String[]{Integer.toString(userId), month, year});
 
         if (c.getCount() == 0) {
             return null;

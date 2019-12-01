@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -31,20 +30,18 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import liftinggoals.dialogs.DeleteRoutineDialog;
 import liftinggoals.services.DefaultRoutineService;
 import liftinggoals.adapters.RoutineAdapter;
-import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RoutineModel;
-import liftinggoals.models.RoutineWorkoutModel;
-import liftinggoals.models.WorkoutExerciseModel;
-import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.dialogs.DefaultRoutineDialog;
 import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 import liftinggoals.services.InitializeRoutineService;
+import liftinggoals.services.RoutineService;
 
-public class RoutineActivity extends AppCompatActivity {
+public class RoutineActivity extends AppCompatActivity implements DeleteRoutineDialog.DeleteDialogListener {
     private ArrayList<RoutineModel> routineModels;
     private RecyclerView recyclerView;
     private RoutineAdapter adapter;
@@ -60,6 +57,7 @@ public class RoutineActivity extends AppCompatActivity {
     private LoadToast initializeLoadToast;
     private CardView createRoutine;
     private boolean serviceError = true;
+    private ImageView commitChangesImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +74,12 @@ public class RoutineActivity extends AppCompatActivity {
         isFirstLogin = sp.getBoolean("firstLogin", false);
         defaultLoadToast = new LoadToast(this);
         initializeLoadToast = new LoadToast(this);
-        final DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        db = new DatabaseHelper(getApplicationContext());
-        db.openDB();
+        if (db == null)
+        {
+            db = new DatabaseHelper(getApplicationContext());
+            db.openDB();
+        }
 
         initializeActionSearch();
         initializeSwipe();
@@ -93,7 +92,6 @@ public class RoutineActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 defaultLoadToast.setText("Fetching default routines...");
-                defaultLoadToast.setTranslationY(displayMetrics.heightPixels/2);
                 defaultLoadToast.setBorderWidthDp(100);
                 DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, defaultLoadToast);
                 dialog.show(getSupportFragmentManager(), "Routine Dialog");
@@ -125,16 +123,18 @@ public class RoutineActivity extends AppCompatActivity {
             startService(defaultRoutine);
         }
 
-        final ImageView commitChangesImage = findViewById(R.id.routine_activity_commit_changes);
+        commitChangesImage = findViewById(R.id.routine_activity_commit_changes);
 
         createRoutine = findViewById(R.id.activity_routine_create_a_workout);
         createRoutine.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                db.insertRoutine(userId, "Untitled Routine", "Description", 0);
-                routineModels.add(new RoutineModel(userId, "Untitled Routine", "Empty Description"));
-                adapter.notifyItemInserted(routineModels.size()-1);
-                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
+            public void onClick(View v)
+            {
+                commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
+                intent.putExtra("type", "insert");
+                intent.putExtra("userId", userId);
+                startService(intent);
             }
         });
 
@@ -142,7 +142,6 @@ public class RoutineActivity extends AppCompatActivity {
         Intent intent = new Intent(RoutineActivity.this, InitializeRoutineService.class);
         intent.putExtra("user_id", userId);
         initializeLoadToast.setText("Loading your routines...");
-        initializeLoadToast.setTranslationY(displayMetrics.heightPixels/2);
         initializeLoadToast.setBorderWidthDp(100);
         initializeLoadToast.show();
         startService(intent);
@@ -160,42 +159,6 @@ public class RoutineActivity extends AppCompatActivity {
             }
         }, 20000);
     }
-
-    private void setReceiver() {
-        myReceiver = new ResponseReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("action");
-        intentFilter.addAction("initializeRoutinesAction");
-        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
-    }
-
-    public class ResponseReceiver extends BroadcastReceiver {
-        private ResponseReceiver() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            serviceError = false;
-
-            if (intent.getAction().equals("initializeRoutinesAction"))
-            {
-                Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
-                initializeRecyclerView();
-                initializeActionSearch();
-                initializeSwipe();
-                initializeLoadToast.success();
-            }
-            else if (intent.getAction().equals("action"))
-            {
-                Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
-                initializeRecyclerView();
-                initializeActionSearch();
-                initializeSwipe();
-                defaultLoadToast.success();
-            }
-        }
-    }
-
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -259,32 +222,6 @@ public class RoutineActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    // Print Helper
-    private void printLocalDatabase()
-    {
-
-        for (RoutineWorkoutModel rWM : db.getAllRoutineWorkouts())
-        {
-            System.out.println(rWM.getRoutineId() + ": " + rWM.getWorkoutId());
-        }
-
-
-        for (WorkoutModel w : db.getAllWorkouts())
-        {
-            System.out.println(w.getWorkoutName() + ": " + w.getDescription() + ": " + w.getEstimatedDuration() + ": " + w.getNumberExercises());
-        }
-
-        for (WorkoutExerciseModel wEM : db.getAllWorkoutExercises())
-        {
-            System.out.println(wEM.getWorkoutId() + ": " + wEM.getExerciseId() + ": " + wEM.getMinimumSets() + ": " + wEM.getMinimumReps() + ": " + wEM.getMaximumSets() + ": " + wEM.getMaximumSets());
-        }
-
-        for (ExerciseModel e : db.getAllExercises())
-        {
-            System.out.println(e.getExerciseName());
-        }
-    }
-
     private void initializeActionSearch() {
         //Search
         search = findViewById(R.id.action_search);
@@ -321,9 +258,35 @@ public class RoutineActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int pos = viewHolder.getAdapterPosition();
+                openDeleteDialog(pos, adapter.getItem(pos));
                 adapter.delete(viewHolder, pos);
             }
         }).attachToRecyclerView(recyclerView);
+    }
+
+    private void openDeleteDialog(int position, Object item)
+    {
+        DeleteRoutineDialog deleteRoutineDialog = new DeleteRoutineDialog(position, item);
+        deleteRoutineDialog.show(getSupportFragmentManager(), "deleteRoutineDialog");
+    }
+
+    @Override
+    public void onCancelClicked(int position, Object item)
+    {
+        routineModels.add(position, ((RoutineModel)item));
+        adapter.notifyItemInserted(position);
+    }
+
+    @Override
+    public void onDeleteClicked(int position, Object item)
+    {
+        commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+        Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
+        intent.putExtra("type", "delete");
+        intent.putExtra("routineId", ((RoutineModel)item).getRoutineId());
+        intent.putExtra("userId", userId);
+        intent.putExtra("routineModels", routineModels);
+        startService(intent);
     }
 
     @Override
@@ -338,6 +301,49 @@ public class RoutineActivity extends AppCompatActivity {
         if (savedInstanceState != null)
         {
             routineModels = savedInstanceState.getParcelableArrayList("routineModels");
+        }
+    }
+
+    private void setReceiver() {
+        myReceiver = new ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("action");
+        intentFilter.addAction("initializeRoutinesAction");
+        intentFilter.addAction("routineAction");
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
+    }
+
+    public class ResponseReceiver extends BroadcastReceiver {
+        private ResponseReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serviceError = false;
+
+            if (intent.getAction().equals("initializeRoutinesAction"))
+            {
+                Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
+                initializeRecyclerView();
+                initializeActionSearch();
+                initializeSwipe();
+                initializeLoadToast.success();
+            }
+            else if (intent.getAction().equals("action"))
+            {
+                Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
+                initializeRecyclerView();
+                initializeActionSearch();
+                initializeSwipe();
+                defaultLoadToast.success();
+            }
+            else if (intent.getAction().equals("routineAction"))
+            {
+                initializeRecyclerView();
+                initializeActionSearch();
+                initializeSwipe();
+                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
+            }
         }
     }
 

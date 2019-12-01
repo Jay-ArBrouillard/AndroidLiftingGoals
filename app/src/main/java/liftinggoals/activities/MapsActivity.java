@@ -104,7 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = mapFragment.getView();
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
-        Places.initialize(MapsActivity.this, "AIzaSyCeHcBAjLZABKGkm18qvsc3D-Gkc93JL44");
+        Places.initialize(MapsActivity.this, getString(R.string.google_maps_key));
         placesClient = Places.createClient(this);
         final AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
@@ -262,7 +262,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 urlBuilder.append("&radius="+PROXIMITY_RADIUS);
                 urlBuilder.append("&type=gym");
                 urlBuilder.append("&sensor=true");
-                urlBuilder.append("&key=").append("AIzaSyCeHcBAjLZABKGkm18qvsc3D-Gkc93JL44");
+                urlBuilder.append("&key=").append(getString(R.string.google_maps_key));
                 Object data [] = new Object[3];
                 data[0] = mMap;
                 data[1] = urlBuilder.toString();

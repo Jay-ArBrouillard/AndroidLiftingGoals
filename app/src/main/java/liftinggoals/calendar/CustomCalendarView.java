@@ -3,6 +3,7 @@ package liftinggoals.calendar;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
@@ -34,12 +35,14 @@ import java.util.TimeZone;
 import liftinggoals.adapters.CalendarGridAdapter;
 import liftinggoals.data.DatabaseHelper;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class CustomCalendarView extends LinearLayout {
     private static final int MAX_CALENDAR_DAYS = 42;
-    private ImageButton nextButton, previousButton;
+    public ImageButton nextButton, previousButton;
     private TextView currentDate;
     private GridView gridView;
-    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
+    public Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
     private Context context;
     private List<Date> dates = new ArrayList<>();
     private List<Event> eventList = new ArrayList<>();
@@ -49,6 +52,7 @@ public class CustomCalendarView extends LinearLayout {
     private SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     private SimpleDateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
     private CalendarGridAdapter calendarGridAdapter;
+    private int userId;
 
     public CustomCalendarView(Context context) {
         super(context);
@@ -59,6 +63,9 @@ public class CustomCalendarView extends LinearLayout {
         this.context = context;
         initializeLayout();
         setupCalendar();
+
+        SharedPreferences sp = context.getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        userId = sp.getInt("UserId", -1);
 
         previousButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -144,7 +151,7 @@ public class CustomCalendarView extends LinearLayout {
     {
         DatabaseHelper db = new DatabaseHelper(context);
         db.openDB();
-        db.insertEvent(event, time, date, month, year, longDate);
+        db.insertEvent(userId, event, time, date, month, year, longDate);
         db.closeDB();
         Toast.makeText(context, "Event Saved", Toast.LENGTH_SHORT).show();
     }
@@ -159,11 +166,10 @@ public class CustomCalendarView extends LinearLayout {
         gridView = view.findViewById(R.id.history_activity_grid_view);
     }
 
-    private void setupCalendar()
+    public void setupCalendar()
     {
         String stringCurrDate = dateFormat.format(calendar.getTime());
         currentDate.setText(stringCurrDate);
-        //Setup dates
         dates.clear();
         Calendar monthCalendar = (Calendar) calendar.clone();
         monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -181,11 +187,11 @@ public class CustomCalendarView extends LinearLayout {
         gridView.setAdapter(calendarGridAdapter);
     }
 
-    private void CollectEventsForMonth(String month, String year)
+    public void CollectEventsForMonth(String month, String year)
     {
         DatabaseHelper db = new DatabaseHelper(context);
         db.openDB();
-        eventList = db.getEventsByMonthAndYear(month, year);
+        eventList = db.getEventsByMonthAndYear(userId, month, year);
         db.closeDB();
     }
 }

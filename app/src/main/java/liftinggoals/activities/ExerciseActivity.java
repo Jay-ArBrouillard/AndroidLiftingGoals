@@ -5,6 +5,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -64,7 +65,7 @@ public class ExerciseActivity extends AppCompatActivity {
     private SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
     private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
     private SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-    private SimpleDateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yy, hh:mm a", Locale.ENGLISH);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +101,11 @@ public class ExerciseActivity extends AppCompatActivity {
                 final String month = monthFormat.format(calendar.getTime());
                 final String year = yearFormat.format(calendar.getTime());
                 String longDate = longDateFormat.format(calendar.getTime());
+                System.out.println("long date: " + longDate);
                 String exerciseDescription = buildExerciseString();
-                db.insertEventWithExercises(workoutName, exerciseDescription, time, date, month, year, longDate);
+                SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+                int userId = sp.getInt("UserId", -1);
+                db.insertEventWithExercises(userId, workoutName, exerciseDescription, time, date, month, year, longDate);
                 Intent intent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
                 startActivity(intent);
                 finish();
@@ -250,8 +254,7 @@ public class ExerciseActivity extends AppCompatActivity {
 
         try {
             Date dt = formatter.parse(timeToFormat);
-            SimpleDateFormat sd2 = new SimpleDateFormat("EEEE-dd, MMMM, yyyy: hh:mm a");
-            String newDate = sd2.format(dt);
+            String newDate = longDateFormat.format(dt);
 
             return newDate;
         } catch (ParseException e) {

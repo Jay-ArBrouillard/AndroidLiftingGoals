@@ -12,7 +12,6 @@
         android:background="@android:color/black"
         android:layout_above="@+id/activity_routines_edit_bottom_navigation">
 
-
         <LinearLayout
             android:id="@+id/activity_routines_edit_title"
             android:layout_width="match_parent"

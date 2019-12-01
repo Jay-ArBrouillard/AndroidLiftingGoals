@@ -3,6 +3,7 @@ package liftinggoals.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class RoutineModel implements Parcelable {
@@ -12,17 +13,11 @@ public class RoutineModel implements Parcelable {
     private String routineName;
     private String description;
     private ArrayList<WorkoutModel> workouts;
+    private int defaultRoutine;
 
     public RoutineModel() {
 
     }
-
-    public RoutineModel(String routineName, String description, ArrayList<WorkoutModel> workouts) {
-        this.routineName = routineName;
-        this.description = description;
-        this.workouts = workouts;
-    }
-
     public RoutineModel(int userId, String routineName, String description) {
         this.userId = userId;
         this.routineName = routineName;
@@ -32,9 +27,11 @@ public class RoutineModel implements Parcelable {
     protected RoutineModel(Parcel in) {
         imageResource = in.readInt();
         routineId = in.readInt();
+        userId = in.readInt();
         routineName = in.readString();
         description = in.readString();
         workouts = in.createTypedArrayList(WorkoutModel.CREATOR);
+        defaultRoutine = in.readInt();
     }
 
     public static final Creator<RoutineModel> CREATOR = new Creator<RoutineModel>() {
@@ -49,12 +46,28 @@ public class RoutineModel implements Parcelable {
         }
     };
 
+    public int getImageResource() {
+        return imageResource;
+    }
+
+    public void setImageResource(int imageResource) {
+        this.imageResource = imageResource;
+    }
+
     public int getRoutineId() {
         return routineId;
     }
 
     public void setRoutineId(int routineId) {
         this.routineId = routineId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getRoutineName() {
@@ -73,13 +86,6 @@ public class RoutineModel implements Parcelable {
         this.description = description;
     }
 
-    public int getImageResource() {
-        return imageResource;
-    }
-
-    public void setImageResource(int imageResource) {
-        this.imageResource = imageResource;
-    }
 
     public ArrayList<WorkoutModel> getWorkouts() {
         return workouts;
@@ -87,6 +93,15 @@ public class RoutineModel implements Parcelable {
 
     public void setWorkouts(ArrayList<WorkoutModel> workouts) {
         this.workouts = workouts;
+    }
+
+
+    public int getDefaultRoutine() {
+        return defaultRoutine;
+    }
+
+    public void setDefaultRoutine(int defaultRoutine) {
+        this.defaultRoutine = defaultRoutine;
     }
 
     @Override
@@ -98,8 +113,10 @@ public class RoutineModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(imageResource);
         dest.writeInt(routineId);
+        dest.writeInt(userId);
         dest.writeString(routineName);
         dest.writeString(description);
         dest.writeTypedList(workouts);
+        dest.writeInt(defaultRoutine);
     }
 }

@@ -2,6 +2,7 @@ package liftinggoals.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,18 +24,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import liftinggoals.models.ExerciseModel;
-import liftinggoals.models.RoutineModel;
-import liftinggoals.models.RoutineWorkoutModel;
-import liftinggoals.models.WorkoutExerciseModel;
-import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
+import liftinggoals.models.RoutineModel;
 
 public class DefaultRoutineService extends IntentService {
     private static final String TAG = "DefaultRoutineService";
     private DatabaseHelper db;
+    private int userId;
 
     public DefaultRoutineService() {
         super(TAG);
@@ -43,6 +42,8 @@ public class DefaultRoutineService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null)
         {
+            SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+            userId = sp.getInt("UserId", -1);
             fetchRemote();
         }
     }
@@ -51,12 +52,9 @@ public class DefaultRoutineService extends IntentService {
         db = new DatabaseHelper(getApplicationContext());
         db.openDB();
 
-        //TODO add muscle groups to musclesTrainedTable
-
-        final ArrayList<RoutineModel> routineModels =  new ArrayList<>();
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "http://3.221.56.60/fetchdefaultRoutines.php";
-        JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
+        String url = "http://3.221.56.60/fetchDefaultRoutines.php";
+        final JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
                 Response.Listener<JSONArray>() {
                     public void onResponse(JSONArray response) {
                         try
@@ -68,7 +66,6 @@ public class DefaultRoutineService extends IntentService {
                                 if (json.has("user_routine_id"))
                                 {
                                     int userRoutineId = json.getInt("user_routine_id");
-                                    int userId = json.getInt("user_id");
                                     int routineId = json.getInt("routine_id");
 
                                     if (db.getUserRoutine(userRoutineId) == null)
@@ -85,12 +82,12 @@ public class DefaultRoutineService extends IntentService {
                                     String routineName = Html.fromHtml(json.getString("routine_name")).toString();
                                     String routineDesc = Html.fromHtml(json.getString("description")).toString();
                                     int routineId = json.getInt("routine_id");
-                                    int userId = json.getInt("user_id");
                                     int totalWorkouts = json.getInt("number_workouts");
+                                    int isDefaultRoutine = json.getInt("default_routine");
 
                                     if (db.getRoutine(routineId) == null)
                                     {
-                                        db.insertRoutine(routineId, userId, routineName, routineDesc, totalWorkouts);
+                                        db.insertRoutine(routineId, userId, routineName, routineDesc, totalWorkouts, isDefaultRoutine);
                                     }
                                     else
                                     {
@@ -218,6 +215,24 @@ public class DefaultRoutineService extends IntentService {
                     } else if (error.getClass().equals(TimeoutError.class)) {
                         Toast.makeText(getApplicationContext(),
                                 "Connectivity error. Try checking your internet and/or wifi",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else if (error.getClass().equals(VolleyError.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Volley Error",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else if (error.getClass().equals(AuthFailureError.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Authentication Error",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else if (error.getClass().equals(Error.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Authentication Error",
                                 Toast.LENGTH_LONG).show();
                     }
                 }

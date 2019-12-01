@@ -52,7 +52,7 @@ public class WorkoutEditDialog extends AppCompatDialogFragment {
                         String minReps = minimumReps.getText().toString();
                         String maxReps = maximumReps.getText().toString();
                         String strWeight = weight.getText().toString();
-                        listener.applyChanges(position, minSets, maxSets, minReps, maxReps, strWeight);
+                        listener.editExerciseDetails(position, minSets, maxSets, minReps, maxReps, strWeight);
                     }
                 });
 
@@ -77,6 +77,6 @@ public class WorkoutEditDialog extends AppCompatDialogFragment {
 
     public interface WorkoutEditDialogListener
     {
-        void applyChanges(int position, String minSets, String maxSets, String minReps, String maxReps, String weight);
+        void editExerciseDetails(int position, String minSets, String maxSets, String minReps, String maxReps, String weight);
     }
 }

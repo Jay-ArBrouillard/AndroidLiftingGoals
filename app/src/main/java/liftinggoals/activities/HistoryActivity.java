@@ -6,8 +6,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.liftinggoals.R;
@@ -33,41 +36,70 @@ public class HistoryActivity extends AppCompatActivity {
     private RecyclerView.Adapter eventsAdapter;
     private RecyclerView.LayoutManager eventsLayoutManager;
     private ArrayList<Event> eventsModels;
-
+    private ImageButton nextButton, previousButton;
     private CustomCalendarView customCalendarView;
     private SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
     private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
     private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
-    private TextView
+    private int userId;
+    private DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+        eventsRecyclerView = findViewById(R.id.activity_history_recycler_view);
         customCalendarView = findViewById(R.id.custom_calendar_view);
-        //Recycler View
+        previousButton = findViewById(R.id.calendarPreviousBtn);
+        nextButton = findViewById(R.id.calendarNextBtn);
+        customCalendarView.setupCalendar();
 
-        DatabaseHelper db = new DatabaseHelper(this);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        userId = sp.getInt("UserId", -1);
+
+        db = new DatabaseHelper(this);
         db.openDB();
 
-        eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(monthFormat.format(calendar.getTime()), yearFormat.format(calendar.getTime()));
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customCalendarView.calendar.add(Calendar.MONTH, -1);
+                customCalendarView.setupCalendar();
+                eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(customCalendarView.calendar.getTime()), yearFormat.format(customCalendarView.calendar.getTime()));
+                if (eventsModels == null) { eventsModels = new ArrayList<>(); }
+                initializeRecyclerView();
+            }
+        });
 
-        if (eventsModels == null)
-        {
-            eventsModels = new ArrayList<>();
-        }
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customCalendarView.calendar.add(Calendar.MONTH, 1);
+                customCalendarView.setupCalendar();
+                eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(customCalendarView.calendar.getTime()), yearFormat.format(customCalendarView.calendar.getTime()));
+                if (eventsModels == null) { eventsModels = new ArrayList<>(); }
+                initializeRecyclerView();
+            }
+        });
+        //Recycler View
 
-        eventsRecyclerView = findViewById(R.id.activity_history_recycler_view);
+
+        initializeRecyclerView();
+        BottomNavigationView bottomNavigation = findViewById(R.id.activity_history_bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+    }
+
+    private void initializeRecyclerView()
+    {
+        eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(calendar.getTime()), yearFormat.format(calendar.getTime()));
+        if (eventsModels == null) { eventsModels = new ArrayList<>(); }
+
         eventsRecyclerView.setHasFixedSize(true);
         eventsLayoutManager = new LinearLayoutManager(this);
         eventsAdapter = new EventsAdapter(eventsModels);
 
         eventsRecyclerView.setLayoutManager(eventsLayoutManager);
         eventsRecyclerView.setAdapter(eventsAdapter);
-
-
-        BottomNavigationView bottomNavigation = findViewById(R.id.activity_history_bottom_navigation);
-        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {

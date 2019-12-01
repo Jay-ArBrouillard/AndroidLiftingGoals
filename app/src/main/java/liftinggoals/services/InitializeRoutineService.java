@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,19 +20,10 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.models.ExerciseModel;
-import liftinggoals.models.RoutineModel;
-import liftinggoals.models.RoutineWorkoutModel;
-import liftinggoals.models.WorkoutExerciseModel;
-import liftinggoals.models.WorkoutModel;
 
 public class InitializeRoutineService extends IntentService {
     private static final String TAG = "InitRoutineService";
@@ -69,7 +61,6 @@ public class InitializeRoutineService extends IntentService {
                                 if (json.has("user_routine_id"))
                                 {
                                     int userRoutineId = json.getInt("user_routine_id");
-                                    int userId = json.getInt("user_id");
                                     int routineId = json.getInt("routine_id");
 
                                     if (db.getUserRoutine(userRoutineId) == null)
@@ -86,12 +77,12 @@ public class InitializeRoutineService extends IntentService {
                                     String routineName = Html.fromHtml(json.getString("routine_name")).toString();
                                     String routineDesc = Html.fromHtml(json.getString("description")).toString();
                                     int routineId = json.getInt("routine_id");
-                                    int userId = json.getInt("user_id");
                                     int totalWorkouts = json.getInt("number_workouts");
+                                    int isDefaultRoutine = json.getInt("default_routine");
 
                                     if (db.getRoutine(routineId) == null)
                                     {
-                                        db.insertRoutine(routineId, userId, routineName, routineDesc, totalWorkouts);
+                                        db.insertRoutine(routineId, userId, routineName, routineDesc, totalWorkouts, isDefaultRoutine);
                                     }
                                     else
                                     {
@@ -198,7 +189,7 @@ public class InitializeRoutineService extends IntentService {
                             db.closeDB();
 
                             Intent intent = new Intent("initializeRoutinesAction");
-                            intent.putExtra("message", "User's routines were added/updated");
+                            intent.putExtra("message", "Synced");
 
                             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                         }
@@ -221,10 +212,30 @@ public class InitializeRoutineService extends IntentService {
                                 "Connectivity error. Try checking your internet and/or wifi",
                                 Toast.LENGTH_LONG).show();
                     }
+                    else if (error.getClass().equals(VolleyError.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Volley Error",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else if (error.getClass().equals(AuthFailureError.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Authentication Error",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else if (error.getClass().equals(Error.class))
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Authentication Error",
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
                 error.printStackTrace();
             }
         });
+
+
 
         queue.add(jsObjRequest);
     }

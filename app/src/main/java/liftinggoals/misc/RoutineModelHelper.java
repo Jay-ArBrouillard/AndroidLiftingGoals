@@ -30,12 +30,10 @@ public class RoutineModelHelper {
             ArrayList<RoutineWorkoutModel> routineWorkoutList = (ArrayList<RoutineWorkoutModel>) db.getRoutineWorkoutsByRoutineId(routineId);
             if (routineWorkoutList == null) routineWorkoutList = new ArrayList<>();
 
-            WorkoutModel workout = null;
             for (int j = 0; j < routineWorkoutList.size(); j++)
             {
                 int workoutId = routineWorkoutList.get(j).getWorkoutId();
-                workout = db.getWorkout(workoutId);
-                listOfWorkouts.add(workout);
+                listOfWorkouts.add(db.getWorkout(workoutId));
                 ArrayList<WorkoutExerciseModel> workoutExerciseList = (ArrayList<WorkoutExerciseModel>) db.getAllWorkoutExercisesByWorkoutId(workoutId);
                 if (workoutExerciseList == null) workoutExerciseList = new ArrayList<>();
 
@@ -45,6 +43,7 @@ public class RoutineModelHelper {
                     ExerciseModel exerciseModel = db.getExercise(exerciseId);
                     workoutExerciseList.get(k).setExercise(exerciseModel);
                 }
+
                 listOfWorkouts.get(j).setNumberExercises(workoutExerciseList.size());   //Added so numExercisesDisplays right
                 listOfWorkouts.get(j).setExercises(workoutExerciseList);
             }

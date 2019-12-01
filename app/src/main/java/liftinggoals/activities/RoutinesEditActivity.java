@@ -2,8 +2,12 @@ package liftinggoals.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,6 +17,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 
 import liftinggoals.models.RoutineModel;
 import liftinggoals.data.DatabaseHelper;
+import liftinggoals.services.RoutineService;
 
 public class RoutinesEditActivity extends AppCompatActivity {
     private ArrayList<RoutineModel> routineModels;
@@ -31,6 +37,7 @@ public class RoutinesEditActivity extends AppCompatActivity {
     private ImageView commitButton;
     private String routineNameUnchanged;
     private String routineDescUnchanged;
+    private RoutinesEditActivity.ResponseReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +52,16 @@ public class RoutinesEditActivity extends AppCompatActivity {
         routineNameEditText = findViewById(R.id.activity_routines_edit_text);
         routineNameEditText.setText(routineModels.get(selectedRoutineIndex).getRoutineName());
         commitButton = findViewById(R.id.routine_activity_commit_button);
+        commitButton.setClickable(false);
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.updateRoutineNameAndDescription(routineModels.get(selectedRoutineIndex).getRoutineId(), routineNameEditText.getText().toString(), routineDescEditText.getText().toString());
-                commitButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                Intent intent = new Intent(RoutinesEditActivity.this, RoutineService.class);
+                intent.putExtra("type", "update");
+                intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
+                intent.putExtra("routineName", routineNameEditText.getText().toString());
+                intent.putExtra("description", routineDescEditText.getText().toString());
+                startService(intent);
             }
         });
 
@@ -69,10 +81,12 @@ public class RoutinesEditActivity extends AppCompatActivity {
                 if (!s.equals(routineNameUnchanged))
                 {
                     commitButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                    commitButton.setClickable(true);
                 }
                 else
                 {
                     commitButton.setImageResource(R.drawable.ic_checked_neutral_48dp);
+                    commitButton.setClickable(false);
                 }
             }
         });
@@ -96,10 +110,12 @@ public class RoutinesEditActivity extends AppCompatActivity {
                 if (!s.equals(routineDescUnchanged))
                 {
                     commitButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                    commitButton.setClickable(true);
                 }
                 else
                 {
                     commitButton.setImageResource(R.drawable.ic_checked_neutral_48dp);
+                    commitButton.setClickable(false);
                 }
             }
         });
@@ -143,6 +159,38 @@ public class RoutinesEditActivity extends AppCompatActivity {
             return true;    //Means we want to select the clicked item
         }
     };
+
+    public class ResponseReceiver extends BroadcastReceiver {
+        private ResponseReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("routineAction"))
+            {
+                commitButton.setImageResource(R.drawable.ic_checked_green_48dp);
+            }
+        }
+    }
+
+    private void setReceiver() {
+        myReceiver = new RoutinesEditActivity.ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("routineAction");
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStart() {
+        setReceiver();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        super.onStop();
+    }
 
     @Override
     protected void onDestroy() {

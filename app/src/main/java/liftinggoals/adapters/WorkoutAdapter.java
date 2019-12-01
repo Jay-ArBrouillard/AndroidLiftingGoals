@@ -42,22 +42,9 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
     }
 
     public void delete(RecyclerView.ViewHolder viewHolder, final int position) {
-        removedPosition = position;
-        removedItem = this.getItem(position);
-
         workoutList.remove(position);
         workoutListFull = new ArrayList<>(workoutList);
         notifyItemRemoved(position);
-
-        Snackbar.make(viewHolder.itemView, removedItem.getWorkoutName() + " deleted", Snackbar.LENGTH_LONG).setAction("UNDO", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                workoutList.add(removedPosition, removedItem);
-                workoutListFull = new ArrayList<>(workoutList);
-                notifyItemInserted(removedPosition);
-            }
-        }).show();
-
     }
 
     @NonNull

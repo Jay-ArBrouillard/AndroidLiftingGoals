@@ -22,7 +22,7 @@ import liftinggoals.models.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 134;
+    public static final int DATABASE_VERSION = 187;
 
     public SQLiteDatabase myDB;
 
@@ -58,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(ExerciseLogTable.SQL_DROP_EXERCISE_LOG_TABLE);
         db.execSQL(RecordsTable.SQL_DROP_RECORDS_TABLE);
         db.execSQL(MusclesTrainedTable.SQL_DROP_MUSCLES_TRAINED_TABLE);
-        db.execSQL(EventsTable.SQL_DROP_EVENTSTABLE);
+        db.execSQL(EventsTable.SQL_DROP_EVENTS_TABLE);
         db.execSQL(UserTable.SQL_DROP_USER_TABLE);
         db.execSQL(UserRoutinesTable.SQL_DROP_USER_ROUTINE_TABLE);
         onCreate(db);
@@ -83,14 +83,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////ROUTINE METHODS/////////////////////////////////////////////////////
 
-    public long insertRoutine(int pk, int userId, String name, String description, int numberWorkouts)
+    public long insertRoutine(int pk, int userId, String name, String description, int numberWorkouts, int defaultRoutine)
     {
-        return RoutineTable.insert(myDB, pk, userId, name, description, numberWorkouts);
+        return RoutineTable.insert(myDB, pk, userId, name, description, numberWorkouts, defaultRoutine);
     }
 
-    public long insertRoutine(int userId, String name, String description, int numberWorkouts)
+    public long insertRoutine(int userId, String name, String description, int numberWorkouts, int defaultRoutine)
     {
-        return RoutineTable.insert(myDB, userId, name, description, numberWorkouts);
+        return RoutineTable.insert(myDB, userId, name, description, numberWorkouts, defaultRoutine);
     }
 
     public long updateRoutineNameAndDescription(int routineId, String name, String description)
@@ -103,9 +103,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.update(myDB, routineId, name, description, numberWorkouts);
     }
 
-    public long deleteRoutine(String name)
+    public long deleteRoutine(int routineId)
     {
-        return RoutineTable.delete(myDB, name);
+        return RoutineTable.delete(myDB, routineId);
     }
 
     public RoutineModel getRoutine(int routineId)
@@ -113,10 +113,16 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.getRoutine(myDB, routineId);
     }
 
+    public List<RoutineModel> getAllRoutines()
+    {
+        return RoutineTable.getAll(myDB);
+    }
+
     public List<RoutineModel> getAllRoutinesForUser(int userId)
     {
         List<RoutineModel> allRoutines = RoutineTable.getAll(myDB);
         List<UserRoutineModel> allUserRoutines = UserRoutinesTable.getAll(myDB);
+
         if (allRoutines == null) {
             return null;
         }
@@ -125,7 +131,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
         {
             return null;
         }
-
 
         List<RoutineModel> results = new ArrayList<>();
         for (UserRoutineModel user : allUserRoutines)
@@ -426,19 +431,19 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ///////////////////////////////////EVENT METHODS ///////////////////////////////////////////////
 
-    public long insertEvent(String event, String time, String date, String month, String year, String longDate)
+    public long insertEvent(int userId, String event, String time, String date, String month, String year, String longDate)
     {
-        return EventsTable.insert(myDB, event, time, date, month, year, longDate);
+        return EventsTable.insert(myDB, userId, event, time, date, month, year, longDate);
     }
 
-    public long insertEventWithExercises(String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
+    public long insertEventWithExercises(int userId, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
     {
-        return EventsTable.insert(myDB, event, exerciseInfo, time, date, month, year, longDate);
+        return EventsTable.insert(myDB, userId, event, exerciseInfo, time, date, month, year, longDate);
     }
 
-    public List<Event> getEventsByMonthAndYear (String month, String year)
+    public List<Event> getEventsByMonthAndYear(int userId, String month, String year)
     {
-        return EventsTable.getEventsForMonth(myDB, month, year);
+        return EventsTable.getEventsForMonth(myDB, userId, month, year);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
