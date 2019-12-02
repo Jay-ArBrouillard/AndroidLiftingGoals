@@ -185,8 +185,6 @@ public class WorkoutExercisesTable {
 
     public static List<Integer> getAllWorkoutExerciseIdsByExerciseId(SQLiteDatabase myDB, int exerciseId)
     {
-        //List<WorkoutExerciseModel> temp = getAllWorkoutExercises(myDB);
-
         String query = "SELECT " + WorkoutExercisesEntry._ID + " FROM " + WorkoutExercisesEntry.TABLE_NAME + " WHERE " + WorkoutExercisesEntry.COLUMN_EXERCISE_ID + " = ?";
 
         Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});

@@ -15,7 +15,7 @@ $duration = $_POST["duration"];
 $numExercises = $_POST["numExercises"];
 
 $stmt = $conn->prepare("UPDATE Workouts SET workout_name = ?, description = ?, duration = ?, number_exercises = ? WHERE workout_id = ?");
-$stmt->bind_param("sssss", $workoutId, $workoutName, $workoutDesc, $duration, $numExercises);
+$stmt->bind_param("sssss", $workoutName, $workoutDesc, $duration, $numExercises, $workoutId);
 $stmt->execute();
 
 if ($stmt->affected_rows > 0)

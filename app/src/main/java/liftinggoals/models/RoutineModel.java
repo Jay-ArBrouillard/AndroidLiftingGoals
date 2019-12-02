@@ -12,16 +12,21 @@ public class RoutineModel implements Parcelable {
     private int userId;
     private String routineName;
     private String description;
+    private ArrayList<UserRoutineModel> ids;
     private ArrayList<WorkoutModel> workouts;
     private int defaultRoutine;
 
     public RoutineModel() {
-
+        workouts = new ArrayList<>();
+        ids = new ArrayList<>();
     }
+
     public RoutineModel(int userId, String routineName, String description) {
         this.userId = userId;
         this.routineName = routineName;
         this.description = description;
+        workouts = new ArrayList<>();
+        ids = new ArrayList<>();
     }
 
     protected RoutineModel(Parcel in) {
@@ -30,6 +35,7 @@ public class RoutineModel implements Parcelable {
         userId = in.readInt();
         routineName = in.readString();
         description = in.readString();
+        ids = in.createTypedArrayList(UserRoutineModel.CREATOR);
         workouts = in.createTypedArrayList(WorkoutModel.CREATOR);
         defaultRoutine = in.readInt();
     }
@@ -104,6 +110,14 @@ public class RoutineModel implements Parcelable {
         this.defaultRoutine = defaultRoutine;
     }
 
+    public ArrayList<UserRoutineModel> getIds() {
+        return ids;
+    }
+
+    public void setIds(ArrayList<UserRoutineModel> ids) {
+        this.ids = ids;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -116,6 +130,7 @@ public class RoutineModel implements Parcelable {
         dest.writeInt(userId);
         dest.writeString(routineName);
         dest.writeString(description);
+        dest.writeTypedList(ids);
         dest.writeTypedList(workouts);
         dest.writeInt(defaultRoutine);
     }

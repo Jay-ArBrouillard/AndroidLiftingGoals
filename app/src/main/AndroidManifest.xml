@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -77,6 +78,8 @@
         <service android:name="liftinggoals.services.RoutineService" />
         <service android:name="liftinggoals.services.WorkoutService" />
         <service android:name="liftinggoals.services.WorkoutExerciseService" />
+        <service android:name="liftinggoals.services.EventService" />
+        <service android:name="liftinggoals.services.ExerciseLogService" />
     </application>
 
 </manifest>

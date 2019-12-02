@@ -54,10 +54,6 @@ public class WorkoutExerciseService extends IntentService {
             {
                 updateWorkoutExercise();
             }
-            else if (type.equals("delete"))
-            {
-                deleteWorkout();
-            }
         }
     }
 
@@ -203,70 +199,6 @@ public class WorkoutExerciseService extends IntentService {
         });
 
         queue.add(stringRequest);
-    }
-
-    private void deleteWorkout()
-    {
-       /* final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
-        db.openDB();
-
-        String url = String.format("http://3.221.56.60/deleteWorkout.php?workoutId=%s", Integer.toString(workout.getWorkoutId()));
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if (response.equals("-1"))
-                {
-                    Toast.makeText(getApplicationContext(), "Error deleting workout", Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    db.deleteWorkout(workout.getWorkoutId());
-                    db.deleteRoutineWorkout(routineId, workout.getWorkoutId());     //TODO this should be primary key
-                    Toast.makeText(getApplicationContext(), "Successfully deleted workout", Toast.LENGTH_LONG).show();
-                }
-                db.closeDB();
-
-                Intent intent = new Intent("workoutAction");
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (error.networkResponse == null) {
-                    if (error.getClass().equals(NoConnectionError.class))
-                    {
-                        Toast.makeText(getApplicationContext(),
-                                "No internet connection",
-                                Toast.LENGTH_LONG).show();
-
-                    } else if (error.getClass().equals(TimeoutError.class))
-                    {
-                        Toast.makeText(getApplicationContext(),
-                                "Connectivity error. Try again",
-                                Toast.LENGTH_LONG).show();
-                    }
-                    else if (error.getClass().equals(VolleyError.class))
-                    {
-                        Toast.makeText(getApplicationContext(),
-                                "Volley Error",
-                                Toast.LENGTH_LONG).show();
-                    }
-                    else if (error.getClass().equals(AuthFailureError.class))
-                    {
-                        Toast.makeText(getApplicationContext(),
-                                "Authentication Error",
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-                error.printStackTrace();
-                db.closeDB();
-                Intent intent = new Intent("workoutAction");
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                Toast.makeText(getApplicationContext(), "Error deleting Workout", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        queue.add(stringRequest);*/
     }
 
     @Override

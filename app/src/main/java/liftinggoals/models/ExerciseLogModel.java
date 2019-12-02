@@ -1,9 +1,12 @@
 package liftinggoals.models;
 
-public class ExerciseLogModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ExerciseLogModel implements Parcelable {
     private int userExerciseLogId;
     private int userRoutineId;
-    private int workoutExeriseId;
+    private int workoutExerciseId;
     private int setPerformed;
     private int repsPerformed;
     private double intensity;
@@ -15,6 +18,31 @@ public class ExerciseLogModel {
 
     public ExerciseLogModel() {
     }
+
+    protected ExerciseLogModel(Parcel in) {
+        userExerciseLogId = in.readInt();
+        userRoutineId = in.readInt();
+        workoutExerciseId = in.readInt();
+        setPerformed = in.readInt();
+        repsPerformed = in.readInt();
+        intensity = in.readDouble();
+        rpe = in.readDouble();
+        restDuration = in.readDouble();
+        tempo = in.readString();
+        date = in.readString();
+    }
+
+    public static final Creator<ExerciseLogModel> CREATOR = new Creator<ExerciseLogModel>() {
+        @Override
+        public ExerciseLogModel createFromParcel(Parcel in) {
+            return new ExerciseLogModel(in);
+        }
+
+        @Override
+        public ExerciseLogModel[] newArray(int size) {
+            return new ExerciseLogModel[size];
+        }
+    };
 
     public int getUserExerciseLogId() {
         return userExerciseLogId;
@@ -32,12 +60,12 @@ public class ExerciseLogModel {
         this.userRoutineId = userRoutineId;
     }
 
-    public int getWorkoutExeriseId() {
-        return workoutExeriseId;
+    public int getWorkoutExerciseId() {
+        return workoutExerciseId;
     }
 
-    public void setWorkoutExeriseId(int workoutExeriseId) {
-        this.workoutExeriseId = workoutExeriseId;
+    public void setWorkoutExerciseId(int workoutExerciseId) {
+        this.workoutExerciseId = workoutExerciseId;
     }
 
     public int getSetPerformed() {
@@ -91,4 +119,23 @@ public class ExerciseLogModel {
     public String getDate() { return date; }
 
     public void setDate(String date) { this.date = date; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(userExerciseLogId);
+        dest.writeInt(userRoutineId);
+        dest.writeInt(workoutExerciseId);
+        dest.writeInt(setPerformed);
+        dest.writeInt(repsPerformed);
+        dest.writeDouble(intensity);
+        dest.writeDouble(rpe);
+        dest.writeDouble(restDuration);
+        dest.writeString(tempo);
+        dest.writeString(date);
+    }
 }

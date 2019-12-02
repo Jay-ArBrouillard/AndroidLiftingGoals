@@ -50,7 +50,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
 
         holder.event.setText(currentItem.getEVENT());
         holder.exercises.setText(currentItem.getExercises());
-        holder.date.setText(currentItem.getLONGDATE());
+        holder.date.setText(currentItem.getFULL_DATE());
     }
 
     @Override

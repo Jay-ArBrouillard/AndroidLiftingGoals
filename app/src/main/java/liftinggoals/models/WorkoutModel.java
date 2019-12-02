@@ -12,7 +12,6 @@ public class WorkoutModel implements Parcelable {
     private String description;
     private double estimatedDuration;
     private int numberExercises;
-    private ArrayList<RoutineWorkoutModel> workoutIds;
     private ArrayList<WorkoutExerciseModel> exercises;
     private Color color;
 
@@ -37,7 +36,6 @@ public class WorkoutModel implements Parcelable {
         description = in.readString();
         estimatedDuration = in.readDouble();
         numberExercises = in.readInt();
-        workoutIds = in.createTypedArrayList(RoutineWorkoutModel.CREATOR);
         exercises = in.createTypedArrayList(WorkoutExerciseModel.CREATOR);
     }
 
@@ -85,14 +83,6 @@ public class WorkoutModel implements Parcelable {
         this.estimatedDuration = estimatedDuration;
     }
 
-    public ArrayList<RoutineWorkoutModel> getWorkoutIds() {
-        return workoutIds;
-    }
-
-    public void setWorkoutIds(ArrayList<RoutineWorkoutModel> workoutIds) {
-        this.workoutIds = workoutIds;
-    }
-
     public ArrayList<WorkoutExerciseModel> getExercises() {
         return exercises;
     }
@@ -130,7 +120,6 @@ public class WorkoutModel implements Parcelable {
         dest.writeString(description);
         dest.writeDouble(estimatedDuration);
         dest.writeInt(numberExercises);
-        dest.writeTypedList(workoutIds);
         dest.writeTypedList(exercises);
     }
 }

@@ -23,13 +23,13 @@ import java.util.Map;
 import liftinggoals.data.DatabaseHelper;
 import liftinggoals.models.WorkoutModel;
 
-public class WorkoutService extends IntentService {
-    private static final String TAG = "WorkoutService";
+public class EventService extends IntentService {
+    private static final String TAG = "EventService";
     private RequestQueue queue;
     private WorkoutModel workout;
     private int routineId;
 
-    public WorkoutService() {
+    public EventService() {
         super(TAG);
     }
 

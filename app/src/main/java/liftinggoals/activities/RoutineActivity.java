@@ -74,6 +74,7 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
         isFirstLogin = sp.getBoolean("firstLogin", false);
         defaultLoadToast = new LoadToast(this);
         initializeLoadToast = new LoadToast(this);
+        initializeLoadToast.setTranslationY(100);
 
         if (db == null)
         {

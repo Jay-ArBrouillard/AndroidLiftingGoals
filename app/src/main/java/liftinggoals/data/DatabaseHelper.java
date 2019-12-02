@@ -22,7 +22,7 @@ import liftinggoals.models.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 187;
+    public static final int DATABASE_VERSION = 201;
 
     public SQLiteDatabase myDB;
 
@@ -118,6 +118,40 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RoutineTable.getAll(myDB);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////ROUTINE WORKOUTS METHODS ///////////////////////////////////////////
+
+    public long insertRoutineWorkout(int pk, int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.insert(myDB, pk, routineId, workoutId);
+    }
+
+    public long insertRoutineWorkout(int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.insert(myDB, routineId, workoutId);
+    }
+
+    public long updateRoutineWorkout(int routineWorkoutId ,int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.update(myDB, routineWorkoutId, routineId, workoutId);
+    }
+
+    public long deleteRoutineWorkout(int routineId, int workoutId)
+    {
+        return RoutineWorkoutsTable.delete(myDB, routineId, workoutId);
+    }
+
+    public RoutineWorkoutModel getRoutineWorkout(int routineWorkoutId)
+    {
+        return RoutineWorkoutsTable.get(myDB, routineWorkoutId);
+    }
+
+    public List<RoutineWorkoutModel> getRoutineWorkoutsByRoutineId (int routineId)
+    {
+        return RoutineWorkoutsTable.getRoutineWorkoutsByRoutineId(myDB, routineId);
+    }
+
     public List<RoutineModel> getAllRoutinesForUser(int userId)
     {
         List<RoutineModel> allRoutines = RoutineTable.getAll(myDB);
@@ -153,40 +187,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
 
         return results;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////ROUTINE WORKOUTS METHODS ///////////////////////////////////////////
-
-    public long insertRoutineWorkout(int pk, int routineId, int workoutId)
-    {
-        return RoutineWorkoutsTable.insert(myDB, pk, routineId, workoutId);
-    }
-
-    public long insertRoutineWorkout(int routineId, int workoutId)
-    {
-        return RoutineWorkoutsTable.insert(myDB, routineId, workoutId);
-    }
-
-    public long updateRoutineWorkout(int routineWorkoutId ,int routineId, int workoutId)
-    {
-        return RoutineWorkoutsTable.update(myDB, routineWorkoutId, routineId, workoutId);
-    }
-
-    public long deleteRoutineWorkout(int routineId, int workoutId)
-    {
-        return RoutineWorkoutsTable.delete(myDB, routineId, workoutId);
-    }
-
-    public RoutineWorkoutModel getRoutineWorkout(int routineWorkoutId)
-    {
-        return RoutineWorkoutsTable.get(myDB, routineWorkoutId);
-    }
-
-    public List<RoutineWorkoutModel> getRoutineWorkoutsByRoutineId (int routineId)
-    {
-        return RoutineWorkoutsTable.getRoutineWorkoutsByRoutineId(myDB, routineId);
     }
 
     public List<RoutineWorkoutModel> getAllRoutineWorkouts()
@@ -379,9 +379,24 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return ExerciseLogTable.insert(myDB, exerciseLogModel);
     }
 
+    public long insertExerciseLog(int userExerciseLogId, ExerciseLogModel exerciseLogModel)
+    {
+        return ExerciseLogTable.insert(myDB, userExerciseLogId, exerciseLogModel);
+    }
+
+    public long deleteExerciseLog(int userExerciseLogId)
+    {
+        return ExerciseLogTable.delete(myDB, userExerciseLogId);
+    }
+
     public List<ExerciseLogModel> getExercisesLogsByWorkoutExerciseId(int workoutExerciseId)
     {
         return ExerciseLogTable.getExercisesLogsByWorkoutExerciseId(myDB, workoutExerciseId);
+    }
+
+    public List<ExerciseLogModel> getExercisesLogsByRoutineAndExercise(int userRoutineId, int workoutExerciseId)
+    {
+        return  ExerciseLogTable.getExercisesLogsByRoutineAndExercise(myDB, userRoutineId, workoutExerciseId);
     }
 
     public List<ExerciseLogModel> getExercisesLogsByExerciseId(int exerciseId)
@@ -490,9 +505,19 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return UserRoutinesTable.get(myDB, userRoutineId);
     }
 
+    public UserRoutineModel getUserRoutine(int userId, int routineId)
+    {
+        return UserRoutinesTable.get(myDB, userId, routineId);
+    }
+
     public long updateUserRoutine(int userRoutineId, int userId, int routineId)
     {
         return UserRoutinesTable.update(myDB, userRoutineId, userId, routineId);
+    }
+
+    public List<UserRoutineModel> getAllUserRoutines()
+    {
+        return UserRoutinesTable.getAll(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

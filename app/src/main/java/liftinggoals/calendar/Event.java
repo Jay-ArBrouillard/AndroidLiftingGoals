@@ -1,7 +1,7 @@
 package liftinggoals.calendar;
 
 public class Event {
-    private String EVENT, TIME, DATE, MONTH, YEAR, LONGDATE;
+    private String EVENT, TIME, DATE, MONTH, YEAR, FULL_DATE;
     private String exercises;
 
     public Event()
@@ -57,11 +57,11 @@ public class Event {
         this.exercises = exercises;
     }
 
-    public String getLONGDATE() {
-        return LONGDATE;
+    public String getFULL_DATE() {
+        return FULL_DATE;
     }
 
-    public void setLONGDATE(String LONGDATE) {
-        this.LONGDATE = LONGDATE;
+    public void setFULL_DATE(String FULL_DATE) {
+        this.FULL_DATE = FULL_DATE;
     }
 }

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import liftinggoals.calendar.Event;
-import liftinggoals.models.ExerciseLogModel;
 
 public class EventsTable {
 
@@ -30,8 +29,8 @@ public class EventsTable {
     public static abstract class EventEntry implements BaseColumns
     {
         public static final String TABLE_NAME = "Events";
-        public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_EVENT = "event";
+        public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_EXERCISES = "exercises";
         public static final String COLUMN_TIME = "time";
         public static final String COLUMN_DATE = "date";
@@ -105,7 +104,7 @@ public class EventsTable {
                 event.setTIME(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_TIME)));
                 event.setDATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_DATE)));
                 event.setYEAR(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_YEAR)));
-                event.setLONGDATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_FULL_DATE)));
+                event.setFULL_DATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_FULL_DATE)));
             }
 
             return event;
@@ -132,7 +131,7 @@ public class EventsTable {
                 event.setTIME(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_TIME)));
                 event.setDATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_DATE)));
                 event.setYEAR(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_YEAR)));
-                event.setLONGDATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_FULL_DATE)));
+                event.setFULL_DATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_FULL_DATE)));
                 events.add(event);
             }
             return events;

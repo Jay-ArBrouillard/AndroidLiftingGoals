@@ -79,8 +79,8 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
                 Intent intent = new Intent(WorkoutActivity.this, WorkoutService.class);
                 intent.putExtra("type", "insert");
                 intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
+                intent.putExtra("duration", 0.0);   //Prevent Parse error null object reference
                 startService(intent);
-
             }
         });
 
@@ -132,8 +132,9 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
             @Override
             public void onItemClick(int position) {
                 Intent startExerciseActivity = new Intent(WorkoutActivity.this, ExerciseActivity.class);
-                startExerciseActivity.putParcelableArrayListExtra("workout_exercise_models", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getExercises());
+                startExerciseActivity.putParcelableArrayListExtra("routine_models", routineModels);
                 startExerciseActivity.putExtra("workout_name", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getWorkoutName());
+                startExerciseActivity.putExtra("exercises", routineModels.get(selectedRoutineIndex).getWorkouts().get(position).getExercises());
                 SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
                 sp.edit().putInt("selected_workout_index", position).commit();
                 startActivity(startExerciseActivity);
@@ -219,6 +220,7 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
         intent.putExtra("type", "delete");
         intent.putExtra("workoutId", ((WorkoutModel)item).getWorkoutId());
         intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
+        intent.putExtra("duration", 0.0);   //Prevent Parse error null object reference
         startService(intent);
     }
 

@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -153,7 +152,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
             String exerciseName = null;
             if (showAllData || muscleGroup != null )
             {
-                exerciseName = db.getExercise(db.getWorkoutExercise(exerciseLogModels.get(i).getWorkoutExeriseId()).getExerciseId()).getExerciseName();
+                exerciseName = db.getExercise(db.getWorkoutExercise(exerciseLogModels.get(i).getWorkoutExerciseId()).getExerciseId()).getExerciseName();
             }
             else
             {
@@ -166,7 +165,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
             newItem.setExerciseName(exerciseName);
             StringBuilder specsBuilder = new StringBuilder();
             newItem.setSpecs(processString(exerciseLogModels.get(i), specsBuilder));
-            newItem.setTime(formatDateTime(exerciseLogModels.get(i).getDate()));
+            newItem.setTime(exerciseLogModels.get(i).getDate());
 
             progressExerciseModels.add(newItem);
         }

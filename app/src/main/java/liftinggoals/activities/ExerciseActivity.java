@@ -1,14 +1,19 @@
 package liftinggoals.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
@@ -38,50 +43,79 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import liftinggoals.models.ExerciseLogModel;
 import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RecordModel;
+import liftinggoals.models.RoutineModel;
 import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
+import liftinggoals.services.ExerciseLogService;
 
 public class ExerciseActivity extends AppCompatActivity {
     private LineChart lineChart;
     private Button doneButton;
     private Button logButton;
+    private ArrayList<RoutineModel> routineModels;
     private ArrayList<WorkoutExerciseModel> workoutExerciseModels;
+    private ArrayList<ExerciseLogModel> loggedExercises;
+    private int selectedRoutineIndex;
+    private int selectedWorkoutIndex;
     private DatabaseHelper db;
     private ArrayList<Entry> entries = new ArrayList<>();
     private Spinner spinner;
     private TextView weightTextView;
     private TextView repsTextView;
+    private TextView setsTextView;
+    private TextView countDownTextView;
+    private CountDownTimer countDownTimer;
+    private long timeLeftMillis = 6000; //1 min
+    private boolean timerRunning;
     private String workoutName;
     private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
     private SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
     private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
     private SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yy, hh:mm a", Locale.ENGLISH);
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MM, dd, yy, hh:mm a", Locale.ENGLISH);
+    private int userId;
+    private ResponseReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
-        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("workout_exercise_models");
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
+        selectedWorkoutIndex = sp.getInt("selected_workout_index", -1);
+        userId = sp.getInt("UserId", -1);
+        routineModels = getIntent().getExtras().getParcelableArrayList("routine_models");
+        workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("exercises");
         workoutName = getIntent().getExtras().getString("workout_name");
+        loggedExercises = new ArrayList<>();
 
-        db = new DatabaseHelper(this);
-        db.openDB();
+        if (db == null)
+        {
+            db = new DatabaseHelper(this);
+            db.openDB();
+        }
 
         spinner = findViewById(R.id.exercise_activity_spinner);
         doneButton = findViewById(R.id.activity_exercise_done_button);
         logButton = findViewById(R.id.exercise_activity_log_button);
         weightTextView = findViewById(R.id.exercise_activity_weight_value);
         repsTextView = findViewById(R.id.exercise_activity_reps_value);
+        setsTextView = findViewById(R.id.exercise_activity_set_value);
+        countDownTextView = findViewById(R.id.exercise_activity_timer);
+
+        countDownTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startStop();
+            }
+        });
 
         if (workoutExerciseModels.size() > 0)
         {
@@ -101,14 +135,16 @@ public class ExerciseActivity extends AppCompatActivity {
                 final String month = monthFormat.format(calendar.getTime());
                 final String year = yearFormat.format(calendar.getTime());
                 String longDate = longDateFormat.format(calendar.getTime());
-                System.out.println("long date: " + longDate);
-                String exerciseDescription = buildExerciseString();
-                SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
-                int userId = sp.getInt("UserId", -1);
+                String exerciseDescription = buildExerciseString(); //Exercise A, Exercise B, Exercise C
+
                 db.insertEventWithExercises(userId, workoutName, exerciseDescription, time, date, month, year, longDate);
-                Intent intent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
-                startActivity(intent);
-                finish();
+                Intent insertAllExerciseLog = new Intent(ExerciseActivity.this, ExerciseLogService.class);
+                insertAllExerciseLog.putExtra("type", "insert");
+                insertAllExerciseLog.putExtra("userId", userId);
+                insertAllExerciseLog.putExtra("userRoutineId", db.getUserRoutine(userId, routineModels.get(selectedRoutineIndex).getRoutineId()).getUserRoutineId());
+                insertAllExerciseLog.putExtra("workoutExerciseId", routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(0).getWorkoutExerciseId());
+                insertAllExerciseLog.putExtra("loggedExercises", loggedExercises);
+                startService(insertAllExerciseLog);
             }
         });
 
@@ -118,7 +154,9 @@ public class ExerciseActivity extends AppCompatActivity {
                 logButton.setEnabled(false);    //Prevent double button click
 
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
-                exerciseLogModel.setWorkoutExeriseId(workoutExerciseModels.get(spinner.getSelectedItemPosition()).getWorkoutExerciseId());
+                exerciseLogModel.setRpe(0.0);
+                exerciseLogModel.setRestDuration(0.0);
+                exerciseLogModel.setTempo("0");
                 TextView set = findViewById(R.id.exercise_activity_set_value);
                 EditText repsEditText = findViewById(R.id.exercise_activity_reps_value);
                 EditText weightEditText = findViewById(R.id.exercise_activity_weight_value);
@@ -130,21 +168,22 @@ public class ExerciseActivity extends AppCompatActivity {
                     double weight = Double.parseDouble(weightEditText.getText().toString().trim());
                     int exerciseId = workoutExerciseModels.get(selectedIndex).getExerciseId();
 
+                    exerciseLogModel.setWorkoutExerciseId(workoutExerciseModels.get(selectedIndex).getWorkoutExerciseId());
+                    exerciseLogModel.setUserRoutineId(db.getUserRoutine(userId, routineModels.get(selectedRoutineIndex).getRoutineId()).getUserRoutineId()); //TODO fix
                     exerciseLogModel.setSetPerformed(index);
                     exerciseLogModel.setRepsPerformed(reps);
                     exerciseLogModel.setIntensity(weight);
 
-                    TimeZone tz = TimeZone.getDefault();
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
-                    df.setTimeZone(tz);
-                    String nowAsISO = df.format(new Date());
-                    exerciseLogModel.setDate(nowAsISO);
+                    SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss");
+                    Date date = new Date();
+                    exerciseLogModel.setDate(dateTime.format(date));
 
                     index++;
                     set.setText(Integer.toString(index));
-                    db.insertExerciseLog(exerciseLogModel);
-                    processRecords(-1, exerciseId, weight, reps, nowAsISO); //Change userId
-
+                    long exerciseLogId = db.insertExerciseLog(exerciseLogModel);
+                    exerciseLogModel.setUserExerciseLogId((int) exerciseLogId);
+                    loggedExercises.add(exerciseLogModel);
+                    processRecords(userId, exerciseId, weight, reps, longDateFormat.format(calendar.getTime()) );
                     buildLineGraph(workoutExerciseModels.get(selectedIndex)); //Do this last
                 }
                 catch (NumberFormatException e)
@@ -164,7 +203,7 @@ public class ExerciseActivity extends AppCompatActivity {
         exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(exerciseAdapter);
 
-
+        spinner.setSelection(-1, true);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -182,6 +221,18 @@ public class ExerciseActivity extends AppCompatActivity {
                 {
                     repsTextView.setText(Integer.toString(minimumReps));
                 }
+
+                int lastSetForExercise = 0; //Set to zero in the case that no set was found
+                for (ExerciseLogModel logged : loggedExercises)
+                {
+                    if (logged.getWorkoutExerciseId() == selected.getWorkoutExerciseId())
+                    {
+                        lastSetForExercise = logged.getSetPerformed();
+                    }
+                }
+                lastSetForExercise++; //Whatever the last set we found was we want the next set after it
+                setsTextView.setText(""+lastSetForExercise);
+
             }
 
             @Override
@@ -192,6 +243,52 @@ public class ExerciseActivity extends AppCompatActivity {
 
                 //this leaves the keyboard hidden on load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void startStop()
+    {
+        if (timerRunning)
+        {
+            stopTimer();
+        }
+        else
+        {
+            startTimer();
+        }
+    }
+
+    private void startTimer()
+    {
+        countDownTimer =  new CountDownTimer(timeLeftMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftMillis = millisUntilFinished;
+                int minutes = (int) timeLeftMillis / 6000;
+                int seconds = (int) timeLeftMillis % 6000 / 1000;
+                String timeLeftText= "" + minutes + ":";
+                if (seconds < 10)
+                {
+                    timeLeftText += "0";
+                }
+                timeLeftText += seconds;
+                countDownTextView.setText(timeLeftText);
+            }
+
+            @Override
+            public void onFinish() {
+                countDownTextView.setText("0:00");
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(getApplicationContext().VIBRATOR_SERVICE);
+                v.vibrate(1000);
+            }
+        }.start();
+
+        timerRunning = true;
+    }
+
+    private void stopTimer()
+    {
+        countDownTimer.cancel();
+        timerRunning = false;
     }
 
     private String buildExerciseString()
@@ -219,7 +316,7 @@ public class ExerciseActivity extends AppCompatActivity {
         if (existing == null)
         {
             //First Record
-            Toast.makeText(getApplicationContext(), "You logged your first weight: " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "You logged your first weight ever: " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
             db.insertRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
             return;
         }
@@ -267,54 +364,115 @@ public class ExerciseActivity extends AppCompatActivity {
     private String processString(WorkoutExerciseModel e, StringBuilder stringBuilder)
     {
         ExerciseModel exerciseModel = e.getExercise();
-        stringBuilder.append(exerciseModel.getExerciseName()).append(" (");
         int minSets = e.getMinimumSets();
         int maxSets = e.getMaximumSets();
         int minReps = e.getMinimumReps();
         int maxReps = e.getMaximumReps();
 
-        if (minSets == -1 && maxSets != -1)
+        if (minSets == -1 && maxSets == -1 && minReps == -1 && maxReps == -1)
         {
-            stringBuilder.append(maxSets).append(" Sets");
+            return exerciseModel.getExerciseName();
         }
-        else if (minSets != -1 && maxSets == -1)
+        else if (minSets == -1 && maxSets == -1)
         {
-            stringBuilder.append(minSets).append("+").append(" Sets");
-        }
-        else if (minSets != -1 && maxSets != -1)
-        {
-            stringBuilder.append(minSets).append("-").append(maxSets).append(" Sets");
-        }
+            stringBuilder.append(exerciseModel.getExerciseName()).append(" (");
 
-        stringBuilder.append(", ");
+            if (minReps == -1 && maxReps != -1)
+            {
+                stringBuilder.append(maxReps).append(" Reps");
+            }
+            else if (minReps != -1 && maxSets == -1)
+            {
+                stringBuilder.append(minReps).append("+").append(" Reps");
+            }
+            else if (minReps != -1 && maxReps != -1)
+            {
+                stringBuilder.append(minReps).append("-").append(maxReps).append(" Reps");
+            }
 
-        if (minReps == -1 && maxReps != -1)
-        {
-            stringBuilder.append(maxReps).append(" Reps");
+            stringBuilder.append(")");
         }
-        else if (minReps != -1 && maxSets == -1)
+        else if (minReps == -1 && maxReps == -1)
         {
-            stringBuilder.append(minReps).append("+").append(" Reps");
-        }
-        else if (minReps != -1 && maxReps != -1)
-        {
-            stringBuilder.append(minReps).append("-").append(maxReps).append(" Reps");
-        }
+            stringBuilder.append(exerciseModel.getExerciseName()).append(" (");
 
-        stringBuilder.append(")");
+            if (minSets == -1 && maxSets != -1)
+            {
+                stringBuilder.append(maxSets).append(" Sets");
+            }
+            else if (minSets != -1 && maxSets == -1)
+            {
+                stringBuilder.append(minSets).append("+").append(" Sets");
+            }
+            else if (minSets != -1 && maxSets != -1)
+            {
+                stringBuilder.append(minSets).append("-").append(maxSets).append(" Sets");
+            }
+
+            stringBuilder.append(")");
+        }
+        else
+        {
+            stringBuilder.append(exerciseModel.getExerciseName()).append(" (");
+
+            if (minSets == -1 && maxSets != -1)
+            {
+                stringBuilder.append(maxSets).append(" Sets");
+            }
+            else if (minSets != -1 && maxSets == -1)
+            {
+                stringBuilder.append(minSets).append("+").append(" Sets");
+            }
+            else if (minSets != -1 && maxSets != -1)
+            {
+                stringBuilder.append(minSets).append("-").append(maxSets).append(" Sets");
+            }
+
+            stringBuilder.append(", ");
+
+            if (minReps == -1 && maxReps != -1)
+            {
+                stringBuilder.append(maxReps).append(" Reps");
+            }
+            else if (minReps != -1 && maxSets == -1)
+            {
+                stringBuilder.append(minReps).append("+").append(" Reps");
+            }
+            else if (minReps != -1 && maxReps != -1)
+            {
+                stringBuilder.append(minReps).append("-").append(maxReps).append(" Reps");
+            }
+
+            stringBuilder.append(")");
+        }
 
         return stringBuilder.toString();
     }
 
-
-
     private boolean setData(WorkoutExerciseModel workoutExerciseModel)
     {
-        ArrayList<ExerciseLogModel> exerciseLogModelArrayList =(ArrayList<ExerciseLogModel>)  db.getExercisesLogsByWorkoutExerciseId(workoutExerciseModel.getWorkoutExerciseId());
-        if (exerciseLogModelArrayList == null)
+//        ArrayList<ExerciseLogModel> exerciseLogModelArrayList =(ArrayList<ExerciseLogModel>)  db.getExercisesLogsByWorkoutExerciseId(workoutExerciseModel.getWorkoutExerciseId());
+//        if (exerciseLogModelArrayList == null)
+//        {
+//            return false;
+//        }
+
+        ArrayList<ExerciseLogModel> exerciseLogModelArrayList = new ArrayList<>();
+        for (ExerciseLogModel e : loggedExercises)
+        {
+            if (workoutExerciseModel.getWorkoutExerciseId() == e.getWorkoutExerciseId())
+            {
+                exerciseLogModelArrayList.add(e);
+            }
+        }
+
+        if (exerciseLogModelArrayList.size() == 0)
         {
             return false;
         }
+//added
+
+        entries.clear();
 
         for (ExerciseLogModel logModel : exerciseLogModelArrayList)
         {
@@ -385,6 +543,42 @@ public class ExerciseActivity extends AppCompatActivity {
         Description description = new Description();
         description.setText("Log an exercise to see data");
         lineChart.setDescription(description);
+    }
+
+    private void setReceiver() {
+        myReceiver = new ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("exerciseLogAction");
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
+    }
+
+    public class ResponseReceiver extends BroadcastReceiver {
+        private ResponseReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("exerciseLogAction"))
+            {
+                entries.clear();
+                loggedExercises.clear();
+                Intent finishWorkoutIntent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
+                startActivity(finishWorkoutIntent);
+                finish();
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        setReceiver();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        super.onStop();
     }
 
 }

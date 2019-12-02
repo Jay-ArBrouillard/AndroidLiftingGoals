@@ -43,6 +43,7 @@ import liftinggoals.misc.VerticalSpaceItemDecoration;
 import liftinggoals.dialogs.WorkoutEditDialog;
 import liftinggoals.models.WorkoutModel;
 import liftinggoals.services.WorkoutExerciseService;
+import liftinggoals.services.WorkoutService;
 
 public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEditDialog.WorkoutEditDialogListener, CreateExerciseDialog.CreateExerciseDialogListener {
     private ArrayList<RoutineModel> routineModels;
@@ -125,22 +126,27 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
                 if (imageViewSrcId == R.drawable.ic_checked_red_48dp)
                 {
                     commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                    imageViewSrcId = R.drawable.ic_checked_red_48dp;
                     int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
                     int numExercises = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getNumberExercises();
                     String newWorkoutName = workoutNameEditText.getText().toString();
-                    String newDuration = durationEditText.getText().toString();
                     String newDesc = workoutDescEditText.getText().toString();
-                    //TODO CHANGES FOR WORKOUT NAME, DESCRRIPTION AND DURATION
 
-                    Intent updateWorkoutIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
-                    updateWorkoutIntent.putExtra("type", "insert");
-                    updateWorkoutIntent.putExtra("workoutId", workoutId);
-                    updateWorkoutIntent.putExtra("numExercises", numExercises);
-                    updateWorkoutIntent.putExtra("workoutName", newWorkoutName);
-                    updateWorkoutIntent.putExtra("duration", newDuration);
-                    startService(updateWorkoutIntent);
-
-                    updateWorkoutIntent.putExtra("description", newDesc);
+                    Double newDuration = null;
+                    try {
+                        newDuration = Double.parseDouble(durationEditText.getText().toString());
+                        Intent updateWorkoutIntent = new Intent(WorkoutEditActivity.this, WorkoutService.class);
+                        updateWorkoutIntent.putExtra("type", "update");
+                        updateWorkoutIntent.putExtra("workoutId", workoutId);
+                        updateWorkoutIntent.putExtra("description", newDesc);
+                        updateWorkoutIntent.putExtra("workoutName", newWorkoutName);
+                        updateWorkoutIntent.putExtra("duration", newDuration);
+                        updateWorkoutIntent.putExtra("numExercises", numExercises);
+                        startService(updateWorkoutIntent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Duration must be a number", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -208,12 +214,13 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
                 int numExercises = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getNumberExercises() + 1;
 
                 commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
-                Intent insertIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
-                insertIntent.putExtra("type", "insert");
-                insertIntent.putExtra("workoutId", workoutId);
-                insertIntent.putExtra("exerciseId", spinnerExerciseModels.get(position).getExerciseId());
-                insertIntent.putExtra("numExercises", numExercises);
-                startService(insertIntent);
+                imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                Intent insertWorkoutExerciseIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
+                insertWorkoutExerciseIntent.putExtra("type", "insert");
+                insertWorkoutExerciseIntent.putExtra("workoutId", workoutId);
+                insertWorkoutExerciseIntent.putExtra("exerciseId", spinnerExerciseModels.get(position).getExerciseId());
+                insertWorkoutExerciseIntent.putExtra("numExercises", numExercises);
+                startService(insertWorkoutExerciseIntent);
             }
 
             @Override
@@ -334,7 +341,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     public void editExerciseDetails(int position, String minSets, String maxSets, String minReps, String maxReps, String weight) {
         int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
         int exerciseId = spinnerExerciseModels.get(position).getExerciseId();
-        int workoutExerciseId = db.getWorkoutExerciseByWorkoutAndExerciseId(workoutId, exerciseId).getWorkoutExerciseId();
+        int workoutExerciseId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(position).getWorkoutExerciseId();
 
         try {
             WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
@@ -346,6 +353,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             workoutExerciseModel.setIntensity(Double.parseDouble(weight));
 
             commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+            imageViewSrcId = R.drawable.ic_checked_red_48dp;
             Intent updateIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
             updateIntent.putExtra("type", "update");
             updateIntent.putExtra("workoutId", workoutId);
@@ -361,6 +369,8 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         myReceiver = new ResponseReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("workoutEditAction");
+        intentFilter.addAction("workoutAction");
+        intentFilter.addAction("errorWorkoutAction");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
     }
 
@@ -373,10 +383,21 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
             if (intent.getAction().equals("workoutEditAction"))
             {
-                //routineModels.get(selectedRoutineIndex).getWorkouts().add(new WorkoutModel("Untitled Workout", "Untitled Description", 0.0, 0));
-                //adapter.notifyItemInserted(routineModels.get(selectedRoutineIndex).getWorkouts().size()-1);
-                initializeRecyclerView();
                 commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                initializeRecyclerView();
+            }
+            else if (intent.getAction().equals("workoutAction"))
+            {
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                initializeRecyclerView();
+            }
+            else if (intent.getAction().equals("errorWorkoutAction"))
+            {
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                initializeRecyclerView();
             }
         }
     }
@@ -385,7 +406,6 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     protected void onStart() {
         setReceiver();
         super.onStart();
-        initializeRecyclerView();
     }
 
     @Override

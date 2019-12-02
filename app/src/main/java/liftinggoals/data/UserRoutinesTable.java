@@ -86,6 +86,30 @@ public class UserRoutinesTable {
         }
     }
 
+    public static UserRoutineModel get(SQLiteDatabase myDB, int userId, int routineId)
+    {
+        String query = "SELECT * FROM " + UserRoutineEntry.TABLE_NAME + " WHERE " + UserRoutineEntry.COLUMN_USER_ID  + " = ? AND " + UserRoutineEntry.COLUMN_ROUTINE_ID + " = ?";
+
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(userId), Integer.toString(routineId)});
+
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            UserRoutineModel userRoutine = new UserRoutineModel();
+
+            while(c.moveToNext()){
+                userRoutine.setUserRoutineId(c.getInt(c.getColumnIndexOrThrow(UserRoutineEntry._ID)));
+                userRoutine.setUserId(c.getInt(c.getColumnIndexOrThrow(UserRoutineEntry.COLUMN_USER_ID)));
+                userRoutine.setRoutineId(c.getInt(c.getColumnIndexOrThrow(UserRoutineEntry.COLUMN_ROUTINE_ID)));
+            }
+
+            return userRoutine;
+        }
+    }
+
     public static List<UserRoutineModel> getAll(SQLiteDatabase myDB)
     {
         String query = "SELECT * FROM " + UserRoutineEntry.TABLE_NAME;

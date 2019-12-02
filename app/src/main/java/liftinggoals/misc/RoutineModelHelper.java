@@ -5,9 +5,12 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
+import liftinggoals.data.RoutineTable;
+import liftinggoals.data.UserRoutinesTable;
 import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RoutineModel;
 import liftinggoals.models.RoutineWorkoutModel;
+import liftinggoals.models.UserRoutineModel;
 import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.models.WorkoutModel;
 import liftinggoals.data.DatabaseHelper;
@@ -22,6 +25,7 @@ public class RoutineModelHelper {
 
         ArrayList<RoutineModel> routineModels = (ArrayList<RoutineModel>) db.getAllRoutinesForUser(userId);
         if (routineModels == null) routineModels = new ArrayList<>();
+
         for (int i = 0; i < routineModels.size(); i++)
         {
             ArrayList<WorkoutModel> listOfWorkouts = new ArrayList<>();

@@ -15,6 +15,7 @@ public class ExerciseLogTable {
     public static final String SQL_CREATE_EXERCISE_LOG_TABLE = "CREATE TABLE " +
             ExerciseLogEntry.TABLE_NAME + " (" +
             ExerciseLogEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            ExerciseLogEntry.COLUMN_USER_ROUTINE_ID + " INTEGER NOT NULL, " +
             ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID + " INTEGER NOT NULL, " +
             ExerciseLogEntry.COLUMN_SET_PERFORMED + " INTEGER, " +
             ExerciseLogEntry.COLUMN_REPS_PERFORMED + " INTEGER, " +
@@ -29,6 +30,7 @@ public class ExerciseLogTable {
     public static abstract class ExerciseLogEntry implements BaseColumns
     {
         public static final String TABLE_NAME = "ExerciseLog";
+        public static final String COLUMN_USER_ROUTINE_ID = "user_routine_id";
         public static final String COLUMN_WORKOUT_EXERCISE_ID = "workout_exercise_id";
         public static final String COLUMN_SET_PERFORMED = "set_performed";
         public static final String COLUMN_REPS_PERFORMED = "reps_performed";
@@ -38,16 +40,34 @@ public class ExerciseLogTable {
         public static final String COLUMN_TEMPO = "tempo";
         public static final String COLUMN_DATE_PERFORMED = "date_performed";
     }
-    public static long insert(SQLiteDatabase myDB, ExerciseLogModel entity)
+    public static long insert(SQLiteDatabase myDB, int userExerciseLogId, ExerciseLogModel entity)
     {
         ContentValues values = new ContentValues();
-        values.put(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID, entity.getWorkoutExeriseId());
+        values.put(ExerciseLogEntry._ID, userExerciseLogId);
+        values.put(ExerciseLogEntry.COLUMN_USER_ROUTINE_ID, entity.getUserRoutineId());
+        values.put(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID, entity.getWorkoutExerciseId());
         values.put(ExerciseLogEntry.COLUMN_SET_PERFORMED, entity.getSetPerformed());
         values.put(ExerciseLogEntry.COLUMN_REPS_PERFORMED, entity.getRepsPerformed());
         values.put(ExerciseLogEntry.COLUMN_INTENSITY, entity.getIntensity());
-        //values.put(ExerciseLogEntry.COLUMN_RPE, entity.getRpe());
-        //values.put(ExerciseLogEntry.COLUMN_REST_DURATION, entity.getRestDuration());
-        //values.put(ExerciseLogEntry.COLUMN_TEMPO, entity.getTempo());
+        values.put(ExerciseLogEntry.COLUMN_RPE, entity.getRpe());
+        values.put(ExerciseLogEntry.COLUMN_REST_DURATION, entity.getRestDuration());
+        values.put(ExerciseLogEntry.COLUMN_TEMPO, entity.getTempo());
+        values.put(ExerciseLogEntry.COLUMN_DATE_PERFORMED, entity.getDate());
+
+        return myDB.insert(ExerciseLogEntry.TABLE_NAME, null, values);
+    }
+
+    public static long insert(SQLiteDatabase myDB, ExerciseLogModel entity)
+    {
+        ContentValues values = new ContentValues();
+        values.put(ExerciseLogEntry.COLUMN_USER_ROUTINE_ID, entity.getUserRoutineId());
+        values.put(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID, entity.getWorkoutExerciseId());
+        values.put(ExerciseLogEntry.COLUMN_SET_PERFORMED, entity.getSetPerformed());
+        values.put(ExerciseLogEntry.COLUMN_REPS_PERFORMED, entity.getRepsPerformed());
+        values.put(ExerciseLogEntry.COLUMN_INTENSITY, entity.getIntensity());
+        values.put(ExerciseLogEntry.COLUMN_RPE, entity.getRpe());
+        values.put(ExerciseLogEntry.COLUMN_REST_DURATION, entity.getRestDuration());
+        values.put(ExerciseLogEntry.COLUMN_TEMPO, entity.getTempo());
         values.put(ExerciseLogEntry.COLUMN_DATE_PERFORMED, entity.getDate());
 
         return myDB.insert(ExerciseLogEntry.TABLE_NAME, null, values);
@@ -61,10 +81,10 @@ public class ExerciseLogTable {
         return myDB.update(ExerciseLogEntry.TABLE_NAME, values, "exercise_name = ?", new String[] {name});
     }
 
-    public static long delete(SQLiteDatabase myDB, String name)
+    public static long delete(SQLiteDatabase myDB, int id)
     {
-        //String where = ExerciseLogEntry.COLUMN_EXERCISE_NAME + " = " + name;
-        String where = null;
+        String where = ExerciseLogEntry._ID + " = " + id;
+
         return myDB.delete(ExerciseLogEntry.TABLE_NAME, where, null);
     }
 
@@ -85,7 +105,8 @@ public class ExerciseLogTable {
             while(c.moveToNext()){
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
                 exerciseLogModel.setUserExerciseLogId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry._ID)));
-                exerciseLogModel.setWorkoutExeriseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID)));
+                exerciseLogModel.setUserRoutineId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_USER_ROUTINE_ID)));
+                exerciseLogModel.setWorkoutExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID)));
                 exerciseLogModel.setSetPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_SET_PERFORMED)));
                 exerciseLogModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REPS_PERFORMED)));
                 exerciseLogModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_INTENSITY)));
@@ -100,8 +121,38 @@ public class ExerciseLogTable {
         }
     }
 
+    public static List<ExerciseLogModel> getExercisesLogsByRoutineAndExercise(SQLiteDatabase myDB, int userRoutineId, int workoutExerciseId)
+    {
+        String query = "SELECT * FROM " + ExerciseLogEntry.TABLE_NAME + " WHERE " + ExerciseLogEntry.COLUMN_USER_ROUTINE_ID + " = ? AND " + ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID + " = ?";
 
+        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(userRoutineId), Integer.toString(workoutExerciseId)});
 
+        if (c.getCount() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<ExerciseLogModel> exercises = new ArrayList<>();
+
+            while(c.moveToNext()){
+                ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
+                exerciseLogModel.setUserExerciseLogId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry._ID)));
+                exerciseLogModel.setUserRoutineId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_USER_ROUTINE_ID)));
+                exerciseLogModel.setWorkoutExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID)));
+                exerciseLogModel.setSetPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_SET_PERFORMED)));
+                exerciseLogModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REPS_PERFORMED)));
+                exerciseLogModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_INTENSITY)));
+                exerciseLogModel.setRpe(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_RPE)));
+                exerciseLogModel.setRestDuration(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REST_DURATION)));
+                exerciseLogModel.setTempo(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_TEMPO)));
+                exerciseLogModel.setDate(c.getString(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_DATE_PERFORMED)));
+                exercises.add(exerciseLogModel);
+            }
+
+            return exercises;
+        }
+    }
 
     public static List<ExerciseLogModel> getAllExercisesLogs(SQLiteDatabase myDB)
     {
@@ -120,7 +171,8 @@ public class ExerciseLogTable {
             while(c.moveToNext()){
                 ExerciseLogModel exerciseLogModel = new ExerciseLogModel();
                 exerciseLogModel.setUserExerciseLogId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry._ID)));
-                exerciseLogModel.setWorkoutExeriseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID)));
+                exerciseLogModel.setUserRoutineId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_USER_ROUTINE_ID)));
+                exerciseLogModel.setWorkoutExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_WORKOUT_EXERCISE_ID)));
                 exerciseLogModel.setSetPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_SET_PERFORMED)));
                 exerciseLogModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_REPS_PERFORMED)));
                 exerciseLogModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(ExerciseLogEntry.COLUMN_INTENSITY)));
