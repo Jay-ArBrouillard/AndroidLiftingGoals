@@ -6,6 +6,7 @@ import android.os.Parcelable;
 public class ExerciseModel implements Parcelable {
     private int exerciseId;
     private String exerciseName;
+    private int userId;
 
     public ExerciseModel() {
     }
@@ -23,6 +24,7 @@ public class ExerciseModel implements Parcelable {
     protected ExerciseModel(Parcel in) {
         exerciseId = in.readInt();
         exerciseName = in.readString();
+        userId = in.readInt();
     }
 
     public static final Creator<ExerciseModel> CREATOR = new Creator<ExerciseModel>() {
@@ -53,6 +55,19 @@ public class ExerciseModel implements Parcelable {
         this.exerciseName = exerciseName;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String toString()
+    {
+        return exerciseName;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -62,10 +77,6 @@ public class ExerciseModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(exerciseId);
         dest.writeString(exerciseName);
-    }
-
-    public String toString()
-    {
-        return exerciseName;
+        dest.writeInt(userId);
     }
 }

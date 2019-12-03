@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,10 +36,14 @@ public class ProgressActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager exerciseLayoutManager;
     private SearchView search;
     private DatabaseHelper db;
+    private int userId;
+    private static final int isAdmin = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        userId = sp.getInt("UserId", -1);
 
         volumeGroups = new ArrayList<>();
         exercisesList = new ArrayList<>();
@@ -94,8 +99,6 @@ public class ProgressActivity extends AppCompatActivity {
         volumeRecyclerView = findViewById(R.id.progress_activity_volume_groups_recycler_view);
         volumeRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
-
-        //TODO database stuff with volumes groups so you can click on them in progress tab
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Arms"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Back"));
         volumeGroups.add(new VolumeGroupModel(R.drawable.ic_keyboard_arrow_right_white_24dp, "Biceps"));
@@ -131,7 +134,16 @@ public class ProgressActivity extends AppCompatActivity {
 
         DatabaseHelper db = new DatabaseHelper(getApplicationContext());
         db.openDB();
-        exercisesList = (ArrayList<ExerciseModel>) db.getAllExercises();
+
+        //If admin get all exercises else get exercises for user
+        if (userId == isAdmin)
+        {
+            exercisesList = (ArrayList<ExerciseModel>) db.getAllExercises();
+        }
+        else
+        {
+            exercisesList = (ArrayList<ExerciseModel>) db.getAllExercisesForUser(userId);
+        }
 
         if (exercisesList == null)
         {

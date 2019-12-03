@@ -78,8 +78,8 @@
         <service android:name="liftinggoals.services.RoutineService" />
         <service android:name="liftinggoals.services.WorkoutService" />
         <service android:name="liftinggoals.services.WorkoutExerciseService" />
-        <service android:name="liftinggoals.services.EventService" />
-        <service android:name="liftinggoals.services.ExerciseLogService" />
+        <service android:name="liftinggoals.services.ExerciseLogAndEventService" />
+        <service android:name="liftinggoals.services.ExerciseMuscleGroupService" />
     </application>
 
 </manifest>

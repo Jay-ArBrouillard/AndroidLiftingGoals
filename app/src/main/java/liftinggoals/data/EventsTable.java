@@ -39,9 +39,10 @@ public class EventsTable {
         public static final String COLUMN_YEAR = "year";
     }
 
-    public static long insert(SQLiteDatabase myDB, int userId, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
+    public static long insert(SQLiteDatabase myDB, int id, int userId, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
     {
         ContentValues values = new ContentValues();
+        values.put(EventEntry._ID, id);
         values.put(EventEntry.COLUMN_USER_ID, userId);
         values.put(EventEntry.COLUMN_EVENT, event);
         values.put(EventEntry.COLUMN_EXERCISES, exerciseInfo);

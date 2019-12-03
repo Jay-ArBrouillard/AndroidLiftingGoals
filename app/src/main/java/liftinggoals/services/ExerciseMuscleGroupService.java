@@ -16,24 +16,23 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.models.ExerciseLogModel;
 
-public class ExerciseLogService extends IntentService {
-    private static final String TAG = "ExerciseLogService";
+public class ExerciseMuscleGroupService extends IntentService {
+    private static final String TAG = "ExerciseMuscleGroupService";
     private RequestQueue queue;
-    private ArrayList<ExerciseLogModel> loggedExercises;
-    private int userRoutineId;
-    private int workoutExerciseId;
+    private String exerciseName;
+    private String muscleGroupsString; //ex: Chest Arms Abs
+    private ArrayList<String> muscleGroups;
+    private int userId;
 
-    public ExerciseLogService() {
+    public ExerciseMuscleGroupService() {
         super(TAG);
     }
 
@@ -42,73 +41,63 @@ public class ExerciseLogService extends IntentService {
         if (intent != null)
         {
             queue = Volley.newRequestQueue(getApplicationContext());
-            userRoutineId = intent.getIntExtra("userRoutineId", -1);
-            workoutExerciseId = intent.getIntExtra("workoutExerciseId", -1);
-            loggedExercises = intent.getParcelableArrayListExtra("loggedExercises");
+            exerciseName = intent.getStringExtra("exerciseName");
+            muscleGroupsString = intent.getStringExtra("muscleGroupsString");
+            muscleGroups = intent.getStringArrayListExtra("muscleGroupsList");
+            userId = intent.getIntExtra("userId", -1);
 
             String type = intent.getStringExtra("type");
             if (type.equals("insert"))
             {
-                insertExerciseLog();
+                insertExerciseAndMuscleGroup();
+            }
+            else if (type.equals("update"))
+            {
+                updateWorkout();
+            }
+            else if (type.equals("delete"))
+            {
+                deleteWorkout();
             }
         }
     }
 
+    private void updateWorkout()
+    {
+    }
 
-    private void insertExerciseLog()
+    private void insertExerciseAndMuscleGroup()
     {
         final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
         db.openDB();
-/*
-        List<ExerciseLogModel> temp = db.getExercisesLogsByRoutineAndExercise(userRoutineId, workoutExerciseId);
-        final ArrayList<ExerciseLogModel> exerciseLogsForUser;
-        if (temp == null)
-        {
-            exerciseLogsForUser = new ArrayList<>();
-        }
-        else
-        {
-            exerciseLogsForUser = (ArrayList<ExerciseLogModel>) temp;
-        }*/
 
-        final String exerciseLogsString = new Gson().toJson(loggedExercises);
-        System.out.println(exerciseLogsString);
-
-        String url = "http://3.221.56.60/insertExerciseLogs.php";
+        String url = "http://3.221.56.60/insertExerciseMuscleGroup.php";
         final StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if (response.equals("-1"))
+                if (response.contains("-1"))
                 {
-                    Toast.makeText(getApplicationContext(), "Error adding exercise log", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error adding exercise", Toast.LENGTH_LONG).show();
                 }
                 else
                 {
-                    String trimmedReponse = response.trim();
-                    String ids [] = trimmedReponse.split(" ");
-
-                    System.out.println("ids length: " + ids.length);
-                    System.out.println("exerciseLogsForUser length: " + loggedExercises.size());
-
-                    //Delete local database exerciselogs but they won't match the primary keys in remote
-                    for (int i = 0; i < loggedExercises.size(); i++)
+                    String stringReponse = response.trim();
+                    String [] ids = stringReponse.split(" ");
+                    int exerciseId = Integer.parseInt(ids[0]);
+                    db.insertExercise(exerciseId, exerciseName, userId);
+                    for (int i = 1; i < ids.length; i++)
                     {
-                        ExerciseLogModel curr = loggedExercises.get(i);
-                        db.deleteExerciseLog(curr.getUserExerciseLogId());
+                        db.insertMuscleGroup(Integer.parseInt(ids[i]), exerciseId, muscleGroups.get(i-1));
                     }
-
-                    //Reenter exercise logs into local with primary keys from remote
-                    for (int i = 0; i < ids.length; i++)
-                    {
-                        ExerciseLogModel curr = loggedExercises.get(i);
-                        db.insertExerciseLog(Integer.parseInt(ids[i]), curr);
-                    }
-                    Toast.makeText(getApplicationContext(), "Successfully added exercise log", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Successfully added exercise", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent("exerciseAction");
+                    intent.putExtra("insertedExerciseIdPk", exerciseId);
+                    intent.putExtra("exerciseName", exerciseName);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 }
                 db.closeDB();
 
-                Intent intent = new Intent("exerciseLogAction");
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -141,20 +130,26 @@ public class ExerciseLogService extends IntentService {
                 }
                 error.printStackTrace();
                 db.closeDB();
-                Intent intent = new Intent("exerciseLogAction");
+                Intent intent = new Intent("exerciseAction");
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                Toast.makeText(getApplicationContext(), "Error saving exercise log", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error saving exercise", Toast.LENGTH_LONG).show();
             }
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("exerciseLogsList", exerciseLogsString);
+                params.put("exerciseName", exerciseName);
+                params.put("userId", Integer.toString(userId));
+                params.put("muscleGroupsList", muscleGroupsString);
                 return params;
             }
         };
 
         queue.add(stringRequest);
+    }
+
+    private void deleteWorkout()
+    {
     }
 
     @Override

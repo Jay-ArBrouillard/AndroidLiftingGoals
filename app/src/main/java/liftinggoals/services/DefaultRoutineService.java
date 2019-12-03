@@ -164,10 +164,11 @@ public class DefaultRoutineService extends IntentService {
                                 {
                                     int exerciseId = json.getInt("exercise_id");
                                     String exerciseName = json.getString("exercise_name");
+                                    int userId = json.getInt("user_id");
 
                                     if (db.getExercise(exerciseId) == null)
                                     {
-                                        db.insertExercise(exerciseId, exerciseName);
+                                        db.insertExercise(exerciseId, exerciseName, userId);
                                     }
                                     else
                                     {

@@ -36,7 +36,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,13 +45,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import liftinggoals.calendar.Event;
 import liftinggoals.models.ExerciseLogModel;
 import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RecordModel;
 import liftinggoals.models.RoutineModel;
 import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.services.ExerciseLogService;
+import liftinggoals.services.ExerciseLogAndEventService;
 
 public class ExerciseActivity extends AppCompatActivity {
     private LineChart lineChart;
@@ -79,9 +79,11 @@ public class ExerciseActivity extends AppCompatActivity {
     private SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
     private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
     private SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MM, dd, yy, hh:mm a", Locale.ENGLISH);
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMMM, dd, yyyy, hh:mm a", Locale.ENGLISH);
     private int userId;
     private ResponseReceiver myReceiver;
+    private boolean exerciseLogSaved = false;
+    private boolean eventSaved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,14 +139,24 @@ public class ExerciseActivity extends AppCompatActivity {
                 String longDate = longDateFormat.format(calendar.getTime());
                 String exerciseDescription = buildExerciseString(); //Exercise A, Exercise B, Exercise C
 
-                db.insertEventWithExercises(userId, workoutName, exerciseDescription, time, date, month, year, longDate);
-                Intent insertAllExerciseLog = new Intent(ExerciseActivity.this, ExerciseLogService.class);
-                insertAllExerciseLog.putExtra("type", "insert");
-                insertAllExerciseLog.putExtra("userId", userId);
-                insertAllExerciseLog.putExtra("userRoutineId", db.getUserRoutine(userId, routineModels.get(selectedRoutineIndex).getRoutineId()).getUserRoutineId());
-                insertAllExerciseLog.putExtra("workoutExerciseId", routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(0).getWorkoutExerciseId());
-                insertAllExerciseLog.putExtra("loggedExercises", loggedExercises);
-                startService(insertAllExerciseLog);
+                Event event = new Event();
+                event.setEVENT(workoutName);
+                event.setExercises(exerciseDescription);
+                event.setYEAR(year);
+                event.setDATE(date);
+                event.setTIME(time);
+                event.setMONTH(month);
+                event.setFULL_DATE(longDate);
+
+                Intent insertAllExerciseLogAndEvent = new Intent(ExerciseActivity.this, ExerciseLogAndEventService.class);
+                insertAllExerciseLogAndEvent.putExtra("userId", userId);
+                insertAllExerciseLogAndEvent.putExtra("loggedExercises", loggedExercises);
+                insertAllExerciseLogAndEvent.putExtra("eventObject", event);
+                String insertString = "";
+                if (!exerciseLogSaved) { insertString +="exerciseLog"; }
+                if (!eventSaved) { insertString += "event"; }
+                insertAllExerciseLogAndEvent.putExtra("type", insertString);
+                startService(insertAllExerciseLogAndEvent);
             }
         });
 
@@ -173,10 +185,7 @@ public class ExerciseActivity extends AppCompatActivity {
                     exerciseLogModel.setSetPerformed(index);
                     exerciseLogModel.setRepsPerformed(reps);
                     exerciseLogModel.setIntensity(weight);
-
-                    SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss");
-                    Date date = new Date();
-                    exerciseLogModel.setDate(dateTime.format(date));
+                    exerciseLogModel.setDate(longDateFormat.format(calendar.getTime()));
 
                     index++;
                     set.setText(Integer.toString(index));
@@ -549,6 +558,7 @@ public class ExerciseActivity extends AppCompatActivity {
         myReceiver = new ResponseReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("exerciseLogAction");
+        intentFilter.addAction("insertEventAction");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
     }
 
@@ -560,8 +570,17 @@ public class ExerciseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("exerciseLogAction"))
             {
+                exerciseLogSaved = true;
                 entries.clear();
                 loggedExercises.clear();
+            }
+            else if (intent.getAction().equals("insertEventAction"))
+            {
+                eventSaved = true;
+            }
+
+            if (exerciseLogSaved && eventSaved)
+            {
                 Intent finishWorkoutIntent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
                 startActivity(finishWorkoutIntent);
                 finish();

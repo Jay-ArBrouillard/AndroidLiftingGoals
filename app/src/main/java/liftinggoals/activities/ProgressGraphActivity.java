@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -52,7 +53,8 @@ public class ProgressGraphActivity extends AppCompatActivity {
     private LineChart lineChart;
     private ArrayList<Entry> entries = new ArrayList<>();
     private ArrayList<ProgressExerciseModel> progressExerciseModels;
-    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMMM, dd, yy, hh:mm a", Locale.ENGLISH);
+    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMMM, dd, yyyy, hh:mm a", Locale.ENGLISH);
+    private int userId;
 
 
     @Override
@@ -63,6 +65,8 @@ public class ProgressGraphActivity extends AppCompatActivity {
         exerciseId = getIntent().getIntExtra("exercise_id", -1);
         exerciseName = getIntent().getStringExtra("exercise_name");
         muscleGroup = getIntent().getStringExtra("volume_group_name");
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        userId = sp.getInt("UserId", -1);
 
         if (exerciseName == null)
         {
@@ -96,7 +100,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
             public void onItemClick(int position) {
                 Intent intent = new Intent(ProgressGraphActivity.this, RepRecordActivity.class);
                 String exerciseName = progressExerciseModels.get(position).getExerciseName();
-                intent.putExtra("exercise_id", db.getExerciseByExerciseName(exerciseName).getExerciseId());
+                intent.putExtra("exercise_id", db.getExerciseByExerciseNameAndUserId(exerciseName, userId).getExerciseId());
                 intent.putExtra("exercise_name", exerciseName);
                 startActivity(intent);
             }
@@ -176,7 +180,8 @@ public class ProgressGraphActivity extends AppCompatActivity {
             emptyMessage.setIndex("");
             emptyMessage.setTime("");
             emptyMessage.setSpecs("");
-            emptyMessage.setExerciseName("No sets logged for " + exerciseName);
+            String name = exerciseName == null ? muscleGroup : exerciseName;
+            emptyMessage.setExerciseName("No sets logged for " + name);
             progressExerciseModels.add(emptyMessage);
         }
     }

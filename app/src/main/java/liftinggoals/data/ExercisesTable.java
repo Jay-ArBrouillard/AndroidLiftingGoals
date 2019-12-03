@@ -15,7 +15,8 @@ public class ExercisesTable {
     public static final String SQL_CREATE_EXERCISE_TABLE = "CREATE TABLE " +
             ExerciseEntry.TABLE_NAME + " (" +
             ExerciseEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            ExerciseEntry.COLUMN_EXERCISE_NAME + " TEXT" +
+            ExerciseEntry.COLUMN_EXERCISE_NAME + " TEXT," +
+            ExerciseEntry.COLUMN_USER_ID + " INTEGER NOT NULL" +
             ");";
     public static final String SQL_DROP_EXERCISE_TABLE = "DROP TABLE IF EXISTS " + ExerciseEntry.TABLE_NAME;
 
@@ -24,21 +25,24 @@ public class ExercisesTable {
     {
         public static final String TABLE_NAME = "Exercises";
         public static final String COLUMN_EXERCISE_NAME = "exercise_name";
+        public static final String COLUMN_USER_ID = "user_id";
     }
 
-    public static long insert(SQLiteDatabase myDB, int exerciseId, String name)
+    public static long insert(SQLiteDatabase myDB, int exerciseId, String name, int userId)
     {
         ContentValues values = new ContentValues();
         values.put(ExerciseEntry._ID, exerciseId);
         values.put(ExerciseEntry.COLUMN_EXERCISE_NAME, name);
+        values.put(ExerciseEntry.COLUMN_USER_ID, userId);
 
         return myDB.insert(ExerciseEntry.TABLE_NAME, null, values);
     }
 
-    public static long insert(SQLiteDatabase myDB, String name)
+    public static long insert(SQLiteDatabase myDB, String name, int userId)
     {
         ContentValues values = new ContentValues();
         values.put(ExerciseEntry.COLUMN_EXERCISE_NAME, name);
+        values.put(ExerciseEntry.COLUMN_USER_ID, userId);
 
         return myDB.insert(ExerciseEntry.TABLE_NAME, null, values);
     }
@@ -76,6 +80,7 @@ public class ExercisesTable {
             while(c.moveToNext()){
                 exerciseModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry._ID)));
                 exerciseModel.setExerciseName(c.getString(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_EXERCISE_NAME)));
+                exerciseModel.setUserId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_USER_ID)));
             }
 
             return exerciseModel;
@@ -83,11 +88,11 @@ public class ExercisesTable {
     }
 
 
-    public static ExerciseModel getExerciseByExerciseName(SQLiteDatabase myDB, String exerciseName)
+    public static ExerciseModel getExerciseByExerciseNameAndUserId(SQLiteDatabase myDB, String exerciseName, int userId)
     {
-        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry.COLUMN_EXERCISE_NAME  + " = ?";
+        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry.COLUMN_EXERCISE_NAME  + " = ?" + ExerciseEntry.COLUMN_USER_ID + " = ?";
 
-        Cursor c = myDB.rawQuery(query, new String[] {exerciseName});
+        Cursor c = myDB.rawQuery(query, new String[] {exerciseName, Integer.toString(userId)});
 
         if (c.getCount() == 0)
         {
@@ -100,6 +105,7 @@ public class ExercisesTable {
             while(c.moveToNext()){
                 exerciseModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry._ID)));
                 exerciseModel.setExerciseName(c.getString(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_EXERCISE_NAME)));
+                exerciseModel.setUserId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_USER_ID)));
             }
 
             return exerciseModel;
@@ -124,6 +130,7 @@ public class ExercisesTable {
                 ExerciseModel exerciseModel = new ExerciseModel();
                 exerciseModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry._ID)));
                 exerciseModel.setExerciseName(c.getString(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_EXERCISE_NAME)));
+                exerciseModel.setUserId(c.getInt(c.getColumnIndexOrThrow(ExerciseEntry.COLUMN_USER_ID)));
                 exercises.add(exerciseModel);
             }
 

@@ -138,7 +138,7 @@ public class RoutineService extends IntentService {
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if (response.equals("-1"))
+                if (response.contains("-1"))
                 {
                     Toast.makeText(getApplicationContext(), "Error adding routine", Toast.LENGTH_LONG).show();
                 }

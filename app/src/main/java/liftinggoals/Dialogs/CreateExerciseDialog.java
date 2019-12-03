@@ -18,8 +18,6 @@ import com.example.liftinggoals.R;
 
 import java.util.ArrayList;
 
-import liftinggoals.data.DatabaseHelper;
-
 public class CreateExerciseDialog extends AppCompatDialogFragment {
     private EditText exerciseName;
     private CreateExerciseDialog.CreateExerciseDialogListener listener;
@@ -56,7 +54,7 @@ public class CreateExerciseDialog extends AppCompatDialogFragment {
         View view = inflater.inflate(R.layout.workout_edit_create_exercise_dialog, null);
 
         builder.setView(view)
-                .setTitle("New Exercise")
+                .setTitle("New Exercise (select at least 1 muscle group)")
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -79,7 +77,7 @@ public class CreateExerciseDialog extends AppCompatDialogFragment {
                             return;
                         }
 
-                        listener.applyChanges(name, userItems);
+                        listener.createExercise(name, userItems);
                     }
                 })
                 .setNeutralButton("clear all", new DialogInterface.OnClickListener() {
@@ -110,6 +108,6 @@ public class CreateExerciseDialog extends AppCompatDialogFragment {
 
     public interface CreateExerciseDialogListener
     {
-        void applyChanges(String name, ArrayList<String> selectedMuscleGroups);
+        void createExercise(String name, ArrayList<String> selectedMuscleGroups);
     }
 }

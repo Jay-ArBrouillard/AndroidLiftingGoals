@@ -22,7 +22,7 @@ import liftinggoals.models.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 201;
+    public static final int DATABASE_VERSION = 212;
 
     public SQLiteDatabase myDB;
 
@@ -299,14 +299,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ////////////////////////////EXERCISE METHODS ///////////////////////////////////////////////////
 
-    public long insertExercise(int pk, String exerciseName)
+    public long insertExercise(int pk, String exerciseName, int userId)
     {
-        return ExercisesTable.insert(myDB, pk, exerciseName);
-    }
-
-    public long insertExercise(String exerciseName)
-    {
-        return ExercisesTable.insert(myDB, exerciseName);
+        return ExercisesTable.insert(myDB, pk, exerciseName, userId);
     }
 
     public long updateExerciseName(int pk, String exerciseName)
@@ -319,15 +314,31 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return ExercisesTable.delete(myDB, exerciseName);
     }
 
-    public ExerciseModel getExerciseByExerciseName(String exerciseName)
+    public ExerciseModel getExerciseByExerciseNameAndUserId(String exerciseName, int userId)
     {
-        return ExercisesTable.getExerciseByExerciseName(myDB, exerciseName);
+        return ExercisesTable.getExerciseByExerciseNameAndUserId(myDB, exerciseName, userId);
     }
 
 
     public ExerciseModel getExercise(int exerciseId)
     {
         return ExercisesTable.getExercise(myDB, exerciseId);
+    }
+
+    public List<ExerciseModel> getAllExercisesForUser(int userId)
+    {
+        List<ExerciseModel> allExercises = ExercisesTable.getAllExercises(myDB);
+        if (allExercises == null) { return new ArrayList<>(); }
+
+        ArrayList<ExerciseModel> results = new ArrayList<>();
+        for (ExerciseModel e : allExercises)
+        {
+            if (e.getUserId() == userId)
+            {
+                results.add(e);
+            }
+        }
+        return results;
     }
 
     public List<ExerciseModel> getAllExercises()
@@ -451,9 +462,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return EventsTable.insert(myDB, userId, event, time, date, month, year, longDate);
     }
 
-    public long insertEventWithExercises(int userId, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
+    public long insertEventWithExercises(int eventId, int userId, String event, String exerciseInfo, String time, String date, String month, String year, String longDate)
     {
-        return EventsTable.insert(myDB, userId, event, exerciseInfo, time, date, month, year, longDate);
+        return EventsTable.insert(myDB, eventId, userId, event, exerciseInfo, time, date, month, year, longDate);
     }
 
     public List<Event> getEventsByMonthAndYear(int userId, String month, String year)

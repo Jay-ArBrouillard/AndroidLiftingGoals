@@ -30,6 +30,7 @@ import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import liftinggoals.adapters.WorkoutEditAdapter;
@@ -42,6 +43,7 @@ import liftinggoals.misc.RoutineModelHelper;
 import liftinggoals.misc.VerticalSpaceItemDecoration;
 import liftinggoals.dialogs.WorkoutEditDialog;
 import liftinggoals.models.WorkoutModel;
+import liftinggoals.services.ExerciseMuscleGroupService;
 import liftinggoals.services.WorkoutExerciseService;
 import liftinggoals.services.WorkoutService;
 
@@ -237,23 +239,8 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             }
         });
 
-
-        List<ExerciseModel> exerciseNames = db.getAllExercises();
-        if (exerciseNames == null)
-        {
-            spinnerExerciseModels = new ArrayList<>();
-        }
-        else
-        {
-            spinnerExerciseModels = (ArrayList<ExerciseModel>)exerciseNames;
-        }
-
-        spinnerExerciseModels.add(0, new ExerciseModel());
-        exerciseAdapter = new ArrayAdapter<>(WorkoutEditActivity.this, android.R.layout.simple_list_item_1, spinnerExerciseModels);
-        exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        addExerciseSpinner.setAdapter(exerciseAdapter);
-
         initializeRecyclerView();
+        initializeExerciseSpinner();
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_workout_edit_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
@@ -293,6 +280,24 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         }
     };
 
+    private void initializeExerciseSpinner()
+    {
+        List<ExerciseModel> exerciseNames = db.getAllExercises();
+        if (exerciseNames == null)
+        {
+            spinnerExerciseModels = new ArrayList<>();
+        }
+        else
+        {
+            spinnerExerciseModels = (ArrayList<ExerciseModel>)exerciseNames;
+        }
+
+        spinnerExerciseModels.add(0, new ExerciseModel());
+        exerciseAdapter = new ArrayAdapter<>(WorkoutEditActivity.this, android.R.layout.simple_list_item_1, spinnerExerciseModels);
+        exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        addExerciseSpinner.setAdapter(exerciseAdapter);
+    }
+
     private void initializeRecyclerView()
     {
         routineModels = RoutineModelHelper.populateRoutineModels(this, userId);
@@ -324,17 +329,20 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     }
 
     @Override
-    public void applyChanges(String name, ArrayList<String> selectedMuscleGroups) {
-        long insertedPK = db.insertExercise(name);
-        for (String muscleGroup : selectedMuscleGroups)
+    public void createExercise(String name, ArrayList<String> selectedMuscleGroups) {
+        Intent insertExerciseAndMuscleIntent = new Intent(WorkoutEditActivity.this, ExerciseMuscleGroupService.class);
+        insertExerciseAndMuscleIntent.putExtra("type", "insert");
+        insertExerciseAndMuscleIntent.putExtra("exerciseName", name);
+        insertExerciseAndMuscleIntent.putExtra("userId", userId);
+        //Convert to String
+        StringBuilder musclesString = new StringBuilder();
+        for (int i = 0; i < selectedMuscleGroups.size(); i++)
         {
-            db.insertMuscleGroup((int)insertedPK, muscleGroup);
+            musclesString.append(" ").append(selectedMuscleGroups.get(i));
         }
-
-        spinnerExerciseModels.add(new ExerciseModel((int)insertedPK, name));
-        exerciseAdapter.notifyDataSetChanged();
-        addExerciseSpinner.postInvalidate();
-        addExerciseSpinner.setAdapter(exerciseAdapter);
+        insertExerciseAndMuscleIntent.putExtra("muscleGroupsString", musclesString.toString().trim());
+        insertExerciseAndMuscleIntent.putExtra("muscleGroupsList", selectedMuscleGroups);
+        startService(insertExerciseAndMuscleIntent);
     }
 
     @Override
@@ -371,6 +379,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         intentFilter.addAction("workoutEditAction");
         intentFilter.addAction("workoutAction");
         intentFilter.addAction("errorWorkoutAction");
+        intentFilter.addAction("exerciseAction");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
     }
 
@@ -398,6 +407,12 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
                 imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
                 initializeRecyclerView();
+            }
+            else if (intent.getAction().equals("exerciseAction"))
+            {
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                initializeExerciseSpinner();
             }
         }
     }
