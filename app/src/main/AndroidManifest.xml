@@ -75,12 +75,22 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:authorities="lifting_goals"
+            android:name="androidx.core.content.FileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
         <service android:name="liftinggoals.services.DefaultRoutineService" />
         <service android:name="liftinggoals.services.InitializeRoutineService" />
         <service android:name="liftinggoals.services.RoutineService" />
         <service android:name="liftinggoals.services.WorkoutService" />
         <service android:name="liftinggoals.services.WorkoutExerciseService" />
-        <service android:name="liftinggoals.services.ExerciseLogAndEventService" />
+        <service android:name="liftinggoals.services.LogEventRecordService" />
         <service android:name="liftinggoals.services.ExerciseMuscleGroupService" />
     </application>
 

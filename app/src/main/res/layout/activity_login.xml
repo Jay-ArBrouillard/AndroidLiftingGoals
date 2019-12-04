@@ -8,7 +8,8 @@
     android:paddingRight="18dp"
     android:paddingTop="25dp"
     android:paddingBottom="25dp"
-    android:background="@drawable/login_gradient"
+    android:id="@+id/login_activity_layout"
+    android:background="@drawable/login_gradient_list"
     tools:context="liftinggoals.activities.LoginActivity">
 
     <ScrollView

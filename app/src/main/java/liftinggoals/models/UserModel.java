@@ -36,11 +36,11 @@ public class UserModel {
         this.password = password;
     }
 
-    public int isAdmin() {
+    public int getIsAdmin() {
         return isAdmin;
     }
 
-    public void setAdmin(int admin) {
+    public void getSetAdmin(int admin) {
         isAdmin = admin;
     }
 

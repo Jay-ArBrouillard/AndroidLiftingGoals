@@ -1,6 +1,7 @@
 package liftinggoals.data;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
@@ -46,6 +47,19 @@ public class RecordsTable {
         return myDB.insert(RecordEntry.TABLE_NAME, null, values);
     }
 
+    public static long insert(SQLiteDatabase myDB, int recordId, RecordModel entity)
+    {
+        ContentValues values = new ContentValues();
+        values.put(RecordEntry._ID, recordId);
+        values.put(RecordEntry.COLUMN_USER_ID, entity.getUserId());
+        values.put(RecordEntry.COLUMN_EXERCISE_ID, entity.getExerciseId());
+        values.put(RecordEntry.COLUMN_INTENSITY, entity.getIntensity());
+        values.put(RecordEntry.COLUMN_REPS_PERFORMED, entity.getRepsPerformed());
+        values.put(RecordEntry.COLUMN_DATE_PERFORMED, entity.getDate());
+
+        return myDB.insert(RecordEntry.TABLE_NAME, null, values);
+    }
+
     public static long update(SQLiteDatabase myDB, int userId, int exercise_id, double intensity, int reps, String date)
     {
         ContentValues values = new ContentValues();
@@ -55,7 +69,9 @@ public class RecordsTable {
         values.put(RecordEntry.COLUMN_REPS_PERFORMED, reps);
         values.put(RecordEntry.COLUMN_DATE_PERFORMED, date);
 
-        return myDB.update(RecordEntry.TABLE_NAME, values, "reps_performed = ?", new String[] {Integer.toString(reps)});
+        String where = RecordEntry.COLUMN_USER_ID + " = ? AND " + RecordEntry.COLUMN_REPS_PERFORMED + " = ? AND " + RecordEntry.COLUMN_EXERCISE_ID + " =  ?";
+
+        return myDB.update(RecordEntry.TABLE_NAME, values, where, new String[] {Integer.toString(userId), Integer.toString(reps), Integer.toString(exercise_id)});
     }
 
     public static long delete(SQLiteDatabase myDB, int id)

@@ -4,23 +4,26 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
+import com.airbnb.lottie.LottieAnimationView;
+
 import net.steamcrafted.loadtoast.LoadToast;
 import liftinggoals.services.DefaultRoutineService;
 
 public class DefaultRoutineDialog extends AppCompatDialogFragment {
     private String username;
-    private LoadToast loadToast;
+    private LottieAnimationView loadingAnim;
 
-    public DefaultRoutineDialog(String username, LoadToast loadToast)
+    public DefaultRoutineDialog(String username, LottieAnimationView loadingAnim)
     {
         this.username = username;
-        this.loadToast = loadToast;
+        this.loadingAnim = loadingAnim;
     }
 
     @NonNull
@@ -38,7 +41,11 @@ public class DefaultRoutineDialog extends AppCompatDialogFragment {
                 .setPositiveButton("continue", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        loadToast.show();
+                        if (!loadingAnim.isAnimating())
+                        {
+                            loadingAnim.setVisibility(View.VISIBLE);
+                            loadingAnim.playAnimation();
+                        }
                         Intent intent = new Intent(getActivity().getApplicationContext(), DefaultRoutineService.class);
                         intent.putExtra("username", username);
                         getActivity().startService(intent);

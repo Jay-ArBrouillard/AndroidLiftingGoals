@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -25,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.liftinggoals.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -44,6 +47,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import liftinggoals.calendar.Event;
 import liftinggoals.models.ExerciseLogModel;
@@ -52,7 +57,7 @@ import liftinggoals.models.RecordModel;
 import liftinggoals.models.RoutineModel;
 import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.data.DatabaseHelper;
-import liftinggoals.services.ExerciseLogAndEventService;
+import liftinggoals.services.LogEventRecordService;
 
 public class ExerciseActivity extends AppCompatActivity {
     private LineChart lineChart;
@@ -61,6 +66,7 @@ public class ExerciseActivity extends AppCompatActivity {
     private ArrayList<RoutineModel> routineModels;
     private ArrayList<WorkoutExerciseModel> workoutExerciseModels;
     private ArrayList<ExerciseLogModel> loggedExercises;
+    private ArrayList<RecordModel> loggedRecords;
     private int selectedRoutineIndex;
     private int selectedWorkoutIndex;
     private DatabaseHelper db;
@@ -84,6 +90,8 @@ public class ExerciseActivity extends AppCompatActivity {
     private ResponseReceiver myReceiver;
     private boolean exerciseLogSaved = false;
     private boolean eventSaved = false;
+    private boolean recordSaved = false;
+    private LottieAnimationView loadingAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +105,7 @@ public class ExerciseActivity extends AppCompatActivity {
         workoutExerciseModels = getIntent().getExtras().getParcelableArrayList("exercises");
         workoutName = getIntent().getExtras().getString("workout_name");
         loggedExercises = new ArrayList<>();
+        loggedRecords = new ArrayList<>();
 
         if (db == null)
         {
@@ -104,6 +113,7 @@ public class ExerciseActivity extends AppCompatActivity {
             db.openDB();
         }
 
+        loadingAnim = findViewById(R.id.exercise_activity_loading_animation);
         spinner = findViewById(R.id.exercise_activity_spinner);
         doneButton = findViewById(R.id.activity_exercise_done_button);
         logButton = findViewById(R.id.exercise_activity_log_button);
@@ -112,6 +122,8 @@ public class ExerciseActivity extends AppCompatActivity {
         setsTextView = findViewById(R.id.exercise_activity_set_value);
         countDownTextView = findViewById(R.id.exercise_activity_timer);
 
+        loadingAnim.cancelAnimation();
+        loadingAnim.setVisibility(View.INVISIBLE);
         countDownTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,15 +160,42 @@ public class ExerciseActivity extends AppCompatActivity {
                 event.setMONTH(month);
                 event.setFULL_DATE(longDate);
 
-                Intent insertAllExerciseLogAndEvent = new Intent(ExerciseActivity.this, ExerciseLogAndEventService.class);
+                Intent insertAllExerciseLogAndEvent = new Intent(ExerciseActivity.this, LogEventRecordService.class);
                 insertAllExerciseLogAndEvent.putExtra("userId", userId);
                 insertAllExerciseLogAndEvent.putExtra("loggedExercises", loggedExercises);
                 insertAllExerciseLogAndEvent.putExtra("eventObject", event);
+                insertAllExerciseLogAndEvent.putExtra("loggedRecords", loggedRecords);
                 String insertString = "";
                 if (!exerciseLogSaved) { insertString +="exerciseLog"; }
                 if (!eventSaved) { insertString += "event"; }
+                if (!recordSaved) { insertString += "record"; }
                 insertAllExerciseLogAndEvent.putExtra("type", insertString);
                 startService(insertAllExerciseLogAndEvent);
+                if (!loadingAnim.isAnimating())
+                {
+                    loadingAnim.setVisibility(View.VISIBLE);
+                    loadingAnim.playAnimation();
+                }
+
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        //Quit the animation if it takes longer than 15 seconds
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (loadingAnim.isAnimating())
+                                {
+                                    loadingAnim.cancelAnimation();
+                                    loadingAnim.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        });
+
+                        timer.cancel();
+                    }
+                }, 15000);
             }
         });
 
@@ -192,7 +231,11 @@ public class ExerciseActivity extends AppCompatActivity {
                     long exerciseLogId = db.insertExerciseLog(exerciseLogModel);
                     exerciseLogModel.setUserExerciseLogId((int) exerciseLogId);
                     loggedExercises.add(exerciseLogModel);
-                    processRecords(userId, exerciseId, weight, reps, longDateFormat.format(calendar.getTime()) );
+                    long recordId = processRecords(userId, exerciseId, weight, reps, longDateFormat.format(calendar.getTime()));
+                    if (recordId != -1)
+                    {
+                        loggedRecords.add(new RecordModel((int)recordId, userId, exerciseId, weight, reps, longDateFormat.format(calendar.getTime())));
+                    }
                     buildLineGraph(workoutExerciseModels.get(selectedIndex)); //Do this last
                 }
                 catch (NumberFormatException e)
@@ -241,7 +284,6 @@ public class ExerciseActivity extends AppCompatActivity {
                 }
                 lastSetForExercise++; //Whatever the last set we found was we want the next set after it
                 setsTextView.setText(""+lastSetForExercise);
-
             }
 
             @Override
@@ -318,7 +360,7 @@ public class ExerciseActivity extends AppCompatActivity {
         return builder.toString();
     }
 
-    private void processRecords(int userId, int exerciseId, double weight, int reps, String date)
+    private int processRecords(int userId, int exerciseId, double weight, int reps, String date)
     {
         ArrayList<RecordModel> existing = (ArrayList<RecordModel>) db.getAllRecords();
 
@@ -326,8 +368,8 @@ public class ExerciseActivity extends AppCompatActivity {
         {
             //First Record
             Toast.makeText(getApplicationContext(), "You logged your first weight ever: " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
-            db.insertRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
-            return;
+            long recordId = db.insertRecord(userId, exerciseId,  weight, reps, date);
+            return (int) recordId;
         }
 
         boolean foundRep = false;
@@ -342,7 +384,8 @@ public class ExerciseActivity extends AppCompatActivity {
             {
                 //New Record
                 Toast.makeText(getApplicationContext(), "Congrats on the PR! " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
-                db.updateRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
+                long recordId = db.updateRecord(userId, exerciseId,  weight, reps, date);
+                return (int) recordId;
             }
         }
 
@@ -350,24 +393,11 @@ public class ExerciseActivity extends AppCompatActivity {
         {
             //New Record
             Toast.makeText(getApplicationContext(), "You logged your first weight: " + weight + " LBS for " + reps + " reps", Toast.LENGTH_LONG).show();
-            db.insertRecord(userId, exerciseId,  weight, reps, formatDateTime(date));
-        }
-    }
-
-    public String formatDateTime(String timeToFormat)
-    {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-        try {
-            Date dt = formatter.parse(timeToFormat);
-            String newDate = longDateFormat.format(dt);
-
-            return newDate;
-        } catch (ParseException e) {
-            e.printStackTrace();
+            long recordId = db.insertRecord(userId, exerciseId,  weight, reps, date);
+            return (int) recordId;
         }
 
-        return "No Date Data";
+        return -1;
     }
 
     private String processString(WorkoutExerciseModel e, StringBuilder stringBuilder)
@@ -460,12 +490,6 @@ public class ExerciseActivity extends AppCompatActivity {
 
     private boolean setData(WorkoutExerciseModel workoutExerciseModel)
     {
-//        ArrayList<ExerciseLogModel> exerciseLogModelArrayList =(ArrayList<ExerciseLogModel>)  db.getExercisesLogsByWorkoutExerciseId(workoutExerciseModel.getWorkoutExerciseId());
-//        if (exerciseLogModelArrayList == null)
-//        {
-//            return false;
-//        }
-
         ArrayList<ExerciseLogModel> exerciseLogModelArrayList = new ArrayList<>();
         for (ExerciseLogModel e : loggedExercises)
         {
@@ -479,7 +503,6 @@ public class ExerciseActivity extends AppCompatActivity {
         {
             return false;
         }
-//added
 
         entries.clear();
 
@@ -559,6 +582,10 @@ public class ExerciseActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("exerciseLogAction");
         intentFilter.addAction("insertEventAction");
+        intentFilter.addAction("recordsAction");
+        intentFilter.addAction("errorExerciseLogAction");
+        intentFilter.addAction("errorRecordsAction");
+        intentFilter.addAction("errorEventAction");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
     }
 
@@ -578,12 +605,44 @@ public class ExerciseActivity extends AppCompatActivity {
             {
                 eventSaved = true;
             }
-
-            if (exerciseLogSaved && eventSaved)
+            else if (intent.getAction().equals("recordsAction"))
             {
+                recordSaved = true;
+                loggedRecords.clear();
+            }
+
+            if (exerciseLogSaved && eventSaved && recordSaved)
+            {
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
                 Intent finishWorkoutIntent = new Intent(ExerciseActivity.this, WorkoutActivity.class);
                 startActivity(finishWorkoutIntent);
                 finish();
+            }
+
+            if (intent.getAction().equals("errorExerciseLogAction"))
+            {
+                if (loadingAnim.isAnimating())
+                {
+                    loadingAnim.cancelAnimation();
+                    loadingAnim.setVisibility(View.INVISIBLE);
+                }
+            }
+            else if (intent.getAction().equals("errorRecordsAction"))
+            {
+                if (loadingAnim.isAnimating())
+                {
+                    loadingAnim.cancelAnimation();
+                    loadingAnim.setVisibility(View.INVISIBLE);
+                }
+            }
+            else if(intent.getAction().equals("errorEventAction"))
+            {
+                if (loadingAnim.isAnimating())
+                {
+                    loadingAnim.cancelAnimation();
+                    loadingAnim.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }

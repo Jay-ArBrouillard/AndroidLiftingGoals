@@ -84,7 +84,7 @@ public class UserTable {
 
             while(c.moveToNext()){
                 user.setUserId(c.getInt(c.getColumnIndexOrThrow(UserEntry._ID)));
-                user.setAdmin(c.getInt(c.getColumnIndexOrThrow(UserEntry.COLUMN_IS_ADMIN)));
+                user.getSetAdmin(c.getInt(c.getColumnIndexOrThrow(UserEntry.COLUMN_IS_ADMIN)));
                 user.setUsername(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_USERNAME)));
                 user.setLastLogin(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_LAST_LOGIN)));
                 user.setPassword(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_PASSWORD)));
@@ -109,7 +109,7 @@ public class UserTable {
 
             while(c.moveToNext()){
                 user.setUserId(c.getInt(c.getColumnIndexOrThrow(UserEntry._ID)));
-                user.setAdmin(c.getInt(c.getColumnIndexOrThrow(UserEntry.COLUMN_IS_ADMIN)));
+                user.getSetAdmin(c.getInt(c.getColumnIndexOrThrow(UserEntry.COLUMN_IS_ADMIN)));
                 user.setUsername(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_USERNAME)));
                 user.setLastLogin(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_LAST_LOGIN)));
                 user.setPassword(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_PASSWORD)));
@@ -135,7 +135,7 @@ public class UserTable {
             while(c.moveToNext()){
                 UserModel user = new UserModel();
                 user.setUserId(c.getInt(c.getColumnIndexOrThrow(UserEntry._ID)));
-                user.setAdmin(c.getInt(c.getColumnIndexOrThrow(UserEntry.COLUMN_IS_ADMIN)));
+                user.getSetAdmin(c.getInt(c.getColumnIndexOrThrow(UserEntry.COLUMN_IS_ADMIN)));
                 user.setUsername(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_USERNAME)));
                 user.setLastLogin(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_LAST_LOGIN)));
                 user.setPassword(c.getString(c.getColumnIndexOrThrow(UserEntry.COLUMN_PASSWORD)));

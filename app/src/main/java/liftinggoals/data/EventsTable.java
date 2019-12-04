@@ -138,4 +138,30 @@ public class EventsTable {
             return events;
         }
     }
+
+    public static List<Event> getAll(SQLiteDatabase myDB) {
+        String query = "SELECT * FROM " + EventEntry.TABLE_NAME;
+
+        Cursor c = myDB.rawQuery(query, null);
+
+        if (c.getCount() == 0) {
+            return null;
+        } else {
+            ArrayList<Event> events = new ArrayList<>();
+
+            while (c.moveToNext()) {
+                Event event = new Event();
+                event.setUserId(c.getInt(c.getColumnIndexOrThrow(EventEntry.COLUMN_USER_ID)));
+                event.setEVENT(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_EVENT)));
+                event.setMONTH(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_MONTH)));
+                event.setTIME(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_TIME)));
+                event.setDATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_DATE)));
+                event.setYEAR(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_YEAR)));
+                event.setFULL_DATE(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_FULL_DATE)));
+                event.setExercises(c.getString(c.getColumnIndexOrThrow(EventEntry.COLUMN_EXERCISES)));
+                events.add(event);
+            }
+            return events;
+        }
+    }
 }

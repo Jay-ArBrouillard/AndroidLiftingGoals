@@ -225,18 +225,13 @@ public class InitializeRoutineService extends IntentService {
                                 "Authentication Error",
                                 Toast.LENGTH_LONG).show();
                     }
-                    else if (error.getClass().equals(Error.class))
-                    {
-                        Toast.makeText(getApplicationContext(),
-                                "Authentication Error",
-                                Toast.LENGTH_LONG).show();
-                    }
                 }
                 error.printStackTrace();
+                Intent intent = new Intent("errorDefaultRoutine");
+                Toast.makeText(getApplicationContext(), "Error retrieving default routines", Toast.LENGTH_LONG).show();
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             }
         });
-
-
 
         queue.add(jsObjRequest);
     }

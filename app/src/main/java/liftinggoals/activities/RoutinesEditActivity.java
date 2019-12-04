@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -19,10 +21,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import liftinggoals.models.RoutineModel;
 import liftinggoals.data.DatabaseHelper;
@@ -37,7 +42,8 @@ public class RoutinesEditActivity extends AppCompatActivity {
     private ImageView commitButton;
     private String routineNameUnchanged;
     private String routineDescUnchanged;
-    private RoutinesEditActivity.ResponseReceiver myReceiver;
+    private ResponseReceiver myReceiver;
+    private LottieAnimationView loadingAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,8 @@ public class RoutinesEditActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
         db.openDB();
 
+        loadingAnim = findViewById(R.id.routine_edit_loading_animation);
+        loadingAnim.setVisibility(View.INVISIBLE);
         routineNameEditText = findViewById(R.id.activity_routines_edit_text);
         routineNameEditText.setText(routineModels.get(selectedRoutineIndex).getRoutineName());
         commitButton = findViewById(R.id.routine_activity_commit_button);
@@ -56,12 +64,38 @@ public class RoutinesEditActivity extends AppCompatActivity {
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!loadingAnim.isAnimating())
+                {
+                    loadingAnim.setVisibility(View.VISIBLE);
+                    loadingAnim.playAnimation();
+                    commitButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                }
                 Intent intent = new Intent(RoutinesEditActivity.this, RoutineService.class);
                 intent.putExtra("type", "update");
                 intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
                 intent.putExtra("routineName", routineNameEditText.getText().toString());
                 intent.putExtra("description", routineDescEditText.getText().toString());
                 startService(intent);
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        //Quit the animation if it takes longer than 10 seconds
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (loadingAnim.isAnimating())
+                                {
+                                    loadingAnim.cancelAnimation();
+                                    loadingAnim.setVisibility(View.INVISIBLE);
+                                    commitButton.setImageResource(R.drawable.ic_checked_green_48dp);
+                                }
+                            }
+                        });
+
+                        timer.cancel();
+                    }
+                }, 10000);
             }
         });
 
@@ -120,8 +154,6 @@ public class RoutinesEditActivity extends AppCompatActivity {
             }
         });
 
-
-
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_routines_edit_bottom_navigation);
@@ -168,6 +200,8 @@ public class RoutinesEditActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("routineAction"))
             {
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
                 commitButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
         }

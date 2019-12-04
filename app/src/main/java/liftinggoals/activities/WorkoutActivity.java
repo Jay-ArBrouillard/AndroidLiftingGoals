@@ -20,6 +20,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -47,6 +49,7 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
     private int userId;
     private ImageView commitChangesImage;
     private ResponseReceiver myReceiver;
+    private LottieAnimationView loadingAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,9 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
         title.setText(routineModels.get(selectedRoutineIndex).getRoutineName());   //Set Workout Title
 
+        loadingAnim = findViewById(R.id.routine_workout_loading_animation);
+        loadingAnim.setVisibility(View.INVISIBLE);
+        loadingAnim.cancelAnimation();
         commitChangesImage = findViewById(R.id.workout_activity_commit_button);
         recyclerView = findViewById(R.id.multiple_workout_recycler_view);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4)); //only do this once
@@ -75,7 +81,12 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
         createWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                if (!loadingAnim.isAnimating())
+                {
+                    loadingAnim.setVisibility(View.VISIBLE);
+                    loadingAnim.playAnimation();
+                    commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                }
                 Intent intent = new Intent(WorkoutActivity.this, WorkoutService.class);
                 intent.putExtra("type", "insert");
                 intent.putExtra("routineId", routineModels.get(selectedRoutineIndex).getRoutineId());
@@ -215,7 +226,12 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
     @Override
     public void onDeleteClicked(int position, Object item)
     {
-        commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+        if (!loadingAnim.isAnimating())
+        {
+            loadingAnim.setVisibility(View.VISIBLE);
+            loadingAnim.playAnimation();
+            commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+        }
         Intent intent = new Intent(this, WorkoutService.class);
         intent.putExtra("type", "delete");
         intent.putExtra("workoutId", ((WorkoutModel)item).getWorkoutId());
@@ -240,11 +256,11 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
 
             if (intent.getAction().equals("workoutAction"))
             {
-                routineModels.get(selectedRoutineIndex).getWorkouts().add(new WorkoutModel("Untitled Workout", "Untitled Description", 0.0, 0));
-                adapter.notifyItemInserted(routineModels.get(selectedRoutineIndex).getWorkouts().size()-1);
                 initializeRecyclerView();
                 initializeActionSearch();
                 initializeSwipe();
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
                 commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
             }
         }

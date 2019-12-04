@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -21,10 +23,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import net.steamcrafted.loadtoast.LoadToast;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -53,11 +54,9 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
     private int userId;
     private boolean isFirstLogin;
     private Button fetchButton;
-    private LoadToast defaultLoadToast;
-    private LoadToast initializeLoadToast;
     private CardView createRoutine;
-    private boolean serviceError = true;
     private ImageView commitChangesImage;
+    private LottieAnimationView loadingAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +64,8 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
         setContentView(R.layout.activity_routine);
         routineModels = new ArrayList<>();
 
+        loadingAnim = findViewById(R.id.routine_loading_animation);
+        commitChangesImage = findViewById(R.id.routine_activity_commit_changes);
         recyclerView = findViewById(R.id.routine_fragment_recycler_view);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));//only do this once
 
@@ -72,9 +73,6 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
         userId = sp.getInt("UserId", -1);
         username = sp.getString("username", null);
         isFirstLogin = sp.getBoolean("firstLogin", false);
-        defaultLoadToast = new LoadToast(this);
-        initializeLoadToast = new LoadToast(this);
-        initializeLoadToast.setTranslationY(100);
 
         if (db == null)
         {
@@ -92,24 +90,22 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                defaultLoadToast.setText("Fetching default routines...");
-                defaultLoadToast.setBorderWidthDp(100);
-                DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, defaultLoadToast);
+                DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, loadingAnim);
                 dialog.show(getSupportFragmentManager(), "Routine Dialog");
                 final Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //Quit the defaultLoadToast if it takes longer than 10 seconds
-                        if (serviceError)
-                        {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    defaultLoadToast.error();
-                                }
-                            });
-                        }
+                        //Quit the animation if it takes longer than 10 seconds
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingAnim.cancelAnimation();
+                                loadingAnim.setVisibility(View.INVISIBLE);
+                                commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                            }
+                        });
+
                         timer.cancel();
                     }
                 }, 10000);
@@ -124,14 +120,18 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
             startService(defaultRoutine);
         }
 
-        commitChangesImage = findViewById(R.id.routine_activity_commit_changes);
 
         createRoutine = findViewById(R.id.activity_routine_create_a_workout);
         createRoutine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
-                commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                if (!loadingAnim.isAnimating())
+                {
+                    loadingAnim.setVisibility(View.VISIBLE);
+                    loadingAnim.playAnimation();
+                    commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
+                }
                 Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
                 intent.putExtra("type", "insert");
                 intent.putExtra("userId", userId);
@@ -142,9 +142,6 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
         //Fetch initialize Routines
         Intent intent = new Intent(RoutineActivity.this, InitializeRoutineService.class);
         intent.putExtra("user_id", userId);
-        initializeLoadToast.setText("Loading your routines...");
-        initializeLoadToast.setBorderWidthDp(100);
-        initializeLoadToast.show();
         startService(intent);
         final Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -153,7 +150,7 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        initializeLoadToast.error();
+                        loadingAnim.cancelAnimation();
                     }
                 });
                 timer.cancel();
@@ -281,6 +278,11 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
     @Override
     public void onDeleteClicked(int position, Object item)
     {
+        if (!loadingAnim.isAnimating())
+        {
+            loadingAnim.setVisibility(View.VISIBLE);
+            loadingAnim.playAnimation();
+        }
         commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
         Intent intent = new Intent(RoutineActivity.this, RoutineService.class);
         intent.putExtra("type", "delete");
@@ -309,6 +311,7 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
         myReceiver = new ResponseReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("action");
+        intentFilter.addAction("errorDefaultRoutine");
         intentFilter.addAction("initializeRoutinesAction");
         intentFilter.addAction("routineAction");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, intentFilter);
@@ -320,15 +323,15 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            serviceError = false;
-
             if (intent.getAction().equals("initializeRoutinesAction"))
             {
                 Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
                 initializeRecyclerView();
                 initializeActionSearch();
                 initializeSwipe();
-                initializeLoadToast.success();
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
             }
             else if (intent.getAction().equals("action"))
             {
@@ -336,13 +339,26 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
                 initializeRecyclerView();
                 initializeActionSearch();
                 initializeSwipe();
-                defaultLoadToast.success();
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
+                Intent thisIntent = getIntent();
+                finish();
+                startActivity(thisIntent);
+            }
+            else if (intent.getAction().equals("errorDefaultRoutine"))
+            {
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesImage.setImageResource(R.drawable.ic_checked_red_48dp);
             }
             else if (intent.getAction().equals("routineAction"))
             {
                 initializeRecyclerView();
                 initializeActionSearch();
                 initializeSwipe();
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
                 commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
             }
         }

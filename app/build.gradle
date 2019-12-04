@@ -2,10 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     lintOptions {
-        checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
-        abortOnError false
     }
 
     compileSdkVersion 29
@@ -44,7 +40,7 @@ dependencies {
     implementation 'com.skyfishjy.ripplebackground:library:1.0.1'
     implementation 'com.github.mancj:MaterialSearchBar:0.8.1'
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation files('libs/jxl.jar')
+    implementation "com.airbnb.android:lottie:3.3.0"
 }
 
 repositories {

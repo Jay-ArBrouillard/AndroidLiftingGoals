@@ -6,12 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.NoConnectionError;
@@ -45,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText password;
     private DatabaseHelper db;
     private CheckBox rememberMe;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +58,16 @@ public class LoginActivity extends AppCompatActivity {
         db = new DatabaseHelper(this.getApplicationContext());
         db.openDB();
 
+        linearLayout = findViewById(R.id.login_activity_layout);
         loginButton = findViewById(R.id.login_button);
         registerButton = findViewById(R.id.register_button);
         username = findViewById(R.id.username_edit_text);
         password = findViewById(R.id.password_edit_text);
+
+        AnimationDrawable animationDrawable = (AnimationDrawable) linearLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(4000);
+        animationDrawable.start();
 
         //Remember me
         rememberMe = findViewById(R.id.login_activity_checkbox);

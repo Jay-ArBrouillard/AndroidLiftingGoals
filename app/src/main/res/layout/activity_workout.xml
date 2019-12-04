@@ -13,23 +13,41 @@
         android:background="@android:color/black"
         android:layout_above="@id/activity_workout_bottom_navigation">
 
-        <LinearLayout
-            android:id="@+id/fragment_multiple_workout_top_bar"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/workout_activity_status_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="right">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/routine_workout_loading_animation"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/workout_activity_commit_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/loading" />
 
             <ImageView
                 android:id="@+id/workout_activity_commit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:paddingTop="10dp"
                 android:paddingRight="10dp"
-                android:src="@drawable/ic_checked_neutral_48dp" />
+                android:src="@drawable/ic_checked_green_48dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/fragment_multiple_workout_title"
@@ -39,7 +57,7 @@
             android:textSize="50dp"
             android:textColor="@android:color/white"
             android:layout_marginLeft="10dp"
-            android:layout_below="@+id/fragment_multiple_workout_top_bar"/>
+            android:layout_below="@+id/workout_activity_status_bar"/>
 
         <LinearLayout
             android:id="@+id/fragment_multiple_workout_search"

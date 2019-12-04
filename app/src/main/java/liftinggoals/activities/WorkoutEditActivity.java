@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -69,7 +70,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     private ArrayAdapter<ExerciseModel> exerciseAdapter;
     private int userId;
     private ResponseReceiver myReceiver;
-
+    private LottieAnimationView loadingAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +91,16 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         description = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getDescription();
 
         //Find Views
+        loadingAnim = findViewById(R.id.workout_edit_loading_animation);
         workoutDescEditText = findViewById(R.id.edit_description_text_view);
         durationEditText = findViewById(R.id.edit_routine_duration_text_view);
         workoutNameEditText = findViewById(R.id.edit_routine_name_text_view);
         addExerciseSpinner = findViewById(R.id.activity_workout_edit_add_exercise_button);
         commitChangesButton = findViewById(R.id.workout_edit_activity_commit_changes);
         recyclerView = findViewById(R.id.edit_routine_recycler_view);
+
+        loadingAnim.setVisibility(View.INVISIBLE);
+        loadingAnim.cancelAnimation();
 
         workoutDescEditText.setText(description);
         workoutDescEditText.addTextChangedListener(new TextWatcher() {
@@ -127,8 +132,13 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             public void onClick(View v) {
                 if (imageViewSrcId == R.drawable.ic_checked_red_48dp)
                 {
-                    commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
-                    imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                    if (!loadingAnim.isAnimating())
+                    {
+                        loadingAnim.setVisibility(View.VISIBLE);
+                        loadingAnim.playAnimation();
+                        commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                        imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                    }
                     int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
                     int numExercises = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getNumberExercises();
                     String newWorkoutName = workoutNameEditText.getText().toString();
@@ -282,7 +292,17 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
     private void initializeExerciseSpinner()
     {
-        List<ExerciseModel> exerciseNames = db.getAllExercises();
+        List<ExerciseModel> exerciseNames = null;
+
+        if (userId == 1) //is admin
+        {
+            exerciseNames = db.getAllExercises();
+        }
+        else
+        {
+            exerciseNames = db.getAllExercisesForUser(userId);
+        }
+
         if (exerciseNames == null)
         {
             spinnerExerciseModels = new ArrayList<>();
@@ -330,6 +350,14 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
     @Override
     public void createExercise(String name, ArrayList<String> selectedMuscleGroups) {
+        if (!loadingAnim.isAnimating())
+        {
+            loadingAnim.setVisibility(View.VISIBLE);
+            loadingAnim.playAnimation();
+            commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+            imageViewSrcId = R.drawable.ic_checked_red_48dp;
+        }
+
         Intent insertExerciseAndMuscleIntent = new Intent(WorkoutEditActivity.this, ExerciseMuscleGroupService.class);
         insertExerciseAndMuscleIntent.putExtra("type", "insert");
         insertExerciseAndMuscleIntent.putExtra("exerciseName", name);
@@ -360,8 +388,13 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             workoutExerciseModel.setMaximumReps(Integer.parseInt(maxReps));
             workoutExerciseModel.setIntensity(Double.parseDouble(weight));
 
-            commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
-            imageViewSrcId = R.drawable.ic_checked_red_48dp;
+            if (!loadingAnim.isAnimating())
+            {
+                loadingAnim.setVisibility(View.VISIBLE);
+                loadingAnim.playAnimation();
+                commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                imageViewSrcId = R.drawable.ic_checked_red_48dp;
+            }
             Intent updateIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
             updateIntent.putExtra("type", "update");
             updateIntent.putExtra("workoutId", workoutId);
@@ -392,27 +425,35 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
             if (intent.getAction().equals("workoutEditAction"))
             {
-                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
-                imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 initializeRecyclerView();
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
             else if (intent.getAction().equals("workoutAction"))
             {
-                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
-                imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 initializeRecyclerView();
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
             else if (intent.getAction().equals("errorWorkoutAction"))
             {
-                imageViewSrcId = R.drawable.ic_checked_green_48dp;
-                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
                 initializeRecyclerView();
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
             else if (intent.getAction().equals("exerciseAction"))
             {
-                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
-                imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 initializeExerciseSpinner();
+                imageViewSrcId = R.drawable.ic_checked_green_48dp;
+                loadingAnim.cancelAnimation();
+                loadingAnim.setVisibility(View.INVISIBLE);
+                commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
         }
     }

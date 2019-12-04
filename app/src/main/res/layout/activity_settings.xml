@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="20dp"
+                android:paddingLeft="10dp"
                 android:text="Subscription Status"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="20dp" />
@@ -44,11 +44,13 @@
                 android:layout_marginBottom="30dp">
 
                 <TextView
+                    android:id="@+id/settings_activity_sub_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:paddingLeft="10dp"
                     android:text="Normal"
+                    android:textStyle="bold"
                     android:textSize="20dp"
                     android:textColor="@android:color/black"/>
 
@@ -57,36 +59,12 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:gravity="right"
-                    android:paddingRight="10dp"
+                    android:paddingRight="5dp"
                     android:text="Lifetime"
                     android:textColor="@android:color/black"
                     android:textSize="20dp" />
 
             </androidx.cardview.widget.CardView>
-
-            <!--<androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="40dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:text="Use dark theme"
-                    android:textColor="@android:color/black"
-                    android:textSize="20dp" />
-
-                <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_gravity="right"
-                    android:checked="true" />
-
-            </androidx.cardview.widget.CardView> -->
-
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -95,16 +73,72 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="40dp">
 
-                <TextView
-                    android:id="@+id/settings_activity_export_data"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:text="export data to CSV"
-                    android:textColor="@android:color/black"
-                    android:textSize="20dp" />
+                    android:weightSum="2">
+
+                    <Button
+                        android:id="@+id/settings_activity_export_data"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:lines="2"
+                        android:maxLines="2"
+                        android:text="Export to Separate CSVs"
+                        android:textColor="@android:color/black"
+                        android:textSize="20dp" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/darker_gray"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="Toggle CSV format"
+                            android:textColor="@android:color/white"
+                            android:textSize="20dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/settings_activity_switch"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Switch
+                            android:id="@+id/settings_activity_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:textSize="20dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <ListView
+                android:id="@+id/checkable_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@android:color/white">
+            </ListView>
+
         </LinearLayout>
     </RelativeLayout>
 
@@ -118,7 +152,5 @@
         app:itemTextColor="@color/colorPrimary"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_navigation" />
-
-
 
 </RelativeLayout>

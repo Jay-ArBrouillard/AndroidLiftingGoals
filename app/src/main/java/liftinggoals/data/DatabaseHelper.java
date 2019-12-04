@@ -22,7 +22,7 @@ import liftinggoals.models.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 212;
+    public static final int DATABASE_VERSION = 227;
 
     public SQLiteDatabase myDB;
 
@@ -356,6 +356,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RecordsTable.insert(myDB, userId, exercise_id, intensity, reps, date);
     }
 
+    public long insertRecord(int recordId, RecordModel entity)
+    {
+        return RecordsTable.insert(myDB, recordId, entity);
+    }
+
     public long updateRecord(int userId, int exercise_id, double intensity, int reps, String date)
     {
         return RecordsTable.update(myDB, userId, exercise_id, intensity, reps, date);
@@ -470,6 +475,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public List<Event> getEventsByMonthAndYear(int userId, String month, String year)
     {
         return EventsTable.getEventsForMonth(myDB, userId, month, year);
+    }
+
+    public List<Event> getAllEvents()
+    {
+        return EventsTable.getAll(myDB);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

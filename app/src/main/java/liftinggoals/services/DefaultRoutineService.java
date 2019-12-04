@@ -53,7 +53,7 @@ public class DefaultRoutineService extends IntentService {
         db.openDB();
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "http://3.221.56.60/fetchDefaultRoutines.php";
+        String url = String.format("http://3.221.56.60/fetchDefaultRoutines.php?userId=%s", Integer.toString(userId));
         final JsonArrayRequest jsObjRequest = new JsonArrayRequest (Request.Method.GET, url, null, new
                 Response.Listener<JSONArray>() {
                     public void onResponse(JSONArray response) {
@@ -194,7 +194,6 @@ public class DefaultRoutineService extends IntentService {
 
                             Intent intent = new Intent("action");
                             intent.putExtra("message", "Default routines added");
-
                             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
                             db.closeDB();
@@ -230,14 +229,12 @@ public class DefaultRoutineService extends IntentService {
                                 "Authentication Error",
                                 Toast.LENGTH_LONG).show();
                     }
-                    else if (error.getClass().equals(Error.class))
-                    {
-                        Toast.makeText(getApplicationContext(),
-                                "Authentication Error",
-                                Toast.LENGTH_LONG).show();
-                    }
                 }
                 error.printStackTrace();
+
+                Intent intent = new Intent("errorDefaultRoutine");
+                Toast.makeText(getApplicationContext(), "Error retrieving default routines", Toast.LENGTH_LONG).show();
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             }
         });
 
