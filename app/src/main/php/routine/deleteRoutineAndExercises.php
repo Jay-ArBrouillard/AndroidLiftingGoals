@@ -31,7 +31,7 @@ while ($routineWorkoutRow = mysqli_fetch_object($routineWorkouts))    // fetch a
     }
 }
 
-if ($exec === true)
+if (mysqli_num_rows($routineWorkouts) == 0 || $exec === true)
 {
     $stmt = $conn->prepare("DELETE FROM Routines WHERE routine_id = ?");
     $stmt->bind_param("s", $routineId);
