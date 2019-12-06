@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -15,7 +17,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.example.liftinggoals.R;
 
-public class WorkoutEditDialog extends AppCompatDialogFragment {
+public class WorkoutEditDialog extends AppCompatDialogFragment implements Parcelable {
     private EditText minimumSets;
     private EditText minimumReps;
     private EditText maximumSets;
@@ -24,10 +26,30 @@ public class WorkoutEditDialog extends AppCompatDialogFragment {
     private WorkoutEditDialogListener listener;
     private int position;
 
+    public WorkoutEditDialog()
+    {
+    }
+
     public WorkoutEditDialog(int position)
     {
         this.position = position;
     }
+
+    public WorkoutEditDialog(Parcel in) {
+        position = in.readInt();
+    }
+
+    public static final Creator<WorkoutEditDialog> CREATOR = new Creator<WorkoutEditDialog>() {
+        @Override
+        public WorkoutEditDialog createFromParcel(Parcel in) {
+            return new WorkoutEditDialog(in);
+        }
+
+        @Override
+        public WorkoutEditDialog[] newArray(int size) {
+            return new WorkoutEditDialog[size];
+        }
+    };
 
     @NonNull
     @Override
@@ -73,6 +95,16 @@ public class WorkoutEditDialog extends AppCompatDialogFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + "must implement WorkoutEditDialog");
         }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(position);
     }
 
     public interface WorkoutEditDialogListener

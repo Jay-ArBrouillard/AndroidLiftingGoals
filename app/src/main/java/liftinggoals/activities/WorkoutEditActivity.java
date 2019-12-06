@@ -71,6 +71,8 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     private int userId;
     private ResponseReceiver myReceiver;
     private LottieAnimationView loadingAnim;
+    private CreateExerciseDialog exerciseDialog;
+    private WorkoutEditDialog workoutEditDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -338,13 +340,13 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
     private void openCreateExerciseDialog()
     {
-        CreateExerciseDialog exerciseDialog = new CreateExerciseDialog();
+        exerciseDialog = new CreateExerciseDialog();
         exerciseDialog.show(getSupportFragmentManager(), "createExerciseDialog");
     }
 
     private void openExerciseDetails(int position)
     {
-        WorkoutEditDialog workoutEditDialog = new WorkoutEditDialog(position);
+        workoutEditDialog = new WorkoutEditDialog(position);
         workoutEditDialog.show(getSupportFragmentManager(), "workoutEditDialog");
     }
 
@@ -382,28 +384,43 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         try {
             WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
             workoutExerciseModel.setWorkoutExerciseId(workoutExerciseId);
-            workoutExerciseModel.setMinimumSets(Integer.parseInt(minSets));
-            workoutExerciseModel.setMinimumReps(Integer.parseInt(minReps));
-            workoutExerciseModel.setMaximumSets(Integer.parseInt(maxSets));
-            workoutExerciseModel.setMaximumReps(Integer.parseInt(maxReps));
-            workoutExerciseModel.setIntensity(Double.parseDouble(weight));
+            if (!isNullOrEmpty(minSets)) { workoutExerciseModel.setMinimumSets(Integer.parseInt(minSets)); }
+            if (!isNullOrEmpty(minReps)) { workoutExerciseModel.setMinimumReps(Integer.parseInt(minReps)); }
+            if (!isNullOrEmpty(maxSets)) { workoutExerciseModel.setMaximumSets(Integer.parseInt(maxSets)); }
+            if (!isNullOrEmpty(maxReps)) { workoutExerciseModel.setMaximumReps(Integer.parseInt(maxReps)); }
+            if (!isNullOrEmpty(weight)) { workoutExerciseModel.setIntensity(Double.parseDouble(weight)); }
 
-            if (!loadingAnim.isAnimating())
+            if (isNullOrEmpty(minSets) && isNullOrEmpty(minReps) && isNullOrEmpty(maxSets) && isNullOrEmpty(maxReps) && isNullOrEmpty(weight))
             {
-                loadingAnim.setVisibility(View.VISIBLE);
-                loadingAnim.playAnimation();
-                commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
-                imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                Toast.makeText(getApplicationContext(), "You entered no data!", Toast.LENGTH_SHORT).show();
             }
-            Intent updateIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
-            updateIntent.putExtra("type", "update");
-            updateIntent.putExtra("workoutId", workoutId);
-            updateIntent.putExtra("exerciseId", exerciseId);
-            updateIntent.putExtra("workoutExerciseModel", workoutExerciseModel);
-            startService(updateIntent);
+            else
+            {
+                if (!loadingAnim.isAnimating())
+                {
+                    loadingAnim.setVisibility(View.VISIBLE);
+                    loadingAnim.playAnimation();
+                    commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                    imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                }
+                Intent updateIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
+                updateIntent.putExtra("type", "update");
+                updateIntent.putExtra("workoutId", workoutId);
+                updateIntent.putExtra("exerciseId", exerciseId);
+                updateIntent.putExtra("workoutExerciseModel", workoutExerciseModel);
+                startService(updateIntent);
+            }
         } catch (NumberFormatException e) {
-            Toast.makeText(getApplicationContext(), "Must enter an integer for Sets and Reps or number for intensity", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Must enter a number for Sets,Reps,intensity", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private boolean isNullOrEmpty(String str) {
+        if(str == null || str.isEmpty())
+        {
+            return true;
+        }
+        return false;
     }
 
     private void setReceiver() {
@@ -455,6 +472,27 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
                 loadingAnim.setVisibility(View.INVISIBLE);
                 commitChangesButton.setImageResource(R.drawable.ic_checked_green_48dp);
             }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("routineModels", routineModels);
+        outState.putParcelableArrayList("spinnerExerciseModels", spinnerExerciseModels);
+        outState.putParcelable("exerciseDialog", exerciseDialog);
+        outState.putParcelable("workoutEditDialog", workoutEditDialog);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null)
+        {
+            routineModels = savedInstanceState.getParcelableArrayList("routineModels");
+            exerciseDialog = savedInstanceState.getParcelable("exerciseDialog");
+            workoutEditDialog = savedInstanceState.getParcelable("workoutEditDialog");
+            spinnerExerciseModels = savedInstanceState.getParcelableArrayList("spinnerExerciseModels");
         }
     }
 

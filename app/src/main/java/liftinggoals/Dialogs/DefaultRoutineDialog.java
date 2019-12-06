@@ -31,7 +31,7 @@ public class DefaultRoutineDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Attention!")
-                .setMessage("Do you want to reset all default routines? Resetting default routines will delete any changes you made to them")
+                .setMessage("Do you want to add pre-made routines? ")
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -112,15 +112,6 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
             }
         });
 
-        //If it is the first Login Start service to get default routines
-        if (isFirstLogin)
-        {
-            Intent defaultRoutine = new Intent(RoutineActivity.this, DefaultRoutineService.class);
-            defaultRoutine.putExtra("username", username);
-            startService(defaultRoutine);
-        }
-
-
         createRoutine = findViewById(R.id.activity_routine_create_a_workout);
         createRoutine.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +147,10 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
                 timer.cancel();
             }
         }, 20000);
+
+        //Login anim
+        loadingAnim.cancelAnimation();
+        loadingAnim.setVisibility(View.INVISIBLE);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -310,7 +305,7 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
     private void setReceiver() {
         myReceiver = new ResponseReceiver();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("action");
+        intentFilter.addAction("defaultRoutineAction");
         intentFilter.addAction("errorDefaultRoutine");
         intentFilter.addAction("initializeRoutinesAction");
         intentFilter.addAction("routineAction");
@@ -333,15 +328,15 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
                 loadingAnim.setVisibility(View.INVISIBLE);
                 commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
             }
-            else if (intent.getAction().equals("action"))
+            else if (intent.getAction().equals("defaultRoutineAction"))
             {
                 Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
-                initializeRecyclerView();
-                initializeActionSearch();
-                initializeSwipe();
-                loadingAnim.cancelAnimation();
-                loadingAnim.setVisibility(View.INVISIBLE);
-                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
+//                initializeRecyclerView();
+//                initializeActionSearch();
+//                initializeSwipe();
+//                loadingAnim.cancelAnimation();
+//                loadingAnim.setVisibility(View.INVISIBLE);
+//                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
                 Intent thisIntent = getIntent();
                 finish();
                 startActivity(thisIntent);

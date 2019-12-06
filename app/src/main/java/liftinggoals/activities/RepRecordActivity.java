@@ -6,9 +6,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.liftinggoals.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -41,10 +43,14 @@ public class RepRecordActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
         db.openDB();
 
-        ArrayList<RecordModel> recordModels = (ArrayList<RecordModel> ) db.getRecordsByExerciseId(exerciseId);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        int userId = sp.getInt("UserId", -1);
+
+        ArrayList<RecordModel> recordModels = (ArrayList<RecordModel> ) db.getRecordsByExerciseIdForUser(userId, exerciseId);
         if (recordModels == null)
         {
             recordModels = new ArrayList<>();
+            Toast.makeText(getApplicationContext(), "You must Complete a workout in order to see records", Toast.LENGTH_LONG).show();
         }
 
         Collections.sort(recordModels, new Comparator<RecordModel>() {

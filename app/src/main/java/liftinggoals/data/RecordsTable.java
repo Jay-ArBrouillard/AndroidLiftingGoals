@@ -108,35 +108,6 @@ public class RecordsTable {
         }
     }
 
-    public static List<RecordModel> getRecordsByExerciseId(SQLiteDatabase myDB, int exerciseId)
-    {
-        String query = "SELECT * FROM " + RecordEntry.TABLE_NAME + " WHERE  " + RecordEntry.COLUMN_EXERCISE_ID  + " = ?";
-
-        Cursor c = myDB.rawQuery(query, new String[] {Integer.toString(exerciseId)});
-
-        if (c.getCount() == 0)
-        {
-            return null;
-        }
-        else
-        {
-            ArrayList<RecordModel> records = new ArrayList<>();
-
-            while(c.moveToNext()){
-                RecordModel recordModel = new RecordModel();
-                recordModel.setRecordId(c.getInt(c.getColumnIndexOrThrow(RecordEntry._ID)));
-                recordModel.setUserId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_USER_ID)));
-                recordModel.setExerciseId(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_EXERCISE_ID)));
-                recordModel.setIntensity(c.getDouble(c.getColumnIndexOrThrow(RecordEntry.COLUMN_INTENSITY)));
-                recordModel.setRepsPerformed(c.getInt(c.getColumnIndexOrThrow(RecordEntry.COLUMN_REPS_PERFORMED)));
-                recordModel.setDate(c.getString(c.getColumnIndexOrThrow(RecordEntry.COLUMN_DATE_PERFORMED)));
-                records.add(recordModel);
-            }
-
-            return records;
-        }
-    }
-
     public static List<RecordModel> getAllRecords(SQLiteDatabase myDB)
     {
         String query = "SELECT * FROM " + RecordEntry.TABLE_NAME;

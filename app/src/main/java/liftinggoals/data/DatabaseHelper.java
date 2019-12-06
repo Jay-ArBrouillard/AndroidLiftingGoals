@@ -22,7 +22,7 @@ import liftinggoals.models.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 227;
+    public static final int DATABASE_VERSION = 231;
 
     public SQLiteDatabase myDB;
 
@@ -376,9 +376,22 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return RecordsTable.getRecord(myDB, recordId);
     }
 
-    public List<RecordModel> getRecordsByExerciseId(int exerciseId)
+    public List<RecordModel> getRecordsByExerciseIdForUser(int userId, int exerciseId )
     {
-        return RecordsTable.getRecordsByExerciseId(myDB, exerciseId);
+        List<RecordModel> allRecords = getAllRecords();
+        ArrayList<RecordModel> results = new ArrayList<>();
+        if (allRecords == null) { return null; }
+
+        for (int i = 0; i < allRecords.size(); i++)
+        {
+            RecordModel curr = allRecords.get(i);
+            if (curr.getUserId() == userId && curr.getExerciseId() == exerciseId)
+            {
+                results.add(curr);
+            }
+        }
+
+        return results;
     }
 
     public List<RecordModel> getAllRecords()
@@ -494,6 +507,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public UserModel getUser(String username, String password)
     {
         return UserTable.get(myDB, username, password);
+    }
+
+    public UserModel getUser(int userId)
+    {
+        return UserTable.get(myDB, userId);
     }
 
     public long updateUserLoginTime(String username, String loginTime)

@@ -30,6 +30,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -53,9 +54,7 @@ public class ProgressGraphActivity extends AppCompatActivity {
     private LineChart lineChart;
     private ArrayList<Entry> entries = new ArrayList<>();
     private ArrayList<ProgressExerciseModel> progressExerciseModels;
-    private SimpleDateFormat longDateFormat = new SimpleDateFormat("MMMM, dd, yyyy, hh:mm a", Locale.ENGLISH);
     private int userId;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,24 +185,6 @@ public class ProgressGraphActivity extends AppCompatActivity {
         }
     }
 
-
-    public String formatDateTime(String timeToFormat)
-    {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-
-        try {
-            Date dt = formatter.parse(timeToFormat);
-            String newDate = longDateFormat.format(dt);
-
-            return newDate;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return "No Date Data";
-    }
-
     private void calculateGeneralStatistics()
     {
         //Volume
@@ -271,6 +252,21 @@ public class ProgressGraphActivity extends AppCompatActivity {
         {
             String reps = Integer.toString(logModel.getRepsPerformed());
             String intensity = Double.toString(logModel.getIntensity());
+
+
+
+            String [] parsed = logModel.getDate().split(", ");
+            Date date = null;
+            try {
+                date = new SimpleDateFormat("MMMM").parse(parsed[0]);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            System.out.println(cal.get(Calendar.MONTH));
+
+            System.out.println(logModel.getDate().substring(0, logModel.getDate().lastIndexOf(",")));
 
             entries.add(new Entry(Float.valueOf(reps), Float.valueOf(intensity)));
         }

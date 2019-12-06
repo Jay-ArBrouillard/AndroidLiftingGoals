@@ -30,7 +30,7 @@ foreach ($json as $key => $value) {
         $row = mysqli_fetch_object($recordResult);
         $recordId = $row->record_id;
         $dbIntensity = $row->intensity;
-        echo $recordId;
+        echo " " . $recordId;
         
         if ($ntensity > $dbIntensity)
         {
@@ -45,6 +45,8 @@ foreach ($json as $key => $value) {
         $stmt->bind_param("sssss", $userId, $exerciseId, $intensity, $repsPerformed, $date);
         $stmt->execute();
 
+        $exit = false;
+
         if ($stmt->affected_rows > 0)
         {
             $id = $conn->insert_id;
@@ -53,13 +55,20 @@ foreach ($json as $key => $value) {
         }
         else
         {
+            
             for ($i = 0; $i < count($remove); $i++) 
             {
                 $stmt = $conn->prepare("DELETE FROM Records WHERE record_id = ?");
                 $stmt->bind_param("s", $remove[$i]);
                 $stmt->execute();
             }
+            $exit = true;
             echo -1;
+            break;
+        }
+
+        if ($exit)
+        {
             break;
         }
     }

@@ -10,10 +10,22 @@ if ($conn->connect_error) {
 
 $userId = $_GET['userId'];
 
-$stmt = $conn->prepare("SELECT * FROM UserRoutines WHERE user_id = ?");
-$stmt->bind_param("s", $userId);
-$stmt->execute();
-$userRoutinesResult = $stmt->get_result();
+$stmt;
+$userRoutinesResult;
+if ($userId == '1') //is Admin can see all routines
+{
+    $stmt = $conn->prepare("SELECT * FROM UserRoutines");
+    $stmt->execute();
+    $userRoutinesResult = $stmt->get_result();
+}
+else
+{
+    $stmt = $conn->prepare("SELECT * FROM UserRoutines WHERE user_id = ?");
+    $stmt->bind_param("s", $userId);
+    $stmt->execute();
+    $userRoutinesResult = $stmt->get_result();
+}
+
 
 $arr = array();
 while ($row0 = mysqli_fetch_object($userRoutinesResult))

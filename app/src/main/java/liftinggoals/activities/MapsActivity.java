@@ -1,13 +1,16 @@
 package liftinggoals.activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -22,7 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.liftinggoals.R;
@@ -88,7 +94,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button decrementRadiusDist;
     private Button incrementRadiusDist;
     private TextView searchRadius;
-    private LatLng currentMarkerLocation;
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private boolean mLocationPermissionsGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +107,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         materialSearchBar = findViewById(R.id.searchBar);
         btnFind = findViewById(R.id.btn_find);
         rippleBg = findViewById(R.id.ripple_bg);
+
+        getLocationPermission();
 
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -172,7 +183,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        materialSearchBar.setSuggstionsClickListener(new SuggestionsAdapter.OnItemViewClickListener() {
+        materialSearchBar.setSuggestionsClickListener(new SuggestionsAdapter.OnItemViewClickListener() {
             @Override
             public void OnItemClickListener(int position, View v) {
                 if (position >= predictionList.size()) {
@@ -242,8 +253,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 int miles = Integer.parseInt(searchRadius.getText().toString());
-                if (miles > 0)
-                {
+                if (miles > 0) {
                     miles--;
                     searchRadius.setText(Integer.toString(miles));
                     PROXIMITY_RADIUS -= 1609;
@@ -259,11 +269,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getNearbyPlacesData = new GetNearbyPlacesData();
                 StringBuilder urlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
                 urlBuilder.append("location=").append(centerLatLang.latitude).append(",").append(centerLatLang.longitude);
-                urlBuilder.append("&radius="+PROXIMITY_RADIUS);
+                urlBuilder.append("&radius=" + PROXIMITY_RADIUS);
                 urlBuilder.append("&type=gym");
                 urlBuilder.append("&sensor=true");
                 urlBuilder.append("&key=").append(getString(R.string.google_maps_key));
-                Object data [] = new Object[3];
+                Object data[] = new Object[3];
                 data[0] = mMap;
                 data[1] = urlBuilder.toString();
                 data[2] = getApplicationContext();
@@ -275,8 +285,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (getNearbyPlacesData.getStatus() != AsyncTask.Status.FINISHED)
-                        {
+                        if (getNearbyPlacesData.getStatus() != AsyncTask.Status.FINISHED) {
                             Toast.makeText(MapsActivity.this, "Gym Locator has timed out. Try again in a minute.", Toast.LENGTH_LONG).show();
                         }
                         rippleBg.stopRippleAnimation();
@@ -310,8 +319,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
 
             }
-            if (selectedActivity != null)
-            {
+            if (selectedActivity != null) {
                 startActivity(selectedActivity);
             }
 
@@ -335,19 +343,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             rippleBg.stopRippleAnimation();
             int numberGyms = intent.getIntExtra("count", 0);
 
-            if (getNearbyPlacesData.getStatus() == AsyncTask.Status.FINISHED)
-            {
-                if (numberGyms == 0)
-                {
+            if (getNearbyPlacesData.getStatus() == AsyncTask.Status.FINISHED) {
+                if (numberGyms == 0) {
                     Toast.makeText(MapsActivity.this, "Couldn't find any nearby gyms. Try increasing search radius or moving locations", Toast.LENGTH_LONG).show();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(MapsActivity.this, "Success found " + numberGyms + " nearby gyms", Toast.LENGTH_LONG).show();
                 }
-            }
-            else
-            {
+            } else {
                 Toast.makeText(MapsActivity.this, "Connectivity error", Toast.LENGTH_LONG).show();
             }
         }
@@ -357,59 +359,112 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
-            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0, 0, 40, 180);
-        }
+        if (mLocationPermissionsGranted) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        //check if gps is enabled or not and then request user to enable it
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-
-        SettingsClient settingsClient = LocationServices.getSettingsClient(MapsActivity.this);
-        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
-
-        task.addOnSuccessListener(MapsActivity.this, new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                getDeviceLocation();
+            if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
+                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                layoutParams.setMargins(0, 0, 40, 180);
             }
-        });
 
-        task.addOnFailureListener(MapsActivity.this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (e instanceof ResolvableApiException) {
-                    ResolvableApiException resolvable = (ResolvableApiException) e;
-                    try {
-                        resolvable.startResolutionForResult(MapsActivity.this, 51);
-                    } catch (IntentSender.SendIntentException e1) {
-                        e1.printStackTrace();
+            //check if gps is enabled or not and then request user to enable it
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(5000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+            SettingsClient settingsClient = LocationServices.getSettingsClient(MapsActivity.this);
+            Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+
+            task.addOnSuccessListener(MapsActivity.this, new OnSuccessListener<LocationSettingsResponse>() {
+                @Override
+                public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                    getDeviceLocation();
+                }
+            });
+
+            task.addOnFailureListener(MapsActivity.this, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    if (e instanceof ResolvableApiException) {
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        try {
+                            resolvable.startResolutionForResult(MapsActivity.this, 51);
+                        } catch (IntentSender.SendIntentException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                if (materialSearchBar.isSuggestionsVisible())
-                    materialSearchBar.clearSuggestions();
-                if (materialSearchBar.isSearchEnabled())
-                    materialSearchBar.disableSearch();
-                return false;
+            mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                @Override
+                public boolean onMyLocationButtonClick() {
+                    if (materialSearchBar.isSuggestionsVisible())
+                        materialSearchBar.clearSuggestions();
+                    if (materialSearchBar.isSearchEnabled())
+                        materialSearchBar.disableSearch();
+                    return false;
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "Must allow location permissions to use gym finder", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private void getLocationPermission(){
+        Log.d("MapsActivity", "getLocationPermission: getting location permissions");
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if(ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                    COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                mLocationPermissionsGranted = true;
+                Log.d("MapsActivity", "Permission granted");
+            }else{
+                ActivityCompat.requestPermissions(this,
+                        permissions,
+                        LOCATION_PERMISSION_REQUEST_CODE);
+                Log.d("MapsActivity", "Course location failed");
             }
-        });
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    permissions,
+                    LOCATION_PERMISSION_REQUEST_CODE);
+            Log.d("MapsActivity", "Permission failed");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d("MapsActivity", "onRequestPermissionsResult: called.");
+        mLocationPermissionsGranted = false;
+
+        switch(requestCode){
+            case LOCATION_PERMISSION_REQUEST_CODE:{
+                if(grantResults.length > 0){
+                    for(int i = 0; i < grantResults.length; i++){
+                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                            mLocationPermissionsGranted = false;
+                            Log.d("MapsActivity", "onRequestPermissionsResult: permission failed");
+                            return;
+                        }
+                    }
+                    Log.d("MapsActivity", "onRequestPermissionsResult: permission granted");
+                    mLocationPermissionsGranted = true;
+                }
+            }
+        }
     }
 
     @Override

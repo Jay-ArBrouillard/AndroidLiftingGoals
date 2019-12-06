@@ -10,6 +10,7 @@ import liftinggoals.data.UserRoutinesTable;
 import liftinggoals.models.ExerciseModel;
 import liftinggoals.models.RoutineModel;
 import liftinggoals.models.RoutineWorkoutModel;
+import liftinggoals.models.UserModel;
 import liftinggoals.models.UserRoutineModel;
 import liftinggoals.models.WorkoutExerciseModel;
 import liftinggoals.models.WorkoutModel;
@@ -23,7 +24,18 @@ public class RoutineModelHelper {
         db = new DatabaseHelper(context);
         db.openDB();
 
-        ArrayList<RoutineModel> routineModels = (ArrayList<RoutineModel>) db.getAllRoutinesForUser(userId);
+        UserModel thisUser = db.getUser(userId);
+        ArrayList<RoutineModel> routineModels;
+
+        if (thisUser.getIsAdmin() == 1)
+        {
+            routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
+        }
+        else
+        {
+            routineModels = (ArrayList<RoutineModel>) db.getAllRoutinesForUser(userId);
+        }
+
         if (routineModels == null) routineModels = new ArrayList<>();
 
         for (int i = 0; i < routineModels.size(); i++)

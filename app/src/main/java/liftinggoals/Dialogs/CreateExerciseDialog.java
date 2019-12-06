@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -18,13 +20,35 @@ import com.example.liftinggoals.R;
 
 import java.util.ArrayList;
 
-public class CreateExerciseDialog extends AppCompatDialogFragment {
+public class CreateExerciseDialog extends AppCompatDialogFragment implements Parcelable {
     private EditText exerciseName;
     private CreateExerciseDialog.CreateExerciseDialogListener listener;
     //Multiple choice dialog vars
     private String[] listItems;
     private boolean[] checkedItems;
     private ArrayList<String> userItems = new ArrayList<>();
+
+    public CreateExerciseDialog ()
+    {
+    }
+
+    protected CreateExerciseDialog(Parcel in) {
+        listItems = in.createStringArray();
+        checkedItems = in.createBooleanArray();
+        userItems = in.createStringArrayList();
+    }
+
+    public static final Creator<CreateExerciseDialog> CREATOR = new Creator<CreateExerciseDialog>() {
+        @Override
+        public CreateExerciseDialog createFromParcel(Parcel in) {
+            return new CreateExerciseDialog(in);
+        }
+
+        @Override
+        public CreateExerciseDialog[] newArray(int size) {
+            return new CreateExerciseDialog[size];
+        }
+    };
 
     @NonNull
     @Override
@@ -104,6 +128,18 @@ public class CreateExerciseDialog extends AppCompatDialogFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + "must implement CreateExerciseDialog");
         }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(listItems);
+        dest.writeBooleanArray(checkedItems);
+        dest.writeStringList(userItems);
     }
 
     public interface CreateExerciseDialogListener

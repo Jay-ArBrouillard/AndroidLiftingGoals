@@ -24,16 +24,19 @@
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="20dp"
-            android:layout_toRightOf="@+id/folder_icon"/>
+            android:layout_toRightOf="@+id/folder_icon"
+            android:layout_toLeftOf="@+id/edit_icon"/>
 
         <TextView
             android:id="@+id/description_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
+            android:maxLines="4"
             android:textColor="@android:color/darker_gray"
             android:layout_below="@id/title_text_view"
-            android:layout_toRightOf="@+id/folder_icon"/>
+            android:layout_toRightOf="@+id/folder_icon"
+            android:layout_toLeftOf="@+id/edit_icon"/>
 
         <ImageView
             android:id="@+id/edit_icon"

@@ -201,11 +201,13 @@ public class RoutineService extends IntentService {
         final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
         db.openDB();
 
-        String url = String.format("http://3.221.56.60/deleteRoutineAndExercises.php?routineId=%s", Integer.toString(routine.getRoutineId()));
+        System.out.println("Routine id for delete: " + routine.getRoutineId());
+
+        String url = String.format("http://3.221.56.60/deleteRoutineAndExercises.php?routineId=%s&userId=%s", Integer.toString(routine.getRoutineId()), Integer.toString(routine.getUserId()));
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if (response.equals("-1"))
+                if (response.contains("-1"))
                 {
                     Toast.makeText(getApplicationContext(), "Error deleting routine", Toast.LENGTH_LONG).show();
                 }

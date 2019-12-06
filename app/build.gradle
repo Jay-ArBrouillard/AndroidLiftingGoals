@@ -42,7 +42,7 @@ dependencies {
     implementation 'com.github.sundeepk:compact-calendar-view:3.0.0'
     implementation 'com.google.android.libraries.places:places:2.0.0'
     implementation 'com.skyfishjy.ripplebackground:library:1.0.1'
-    implementation 'com.github.mancj:MaterialSearchBar:0.8.1'
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.2'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation "com.airbnb.android:lottie:3.3.0"
 }

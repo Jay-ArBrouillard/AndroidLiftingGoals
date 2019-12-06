@@ -191,12 +191,11 @@ public class DefaultRoutineService extends IntentService {
                                     }
                                 }
                             }
+                            db.closeDB();
 
-                            Intent intent = new Intent("action");
+                            Intent intent = new Intent("defaultRoutineAction");
                             intent.putExtra("message", "Default routines added");
                             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-                            db.closeDB();
                         }
                         catch (JSONException e)
                         {

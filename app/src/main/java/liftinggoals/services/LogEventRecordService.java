@@ -96,8 +96,6 @@ public class LogEventRecordService extends IntentService {
         final StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                System.out.println("response: " + response);
-
                 if (response.contains("-1"))
                 {
                     Toast.makeText(getApplicationContext(), "Error updating records", Toast.LENGTH_LONG).show();
@@ -123,13 +121,14 @@ public class LogEventRecordService extends IntentService {
                         for (int i = 0; i < ids.length; i++)
                         {
                             RecordModel curr = loggedRecords.get(i);
-                            if (db.getRecord(Integer.parseInt(ids[i])) != null)
+                            if (db.getRecord(Integer.parseInt(ids[i])) == null)
                             {
                                 db.insertRecord(Integer.parseInt(ids[i]), curr);
                             }
                             else
                             {
-                                db.updateRecord(curr.getUserId(), curr.getExerciseId(), curr.getIntensity(), curr.getRepsPerformed(), curr.getDate());
+                                long result = db.updateRecord(curr.getUserId(), curr.getExerciseId(), curr.getIntensity(), curr.getRepsPerformed(), curr.getDate());
+                                System.out.println("result: " + result);
                             }
                         }
                         Toast.makeText(getApplicationContext(), "Successfully added records", Toast.LENGTH_SHORT).show();

@@ -90,7 +90,7 @@ public class ExercisesTable {
 
     public static ExerciseModel getExerciseByExerciseNameAndUserId(SQLiteDatabase myDB, String exerciseName, int userId)
     {
-        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry.COLUMN_EXERCISE_NAME  + " = ?" + ExerciseEntry.COLUMN_USER_ID + " = ?";
+        String query = "SELECT * FROM " + ExerciseEntry.TABLE_NAME + " WHERE " + ExerciseEntry.COLUMN_EXERCISE_NAME  + " = ? AND " + ExerciseEntry.COLUMN_USER_ID + " = ?";
 
         Cursor c = myDB.rawQuery(query, new String[] {exerciseName, Integer.toString(userId)});
 
