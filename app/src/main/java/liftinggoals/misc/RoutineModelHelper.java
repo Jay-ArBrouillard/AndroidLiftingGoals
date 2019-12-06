@@ -24,10 +24,16 @@ public class RoutineModelHelper {
         db = new DatabaseHelper(context);
         db.openDB();
 
+        for (UserModel u : db.getAllUsers())
+        {
+            System.out.println("user: "  + u.getUsername() + " : isAdmin ->" + u.getIsAdmin());
+
+        }
+
         UserModel thisUser = db.getUser(userId);
         ArrayList<RoutineModel> routineModels;
 
-        if (thisUser.getIsAdmin() == 1)
+        if (thisUser != null && thisUser.getIsAdmin() == 1)
         {
             routineModels = (ArrayList<RoutineModel>) db.getAllRoutines();
         }

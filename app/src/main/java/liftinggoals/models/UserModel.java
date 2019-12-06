@@ -40,7 +40,7 @@ public class UserModel {
         return isAdmin;
     }
 
-    public void getSetAdmin(int admin) {
+    public void setAdmin(int admin) {
         isAdmin = admin;
     }
 

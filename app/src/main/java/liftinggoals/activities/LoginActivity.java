@@ -164,6 +164,8 @@ public class LoginActivity extends AppCompatActivity {
                                 Date date = new Date();
                                 if (user == null)
                                 {
+                                    sdhakldhsad
+                                            //Change insertUser to insert userId from Remote
                                     db.insertUser(userNameInput, passwordInput, 0, formatter.format(date));
                                 }
                                 else
