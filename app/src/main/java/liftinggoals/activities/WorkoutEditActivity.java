@@ -137,13 +137,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             public void onClick(View v) {
                 if (imageViewSrcId == R.drawable.ic_checked_red_48dp)
                 {
-                    if (!loadingAnim.isAnimating())
-                    {
-                        loadingAnim.setVisibility(View.VISIBLE);
-                        loadingAnim.playAnimation();
-                        commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
-                        imageViewSrcId = R.drawable.ic_checked_red_48dp;
-                    }
+
                     int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
                     int numExercises = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getNumberExercises();
                     String newWorkoutName = workoutNameEditText.getText().toString();
@@ -152,6 +146,21 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
                     Double newDuration = null;
                     try {
                         newDuration = Double.parseDouble(durationEditText.getText().toString());
+
+                        if (newDuration < 0)
+                        {
+                            Toast.makeText(getApplicationContext(), "You cannot enter negative value for duration!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (!loadingAnim.isAnimating())
+                        {
+                            loadingAnim.setVisibility(View.VISIBLE);
+                            loadingAnim.playAnimation();
+                            commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+                            imageViewSrcId = R.drawable.ic_checked_red_48dp;
+                        }
+
                         Intent updateWorkoutIntent = new Intent(WorkoutEditActivity.this, WorkoutService.class);
                         updateWorkoutIntent.putExtra("type", "update");
                         updateWorkoutIntent.putExtra("workoutId", workoutId);

@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:paddingLeft="10dp"
-                android:text="Untitled Workout"
+                android:hint="Untitled Workout"
                 android:textSize="20dp" />
 
         </androidx.cardview.widget.CardView>
@@ -101,7 +101,7 @@
                 android:lines="5"
                 android:maxLines="5"
                 android:paddingLeft="10dp"
-                android:text="Untitled Description"
+                android:hint="Untitled Description"
                 android:textSize="20dp" />
 
         </androidx.cardview.widget.CardView>

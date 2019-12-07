@@ -91,7 +91,7 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
             @Override
             public void onClick(View v) {
                 DefaultRoutineDialog dialog = new DefaultRoutineDialog(username, loadingAnim);
-                dialog.show(getSupportFragmentManager(), "Routine Dialog");
+                dialog.show(getSupportFragmentManager(), "routine Dialog");
                 final Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override

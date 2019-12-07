@@ -108,6 +108,11 @@ public class WorkoutEditDialog extends AppCompatDialogFragment implements Parcel
                             {
                                 Toast.makeText(getActivity().getApplicationContext(), "You made no new changes!", Toast.LENGTH_SHORT).show();
                             }
+                            else if (workoutExerciseModel.getMinimumSets() < 0 || workoutExerciseModel.getMinimumReps() < 0 || workoutExerciseModel.getMaximumSets() < 0 ||
+                                    workoutExerciseModel.getMaximumReps() < 0 || workoutExerciseModel.getIntensity() < 0)
+                            {
+                                Toast.makeText(getActivity().getApplicationContext(), "You cannot enter negative values!", Toast.LENGTH_SHORT).show();
+                            }
                             else
                             {
                                 listener.editExerciseDetails(position, workoutExerciseModel);

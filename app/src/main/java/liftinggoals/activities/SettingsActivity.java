@@ -245,7 +245,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String convertRoutinesToString(StringBuilder stringBuilder)
     {
         List<RoutineModel> routineModels = db.getAllRoutines();
-        stringBuilder.append("routineId, UserId, Routine Name, Description, Default Routine");
+        stringBuilder.append("routineId, UserId, routine Name, Description, Default routine");
         for (RoutineModel r : routineModels)
         {
             stringBuilder.append("\n").append(r.getRoutineId()).append(",").append(r.getUserId()).append(",").append(r.getRoutineName()).append(",").append(r.getRoutineDescription()).append(",").append(r.getDefaultRoutine());

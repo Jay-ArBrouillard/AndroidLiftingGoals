@@ -113,7 +113,7 @@ public class RoutineService extends IntentService {
                 db.closeDB();
                 Intent intent = new Intent("routineAction");
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                Toast.makeText(getApplicationContext(), "Error updating Routine", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error updating routine", Toast.LENGTH_LONG).show();
             }
         }){
             @Override
@@ -148,7 +148,7 @@ public class RoutineService extends IntentService {
                     int routineId = Integer.parseInt(ids[0].trim());
                     int userRoutineId = Integer.parseInt(ids[1].trim());
                     int temp = routine.getUserId();
-                    db.insertRoutine(routineId, routine.getUserId(), "Untitled Routine", "Untitled Description", 0, 0);
+                    db.insertRoutine(routineId, routine.getUserId(), "Untitled routine", "Untitled Description", 0, 0);
                     db.insertUserRoutine(userRoutineId, temp, routineId);
                     Toast.makeText(getApplicationContext(), "Successfully added routine", Toast.LENGTH_LONG).show();
                 }
@@ -189,7 +189,7 @@ public class RoutineService extends IntentService {
                 db.closeDB();
                 Intent intent = new Intent("routineAction");
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                Toast.makeText(getApplicationContext(), "Error saving Routine", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error saving routine", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -201,7 +201,7 @@ public class RoutineService extends IntentService {
         final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
         db.openDB();
 
-        System.out.println("Routine id for delete: " + routine.getRoutineId());
+        System.out.println("routine id for delete: " + routine.getRoutineId());
 
         String url = String.format("http://3.221.56.60/deleteRoutineAndExercises.php?routineId=%s&userId=%s", Integer.toString(routine.getRoutineId()), Integer.toString(routine.getUserId()));
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -253,7 +253,7 @@ public class RoutineService extends IntentService {
                 db.closeDB();
                 Intent intent = new Intent("routineAction");
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                Toast.makeText(getApplicationContext(), "Error deleting Routine", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error deleting routine", Toast.LENGTH_LONG).show();
             }
         });
 

@@ -195,7 +195,7 @@ public class LoginActivity extends AppCompatActivity {
                                     sp.edit().clear();
                                 }
 
-                                Intent startMainActivity = new Intent(LoginActivity.this, RoutineActivity.class);
+                                Intent startMainActivity = new Intent(LoginActivity.this, IntroActivity.class);
                                 startActivity(startMainActivity);
                                 finish();   //Prevent user from pressing back button and going to login page
                             }
