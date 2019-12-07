@@ -3,6 +3,7 @@ package liftinggoals.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -42,7 +43,7 @@ public class IntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-        if (restorePrefData())
+        if (!restorePrefData())
         {
             Intent routineIntent = new Intent(IntroActivity.this, RoutineActivity.class);
             startActivity(routineIntent);
@@ -151,15 +152,15 @@ public class IntroActivity extends AppCompatActivity {
 
     private boolean restorePrefData()
     {
-        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
-        return sp.getBoolean("isIntroOpened", false);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", Context.MODE_PRIVATE);
+        return sp.getBoolean("firstLogin", false);
     }
 
     private void saveSharedPrefs()
     {
-        SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("lifting_goals", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putBoolean("isIntroOpened", true);
+        editor.putBoolean("firstLogin", true);
         editor.commit();
     }
 

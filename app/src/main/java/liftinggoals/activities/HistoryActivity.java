@@ -64,9 +64,9 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 customCalendarView.calendar.add(Calendar.MONTH, -1);
-                customCalendarView.setupCalendar();
                 eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(customCalendarView.calendar.getTime()), yearFormat.format(customCalendarView.calendar.getTime()));
                 if (eventsModels == null) { eventsModels = new ArrayList<>(); }
+                customCalendarView.setupCalendar();
                 initializeRecyclerView();
             }
         });
@@ -75,15 +75,17 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 customCalendarView.calendar.add(Calendar.MONTH, 1);
-                customCalendarView.setupCalendar();
                 eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(customCalendarView.calendar.getTime()), yearFormat.format(customCalendarView.calendar.getTime()));
                 if (eventsModels == null) { eventsModels = new ArrayList<>(); }
+                customCalendarView.setupCalendar();
                 initializeRecyclerView();
             }
         });
         //Recycler View
 
 
+        eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(calendar.getTime()), yearFormat.format(calendar.getTime()));
+        if (eventsModels == null) { eventsModels = new ArrayList<>(); }
         initializeRecyclerView();
         BottomNavigationView bottomNavigation = findViewById(R.id.activity_history_bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
@@ -91,9 +93,6 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void initializeRecyclerView()
     {
-        eventsModels = (ArrayList<Event>) db.getEventsByMonthAndYear(userId, monthFormat.format(calendar.getTime()), yearFormat.format(calendar.getTime()));
-        if (eventsModels == null) { eventsModels = new ArrayList<>(); }
-
         eventsRecyclerView.setHasFixedSize(true);
         eventsLayoutManager = new LinearLayoutManager(this);
         eventsAdapter = new EventsAdapter(eventsModels);

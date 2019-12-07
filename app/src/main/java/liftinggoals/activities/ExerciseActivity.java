@@ -77,7 +77,7 @@ public class ExerciseActivity extends AppCompatActivity {
     private TextView setsTextView;
     private TextView countDownTextView;
     private CountDownTimer countDownTimer;
-    private long timeLeftMillis = 6000; //1 min
+    private long timeLeftMillis = 60000; //1 min
     private boolean timerRunning;
     private String workoutName;
     private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("CST"), Locale.ENGLISH);
