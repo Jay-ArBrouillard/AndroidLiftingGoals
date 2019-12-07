@@ -3,7 +3,7 @@
     <string name="first_nav_tab">Routines</string>
     <string name="second_nav_tab">Progress</string>
     <string name="third_nav_tab">History</string>
-    <string name="fourth_nav_tab">Maps</string>
+    <string name="fourth_nav_tab">Gym Finder</string>
     <string name="fifth_nav_tab">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>

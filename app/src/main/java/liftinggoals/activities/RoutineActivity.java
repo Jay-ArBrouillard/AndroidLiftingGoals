@@ -331,12 +331,6 @@ public class RoutineActivity extends AppCompatActivity implements DeleteRoutineD
             else if (intent.getAction().equals("defaultRoutineAction"))
             {
                 Toast.makeText(getApplicationContext(), intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
-//                initializeRecyclerView();
-//                initializeActionSearch();
-//                initializeSwipe();
-//                loadingAnim.cancelAnimation();
-//                loadingAnim.setVisibility(View.INVISIBLE);
-//                commitChangesImage.setImageResource(R.drawable.ic_checked_green_48dp);
                 Intent thisIntent = getIntent();
                 finish();
                 startActivity(thisIntent);

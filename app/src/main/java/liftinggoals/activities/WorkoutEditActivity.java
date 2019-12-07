@@ -82,7 +82,10 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         db = new DatabaseHelper(this);
         db.openDB();
 
-        routineModels = getIntent().getExtras().getParcelableArrayList("routine_models");
+        if (routineModels == null)
+        {
+            routineModels = getIntent().getExtras().getParcelableArrayList("routine_models");
+        }
         SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
         selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
         selectedWorkoutIndex = sp.getInt("selected_workout_index", -1);
@@ -219,6 +222,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
 
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
 
+        addExerciseSpinner.setSelection(0);
         addExerciseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -314,7 +318,9 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             spinnerExerciseModels = (ArrayList<ExerciseModel>)exerciseNames;
         }
 
-        spinnerExerciseModels.add(0, new ExerciseModel());
+        ExerciseModel placeHolder = new ExerciseModel();
+        placeHolder.setExerciseName("Select an exercise...");
+        spinnerExerciseModels.add(0, placeHolder);
         exerciseAdapter = new ArrayAdapter<>(WorkoutEditActivity.this, android.R.layout.simple_list_item_1, spinnerExerciseModels);
         exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         addExerciseSpinner.setAdapter(exerciseAdapter);
@@ -333,7 +339,8 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         adapter.setOnItemClickListener(new WorkoutEditAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                openExerciseDetails(position);
+                WorkoutExerciseModel currItem = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(position);
+                openExerciseDetails(position, currItem);
             }
         });
     }
@@ -344,9 +351,9 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         exerciseDialog.show(getSupportFragmentManager(), "createExerciseDialog");
     }
 
-    private void openExerciseDetails(int position)
+    private void openExerciseDetails(int position, WorkoutExerciseModel item)
     {
-        workoutEditDialog = new WorkoutEditDialog(position);
+        workoutEditDialog = new WorkoutEditDialog(position, item);
         workoutEditDialog.show(getSupportFragmentManager(), "workoutEditDialog");
     }
 
@@ -376,51 +383,21 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
     }
 
     @Override
-    public void editExerciseDetails(int position, String minSets, String maxSets, String minReps, String maxReps, String weight) {
-        int workoutId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId();
-        int exerciseId = spinnerExerciseModels.get(position).getExerciseId();
-        int workoutExerciseId = routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(position).getWorkoutExerciseId();
+    public void editExerciseDetails(int position, WorkoutExerciseModel workoutExerciseModel) {
+        workoutExerciseModel.setWorkoutId(routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getWorkoutId());
+        workoutExerciseModel.setWorkoutExerciseId(routineModels.get(selectedRoutineIndex).getWorkouts().get(selectedWorkoutIndex).getExercises().get(position).getWorkoutExerciseId());
 
-        try {
-            WorkoutExerciseModel workoutExerciseModel = new WorkoutExerciseModel();
-            workoutExerciseModel.setWorkoutExerciseId(workoutExerciseId);
-            if (!isNullOrEmpty(minSets)) { workoutExerciseModel.setMinimumSets(Integer.parseInt(minSets)); }
-            if (!isNullOrEmpty(minReps)) { workoutExerciseModel.setMinimumReps(Integer.parseInt(minReps)); }
-            if (!isNullOrEmpty(maxSets)) { workoutExerciseModel.setMaximumSets(Integer.parseInt(maxSets)); }
-            if (!isNullOrEmpty(maxReps)) { workoutExerciseModel.setMaximumReps(Integer.parseInt(maxReps)); }
-            if (!isNullOrEmpty(weight)) { workoutExerciseModel.setIntensity(Double.parseDouble(weight)); }
-
-            if (isNullOrEmpty(minSets) && isNullOrEmpty(minReps) && isNullOrEmpty(maxSets) && isNullOrEmpty(maxReps) && isNullOrEmpty(weight))
-            {
-                Toast.makeText(getApplicationContext(), "You entered no data!", Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                if (!loadingAnim.isAnimating())
-                {
-                    loadingAnim.setVisibility(View.VISIBLE);
-                    loadingAnim.playAnimation();
-                    commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
-                    imageViewSrcId = R.drawable.ic_checked_red_48dp;
-                }
-                Intent updateIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
-                updateIntent.putExtra("type", "update");
-                updateIntent.putExtra("workoutId", workoutId);
-                updateIntent.putExtra("exerciseId", exerciseId);
-                updateIntent.putExtra("workoutExerciseModel", workoutExerciseModel);
-                startService(updateIntent);
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(getApplicationContext(), "Must enter a number for Sets,Reps,intensity", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private boolean isNullOrEmpty(String str) {
-        if(str == null || str.isEmpty())
+        if (!loadingAnim.isAnimating())
         {
-            return true;
+            loadingAnim.setVisibility(View.VISIBLE);
+            loadingAnim.playAnimation();
+            commitChangesButton.setImageResource(R.drawable.ic_checked_red_48dp);
+            imageViewSrcId = R.drawable.ic_checked_red_48dp;
         }
-        return false;
+        Intent updateIntent = new Intent(WorkoutEditActivity.this, WorkoutExerciseService.class);
+        updateIntent.putExtra("type", "update");
+        updateIntent.putExtra("workoutExerciseModel", workoutExerciseModel);
+        startService(updateIntent);
     }
 
     private void setReceiver() {
@@ -443,6 +420,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             if (intent.getAction().equals("workoutEditAction"))
             {
                 initializeRecyclerView();
+                initializeExerciseSpinner();
                 imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 loadingAnim.cancelAnimation();
                 loadingAnim.setVisibility(View.INVISIBLE);
@@ -451,6 +429,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             else if (intent.getAction().equals("workoutAction"))
             {
                 initializeRecyclerView();
+                initializeExerciseSpinner();
                 imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 loadingAnim.cancelAnimation();
                 loadingAnim.setVisibility(View.INVISIBLE);
@@ -459,6 +438,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             else if (intent.getAction().equals("errorWorkoutAction"))
             {
                 initializeRecyclerView();
+                initializeExerciseSpinner();
                 imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 loadingAnim.cancelAnimation();
                 loadingAnim.setVisibility(View.INVISIBLE);
@@ -466,6 +446,7 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             }
             else if (intent.getAction().equals("exerciseAction"))
             {
+                initializeExerciseSpinner();
                 initializeExerciseSpinner();
                 imageViewSrcId = R.drawable.ic_checked_green_48dp;
                 loadingAnim.cancelAnimation();
@@ -490,9 +471,9 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         if (savedInstanceState != null)
         {
             routineModels = savedInstanceState.getParcelableArrayList("routineModels");
+            spinnerExerciseModels = savedInstanceState.getParcelableArrayList("spinnerExerciseModels");
             exerciseDialog = savedInstanceState.getParcelable("exerciseDialog");
             workoutEditDialog = savedInstanceState.getParcelable("workoutEditDialog");
-            spinnerExerciseModels = savedInstanceState.getParcelableArrayList("spinnerExerciseModels");
         }
     }
 

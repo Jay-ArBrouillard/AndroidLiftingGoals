@@ -28,7 +28,8 @@ else //Username doesn't exist
 
     if ($stmt->execute() == TRUE)
     {
-      echo "success";
+      $id = $conn->insert_id;
+      echo strval($id);;
     }
     else {
       echo "error";

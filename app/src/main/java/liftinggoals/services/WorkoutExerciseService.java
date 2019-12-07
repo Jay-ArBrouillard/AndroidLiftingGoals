@@ -26,10 +26,8 @@ import liftinggoals.models.WorkoutExerciseModel;
 public class WorkoutExerciseService extends IntentService {
     private static final String TAG = "WorkoutExerciseService";
     private RequestQueue queue;
-    private int workoutId;
-    private int exerciseId;
-    private int numExercises;
     private WorkoutExerciseModel workoutExerciseModel;
+    private int numExercises;
 
     public WorkoutExerciseService() {
         super(TAG);
@@ -40,10 +38,17 @@ public class WorkoutExerciseService extends IntentService {
         if (intent != null)
         {
             queue = Volley.newRequestQueue(getApplicationContext());
-            workoutId = intent.getIntExtra("workoutId", -1);
-            exerciseId =  intent.getIntExtra("exerciseId", -1);
-            numExercises = intent.getIntExtra("numExercises", -1);
             workoutExerciseModel = intent.getParcelableExtra("workoutExerciseModel");
+            if (workoutExerciseModel == null) { workoutExerciseModel = new WorkoutExerciseModel(); }
+            if (intent.hasExtra("workoutId"))
+            {
+                workoutExerciseModel.setWorkoutId(intent.getIntExtra("workoutId", -1));
+            }
+            if (intent.hasExtra("exerciseId"))
+            {
+                workoutExerciseModel.setExerciseId(intent.getIntExtra("exerciseId", -1));
+            }
+            numExercises = intent.getIntExtra("numExercises", -1);
 
             String type = intent.getStringExtra("type");
             if (type.equals("insert"))
@@ -141,7 +146,7 @@ public class WorkoutExerciseService extends IntentService {
         final DatabaseHelper db = new DatabaseHelper(getApplicationContext());
         db.openDB();
 
-        String url = String.format("http://3.221.56.60/insertWorkoutExercise.php?workoutId=%s&exerciseId=%s", Integer.toString(workoutId), Integer.toString(exerciseId));
+        String url = String.format("http://3.221.56.60/insertWorkoutExercise.php?workoutId=%s&exerciseId=%s", Integer.toString(workoutExerciseModel.getWorkoutId()), Integer.toString(workoutExerciseModel.getExerciseId()));
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -152,8 +157,8 @@ public class WorkoutExerciseService extends IntentService {
                 else
                 {
                     int workoutExerciseId = Integer.parseInt(response.trim());
-                    db.insertWorkoutExercise(workoutExerciseId, workoutId, exerciseId, 0,0,0,0,0);
-                    db.updateWorkoutNumExercises(workoutId, numExercises);
+                    db.insertWorkoutExercise(workoutExerciseId, workoutExerciseModel.getWorkoutId(), workoutExerciseModel.getExerciseId(), 0,0,0,0,0);
+                    db.updateWorkoutNumExercises(workoutExerciseModel.getWorkoutId(), numExercises);
                     Toast.makeText(getApplicationContext(), "Successfully added workout exercise", Toast.LENGTH_LONG).show();
                 }
                 db.closeDB();

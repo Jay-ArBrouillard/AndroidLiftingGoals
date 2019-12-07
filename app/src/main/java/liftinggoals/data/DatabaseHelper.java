@@ -22,7 +22,7 @@ import liftinggoals.models.WorkoutModel;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "liftingGoals.db";
-    public static final int DATABASE_VERSION = 231;
+    public static final int DATABASE_VERSION = 235;
 
     public SQLiteDatabase myDB;
 
@@ -499,7 +499,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     ///////////////////////////////////USER METHODS ///////////////////////////////////////////////
 
-    public long insertUser(String username, String password, int isAdmin, String lastLogin)
+    public long insertUser(int userId, String username, String password, int isAdmin, String lastLogin)
     {
         return UserTable.insert(myDB, username, password, isAdmin, lastLogin);
     }

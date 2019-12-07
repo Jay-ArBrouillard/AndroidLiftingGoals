@@ -164,9 +164,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Date date = new Date();
                                 if (user == null)
                                 {
-                                    sdhakldhsad
-                                            //Change insertUser to insert userId from Remote
-                                    db.insertUser(userNameInput, passwordInput, 0, formatter.format(date));
+                                    db.insertUser(Integer.parseInt(userId), userNameInput, passwordInput, 0, formatter.format(date));
                                 }
                                 else
                                 {
@@ -241,27 +239,35 @@ public class LoginActivity extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest (Request.Method.GET, url, new
                 Response.Listener<String>() {
                     public void onResponse(String response) {
-                        if (response.equals("success"))
+                        if (response.equals("UserExists"))
+                        {
+                            loadToast.error();
+                            Toast.makeText(getApplicationContext(), "Username \"" + userNameInput + "\" already exists!", Toast.LENGTH_LONG).show();
+                        }
+                        else if (response.equals("error"))
+                        {
+                            loadToast.error();
+                            Toast.makeText(getApplicationContext(), "Error registering", Toast.LENGTH_LONG).show();
+                        }
+                        else
                         {
                             //Register on local Database
                             if (db.getUser(userNameInput,passwordInput) == null)
                             {
-                                db.insertUser(userNameInput, passwordInput, 0, null);
+                                int userId = Integer.parseInt(response);
+                                if (userId == 1)
+                                {
+                                    db.insertUser(Integer.parseInt(response), userNameInput, passwordInput, 1, null);
+                                }
+                                else
+                                {
+                                    db.insertUser(Integer.parseInt(response), userNameInput, passwordInput, 0, null);
+                                }
                             }
                             //End register on local Database
 
                             loadToast.success();
                             Toast.makeText(getApplicationContext(), "Successfully registered " + userNameInput, Toast.LENGTH_LONG).show();
-                        }
-                        else if (response.equals("UserExists"))
-                        {
-                            loadToast.error();
-                            Toast.makeText(getApplicationContext(), "Username \"" + userNameInput + "\" already exists!", Toast.LENGTH_LONG).show();
-                        }
-                        else
-                        {
-                            loadToast.error();
-                            Toast.makeText(getApplicationContext(), "Error registering", Toast.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
