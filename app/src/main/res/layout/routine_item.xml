@@ -23,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
+            android:hint="Untitled Routine"
             android:textSize="20dp"
             android:layout_toRightOf="@+id/folder_icon"
             android:layout_toLeftOf="@+id/edit_icon"/>
@@ -32,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
+            android:hint="Untitled Description"
             android:textColor="@android:color/darker_gray"
             android:layout_below="@id/title_text_view"
             android:layout_toRightOf="@+id/folder_icon"

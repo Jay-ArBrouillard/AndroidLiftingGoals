@@ -58,7 +58,11 @@ public class RoutinesEditActivity extends AppCompatActivity {
         loadingAnim = findViewById(R.id.routine_edit_loading_animation);
         loadingAnim.setVisibility(View.INVISIBLE);
         routineNameEditText = findViewById(R.id.activity_routines_edit_text);
-        routineNameEditText.setText(routineModels.get(selectedRoutineIndex).getRoutineName());
+        String routineName = routineModels.get(selectedRoutineIndex).getRoutineName();
+        if (!routineName.equals("Untitled Routine"))
+        {
+            routineNameEditText.setText(routineName);
+        }
         commitButton = findViewById(R.id.routine_activity_commit_button);
         commitButton.setClickable(false);
         commitButton.setOnClickListener(new View.OnClickListener() {
@@ -126,8 +130,12 @@ public class RoutinesEditActivity extends AppCompatActivity {
         });
 
         routineDescEditText = findViewById(R.id.activity_routines_edit_description_text);
-        routineDescEditText.setText(routineModels.get(selectedRoutineIndex).getRoutineDescription());
-        routineDescUnchanged = routineModels.get(selectedRoutineIndex).getRoutineDescription();
+        String routineDescription = routineModels.get(selectedRoutineIndex).getRoutineDescription();
+        if (!routineDescription.equals("Untitled Description"))
+        {
+            routineDescEditText.setText(routineDescription);
+        }
+        routineDescUnchanged = routineDescription;
         routineDescEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

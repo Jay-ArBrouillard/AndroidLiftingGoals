@@ -63,10 +63,12 @@ public class WorkoutActivity extends AppCompatActivity implements DeleteRoutineD
         SharedPreferences sp = getSharedPreferences("lifting_goals", MODE_PRIVATE);
         userId = sp.getInt("UserId", -1);
         selectedRoutineIndex = sp.getInt("selected_routine_index", -1);
-
         TextView title = findViewById(R.id.fragment_multiple_workout_title);
-        title.setText(routineModels.get(selectedRoutineIndex).getRoutineName());   //Set Workout Title
-
+        String routineName = routineModels.get(selectedRoutineIndex).getRoutineName();
+        if (!routineName.equals("Untitled Routine"))
+        {
+            title.setText(routineName);   //Set Workout Title
+        }
         loadingAnim = findViewById(R.id.routine_workout_loading_animation);
         loadingAnim.setVisibility(View.INVISIBLE);
         loadingAnim.cancelAnimation();

@@ -148,7 +148,7 @@ public class RoutineService extends IntentService {
                     int routineId = Integer.parseInt(ids[0].trim());
                     int userRoutineId = Integer.parseInt(ids[1].trim());
                     int temp = routine.getUserId();
-                    db.insertRoutine(routineId, routine.getUserId(), "Untitled routine", "Untitled Description", 0, 0);
+                    db.insertRoutine(routineId, routine.getUserId(), "Untitled Routine", "Untitled Description", 0, 0);
                     db.insertUserRoutine(userRoutineId, temp, routineId);
                     Toast.makeText(getApplicationContext(), "Successfully added routine", Toast.LENGTH_LONG).show();
                 }

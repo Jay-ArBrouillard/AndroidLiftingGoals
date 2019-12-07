@@ -79,16 +79,25 @@
             android:layout_marginRight="10dp"
             android:background="@android:color/white"
             android:padding="10dp"
-            android:text="Chest Routine"
+            android:hint="Untitled Routine"
             android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/activity_routines_description_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:text="Routine Description"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="20dp"
+            android:layout_above="@+id/activity_routines_edit_description_text"/>
 
         <TextView
             android:id="@+id/activity_routines_edit_description_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:text="Description"
+            android:layout_marginTop="10dp"
             android:textColor="@android:color/darker_gray"
             android:textSize="20dp"
             android:layout_below="@+id/activity_routines_edit_text"/>
@@ -108,7 +117,7 @@
             android:lines="10"
             android:maxLines="10"
             android:paddingLeft="10dp"
-            android:text="abc"
+            android:hint="Untitled Description"
             android:textColor="@android:color/black"
             android:textSize="20dp" />
 

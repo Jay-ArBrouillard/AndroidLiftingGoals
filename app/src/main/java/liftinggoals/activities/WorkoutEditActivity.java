@@ -107,7 +107,10 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
         loadingAnim.setVisibility(View.INVISIBLE);
         loadingAnim.cancelAnimation();
 
-        workoutDescEditText.setText(description);
+        if (!description.equals("Untitled Description"))
+        {
+            workoutDescEditText.setText(description);
+        }
         workoutDescEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -177,7 +180,10 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             }
         });
 
-        durationEditText.setText(duration);
+        if (!duration.equals("0.0"))
+        {
+            durationEditText.setText(duration);
+        }
         durationEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -202,9 +208,10 @@ public class WorkoutEditActivity extends AppCompatActivity implements WorkoutEdi
             }
         });
 
-        ((TextView)findViewById(R.id.edit_routine_name_text_view)).setText(workoutName);
-
-
+        if (!workoutName.equals("Untitled Workout"))
+        {
+            workoutNameEditText.setText(workoutName);
+        }
         workoutNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

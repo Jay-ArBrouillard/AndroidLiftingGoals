@@ -42,7 +42,7 @@ public class IntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-        if (!restorePrefData())
+        if (restorePrefData())
         {
             Intent routineIntent = new Intent(IntroActivity.this, RoutineActivity.class);
             startActivity(routineIntent);
