@@ -111,9 +111,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getLocationPermission();
         initMap();
 
-
-
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
         Places.initialize(MapsActivity.this, getString(R.string.google_maps_key));
         placesClient = Places.createClient(this);
