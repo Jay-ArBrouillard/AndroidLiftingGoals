@@ -56,20 +56,14 @@ public class CreateExerciseDialog extends AppCompatDialogFragment implements Par
         listItems = getResources().getStringArray(R.array.exercise_muscle_groups);
         checkedItems = new boolean[listItems.length];
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme);
         builder.setMultiChoiceItems(listItems, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int position, boolean isChecked) {
-                if (isChecked)
-                {
-                    if (!userItems.contains(listItems[position]))
-                    {
-                        userItems.add(listItems[position]);
-                    }
-                    else
-                    {
-                        userItems.remove(position);
-                    }
+                if(isChecked){
+                    userItems.add(listItems[position]);
+                }else if (userItems.contains(listItems[position])){
+                    userItems.remove(listItems[position]);
                 }
             }
         });

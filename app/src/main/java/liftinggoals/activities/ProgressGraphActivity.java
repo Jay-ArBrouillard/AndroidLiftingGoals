@@ -253,8 +253,6 @@ public class ProgressGraphActivity extends AppCompatActivity {
             String reps = Integer.toString(logModel.getRepsPerformed());
             String intensity = Double.toString(logModel.getIntensity());
 
-
-
             String [] parsed = logModel.getDate().split(", ");
             Date date = null;
             try {
