@@ -109,10 +109,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         rippleBg = findViewById(R.id.ripple_bg);
 
         getLocationPermission();
+        initMap();
 
-        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        mapView = mapFragment.getView();
+
+
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
         Places.initialize(MapsActivity.this, getString(R.string.google_maps_key));
@@ -299,6 +299,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
     }
 
+    private void initMap()
+    {
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        mapView = mapFragment.getView();
+    }
+
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -462,6 +469,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     Log.d("MapsActivity", "onRequestPermissionsResult: permission granted");
                     mLocationPermissionsGranted = true;
+                    initMap();
                 }
             }
         }
